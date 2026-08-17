@@ -1,0 +1,22 @@
+M6 VALIDATION FULL
+
+TDD/CAF chronology:
+1. `32019452922` established the primary RED: install/lint passed; tests failed because M6 implementation was absent.
+2. After implementation, legacy profile-scope regression required restoring the canonical home expression. `32019862966` then passed 39 tests, typecheck and build.
+3. Hosted migration 0006 validated pending signup semantics, inactive-user data lockout, admin-only profile management, last-admin guard and ADMIN adjustment. Rollback left zero fixtures.
+4. Advisor review found two externally-facing authenticated SECURITY DEFINER warnings. This was treated as a hardening finding rather than accepted debt.
+5. `32020057858` established a second valid RED for migration 0007. The migration moved privileged implementations into `private` and recreated public SQL SECURITY INVOKER wrappers with the same external signatures.
+6. Live 0007 application succeeded. Advisor returned zero lints. Post-hardening hosted smoke proved admin activation and inventory adjustment still worked and public `prosecdef=false`.
+7. `32020129985` failed one newly-added static test because a broad regex matched a documentation comment containing the phrase SECURITY DEFINER. The database behavior and function metadata were already correct. The test was narrowed to each public wrapper block; this execution remains NOT PASS.
+8. `32020303906` passed 40 tests, lint, typecheck and build. The remaining harmless lint warning in Supabase SSR cookie adapter was then removed without functional behavior change.
+9. `32020429417` established a final RED for the missing first-ADMIN operational bootstrap document.
+10. `docs/operations/FIRST-ADMIN-BOOTSTRAP.md` was added. `32020498485` passed 41 tests, lint, typecheck and build.
+
+Live security state:
+- `public.register_stock_movement`: SECURITY INVOKER; authenticated execute true; anon/service_role false.
+- `private.register_stock_movement`: SECURITY DEFINER; authenticated execute true; anon/service_role false.
+- `public.admin_update_profile`: SECURITY INVOKER; authenticated execute true; anon/service_role false.
+- `private.admin_update_profile`: SECURITY DEFINER; authenticated execute true; anon/service_role false.
+- Security Advisor: no lints.
+
+Operational bootstrap is intentionally outside the normal app flow only for the first ADMIN in an empty environment. It is owner-only and one-time; subsequent profile management is through `/admin/users`. No privileged key is placed in client/server app configuration or repository docs.

@@ -1,0 +1,36 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M6-ADMIN-HARDENING
+milestone: M6
+risk_class: B
+branch: feature/m6-admin-hardening
+pull_request: 8
+current_state: AGUARDANDO_AUDITORIA_E_GATE
+cycle: 1
+delivered_scope:
+  - pending_self_registration
+  - inactive_user_data_lockout
+  - admin_profile_management
+  - last_admin_protection
+  - adjustment_ui
+  - rpc_security_hardening
+  - first_admin_bootstrap_runbook
+validation:
+  primary_red_ci: 32019452922
+  base_green_ci: 32019862966
+  rpc_red_ci: 32020057858
+  final_green_ci: 32020498485
+  tests: 41/41
+  hosted_security_smoke: PASS
+  post_rpc_hardening_smoke: PASS
+  security_advisor_lints: 0
+  cleanup_zero_residue: true
+  blocking_review_threads: 0
+security:
+  public_rpcs: SECURITY_INVOKER
+  privileged_implementations: PRIVATE_SECURITY_DEFINER
+  application_privileged_secret: NONE
+  first_admin_bootstrap: OWNER_ONLY_ONE_TIME
+next_if_approved:
+  phase_id: PHASE-06-M7-MVP-QUALIFICATION
+  action: Qualificar o MVP completo sem adicionar novo escopo funcional.
+human_action_required: false

@@ -1,0 +1,19 @@
+M6 SMOKE RESULT
+PASS
+
+Hosted database security scenario:
+- new users were created by the trigger as OPERATOR and inactive;
+- inactive identity read zero rows from categories, products, inventory and stock_movements;
+- OPERATOR administrative RPC attempt was rejected;
+- one active ADMIN could not demote itself while it was the last active ADMIN;
+- ADMIN activated the pending OPERATOR;
+- inventory INITIAL 10 followed by ADJUSTMENT 7 with reason produced final quantity 7 and delta -3;
+- rollback left zero test users/products/movements.
+
+Post-RPC-hardening scenario:
+- public SECURITY INVOKER admin wrapper activated a user;
+- public SECURITY INVOKER inventory wrapper registered INITIAL and ADJUSTMENT through private implementations;
+- function metadata confirmed public wrappers are not SECURITY DEFINER;
+- rollback left zero test users.
+
+Supabase Security Advisor after hardening: 0 lints.

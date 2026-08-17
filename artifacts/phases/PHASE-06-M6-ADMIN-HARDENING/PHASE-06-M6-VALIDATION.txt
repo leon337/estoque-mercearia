@@ -1,0 +1,30 @@
+M6 VALIDATION
+
+primary_red_ci=32019452922 VALID_RED
+base_green_ci=32019862966 PASS
+rpc_hardening_red_ci=32020057858 VALID_RED
+rpc_false_positive_ci=32020129985 NOT_PASS_TEST_HARNESS
+post_rpc_green_ci=32020303906 PASS
+first_admin_red_ci=32020429417 VALID_RED
+final_green_ci=32020498485 PASS
+final_tests=41/41 PASS
+npm_ci=PASS
+lint=PASS
+typecheck=PASS
+build=PASS
+hosted_user_admin_security_smoke=PASS
+hosted_post_rpc_hardening_smoke=PASS
+new_user_pending_inactive=PASS
+inactive_operational_read_blocked=PASS
+operator_admin_rpc_blocked=PASS
+last_active_admin_protected=PASS
+admin_activation=PASS
+adjustment_10_to_7_delta_minus_3_reason=PASS
+public_rpcs_security_invoker=PASS
+private_implementations_security_definer=PASS
+anon_rpc_execute=false
+service_role_rpc_execute=false
+security_advisor_lints=0
+cleanup_zero_residue=PASS
+blocking_review_threads=0
+first_admin_bootstrap_documented=PASS

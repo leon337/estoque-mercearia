@@ -47,17 +47,19 @@ jobs:
           LOCAL_URL="${API_URL:-http://127.0.0.1:54321}"
           LOCAL_PUBLISHABLE="${PUBLISHABLE_KEY:-${ANON_KEY:-}}"
           LOCAL_SECRET="${SECRET_KEY:-${SERVICE_ROLE_KEY:-}}"
+          LOCAL_DB="${DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}"
           test -n "$LOCAL_PUBLISHABLE"
           test -n "$LOCAL_SECRET"
           echo "NEXT_PUBLIC_SUPABASE_URL=$LOCAL_URL" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$LOCAL_PUBLISHABLE" >> "$GITHUB_ENV"
           echo "LOCAL_SERVICE_KEY=$LOCAL_SECRET" >> "$GITHUB_ENV"
+          echo "LOCAL_DB_URL=$LOCAL_DB" >> "$GITHUB_ENV"
           echo "ADMIN_EMAIL=m2-admin-${GITHUB_RUN_ID}@test.local" >> "$GITHUB_ENV"
           echo "ADMIN_PASSWORD=M2-Admin-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
           echo "OPERATOR_EMAIL=m2-operator-${GITHUB_RUN_ID}@test.local" >> "$GITHUB_ENV"
           echo "OPERATOR_PASSWORD=M2-Operator-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
 
-      - name: Create local ADMIN and OPERATOR
+      - name: Create local Auth users
         run: |
           node --input-type=module <<'NODE'
           import { createClient } from '@supabase/supabase-js'
@@ -76,29 +78,40 @@ jobs:
               user_metadata: { name },
             })
             if (error || !data.user) throw error ?? new Error(`user creation failed: ${email}`)
-            return data.user.id
           }
 
-          const adminId = await createUser(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD, 'M2 Admin Smoke')
-          const operatorId = await createUser(process.env.OPERATOR_EMAIL, process.env.OPERATOR_PASSWORD, 'M2 Operator Smoke')
-
-          const { error: promoteError } = await admin
-            .from('profiles')
-            .update({ role: 'ADMIN' })
-            .eq('id', adminId)
-          if (promoteError) throw promoteError
-
-          const { data: profiles, error: profileError } = await admin
-            .from('profiles')
-            .select('id, name, role, active')
-            .in('id', [adminId, operatorId])
-          if (profileError) throw profileError
-          if (profiles?.length !== 2) throw new Error('profiles were not created by auth trigger')
-          if (!profiles.some((p) => p.id === adminId && p.role === 'ADMIN' && p.active)) throw new Error('ADMIN profile invalid')
-          if (!profiles.some((p) => p.id === operatorId && p.role === 'OPERATOR' && p.active)) throw new Error('OPERATOR profile invalid')
-
-          console.log('Local auth fixtures ready')
+          await createUser(process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD, 'M2 Admin Smoke')
+          await createUser(process.env.OPERATOR_EMAIL, process.env.OPERATOR_PASSWORD, 'M2 Operator Smoke')
+          console.log('Local Auth users created')
           NODE
+
+      - name: Promote ADMIN fixture and verify profiles in local Postgres
+        run: |
+          psql "$LOCAL_DB_URL" -v ON_ERROR_STOP=1 <<SQL
+          update public.profiles p
+          set role = 'ADMIN'::public.app_role
+          from auth.users u
+          where p.id = u.id and u.email = '$ADMIN_EMAIL';
+
+          do \$\$
+          declare
+            admin_ok boolean;
+            operator_ok boolean;
+          begin
+            select exists(
+              select 1 from public.profiles p join auth.users u on u.id=p.id
+              where u.email='$ADMIN_EMAIL' and p.role='ADMIN'::public.app_role and p.active=true
+            ) into admin_ok;
+            select exists(
+              select 1 from public.profiles p join auth.users u on u.id=p.id
+              where u.email='$OPERATOR_EMAIL' and p.role='OPERATOR'::public.app_role and p.active=true
+            ) into operator_ok;
+            if not admin_ok or not operator_ok then
+              raise exception 'invalid local auth fixtures';
+            end if;
+          end
+          \$\$;
+          SQL
 
       - name: Build application
         run: npm run build

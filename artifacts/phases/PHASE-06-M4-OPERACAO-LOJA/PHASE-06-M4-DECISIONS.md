@@ -9,10 +9,11 @@
 7. O teste M1 de escopo de perfil foi preservado em vez de enfraquecido quando uma refatoração equivalente alterou sua expressão canônica.
 8. Relações Supabase embutidas são normalizadas como array para type safety.
 9. O WARN M3 de SECURITY DEFINER permanece conhecido, intencional e sem agravamento no M4.
-10. M5 inicia automaticamente após gate/merge porque existe autorização contínua M4→M7.
+10. M5 inicia automaticamente após merge porque existe autorização contínua M4→M7.
 
-## Auditoria
-Pendente de Emily.
+## Auditoria independente
+**Emily: APROVADO.** CI e smoke efetivos, zero resíduo e nenhum achado crítico/alto ou thread bloqueante.
 
-## Gate
-Pendente de LÉO.
+## Gate operacional
+**LÉO: APROVAR** → `APROVADO_PARA_INTEGRACAO`.
+Condições finais: manifesto SHA-256, CI verde do HEAD final e zero threads bloqueantes.

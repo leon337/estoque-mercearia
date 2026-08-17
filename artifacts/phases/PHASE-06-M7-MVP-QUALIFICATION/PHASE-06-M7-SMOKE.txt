@@ -1,0 +1,23 @@
+M7 SMOKE RESULT
+PASS
+
+Database acceptance:
+- INITIAL 20, ENTRY 10, EXIT 4 => 26
+- idempotent replay => one ENTRY movement
+- excessive EXIT rejected
+- ADJUSTMENT 26 => 25 with delta -1 and reason
+- role/RLS/last-admin/direct-write controls passed
+- rollback and zero residue
+
+Application HTTP acceptance run 32022300390:
+- hosted password Auth PASS
+- production Next build/start PASS
+- login Server Action PASS
+- authenticated cookie PASS
+- /, /inventory, /movements/new, /history, /admin/users, /admin/adjustment and /products PASS
+- logout Server Action PASS
+- session invalidation PASS
+
+Final Security Advisor: 0 lints.
+Temporary HTTP fixture/workflow: removed; zero residue.
+Public release: NOT PERFORMED.

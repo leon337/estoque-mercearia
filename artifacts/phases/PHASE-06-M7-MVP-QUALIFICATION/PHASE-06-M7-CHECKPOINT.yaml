@@ -1,0 +1,42 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M7-MVP-QUALIFICATION
+milestone: M7
+risk_class: B
+branch: feature/m7-mvp-qualification
+pull_request: 9
+current_state: MVP_PRONTO_VALIDADO_PARA_INTEGRACAO
+cycle: 1
+qualification:
+  red_ci: 32021317175
+  docs_green_ci: 32021459931
+  prf_ci: 32022615896
+  full_hosted_acceptance: PASS
+  canonical_balance_20_10_4: 26
+  adjustment_final_balance: 25
+  http_final_run: 32022300390
+  hosted_auth: PASS
+  server_action_login: PASS
+  protected_routes: PASS
+  server_action_logout: PASS
+  cleanup_zero_residue: true
+  security_advisor_lints: 0
+operations:
+  mvp_runbook: PRESENT
+  first_admin_bootstrap: PRESENT
+  backup_restore_runbook: PRESENT
+  acceptance_checklist: PRESENT
+audit:
+  Emily: APROVADO
+  blocking_findings: 0
+gate:
+  Leo: APROVAR
+  decision_state: MVP_PRONTO_VALIDADO
+  conditions:
+    - final_prf_manifest_sha256
+    - final_ci_green
+    - no_blocking_review_threads
+release:
+  public_release_performed: false
+  human_gate_required_for_public_release: true
+terminal_if_merged: MVP_PRONTO_VALIDADO
+human_action_required: false

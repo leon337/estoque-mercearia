@@ -30,7 +30,7 @@ jobs:
             -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
             -H 'Content-Type: application/json' \
             --data "{\"email\":\"$FIXTURE_EMAIL\",\"password\":\"$FIXTURE_PASSWORD\"}")
-          cat /tmp/auth.json | python -c 'import json,sys; d=json.load(sys.stdin); assert d.get("access_token"), d'
+          python -c 'import json; d=json.load(open("/tmp/auth.json")); assert d.get("access_token"), d'
           test "$CODE" = "200"
 
       - name: Build and start Next.js
@@ -56,19 +56,32 @@ jobs:
           print(match.group(1))
           PY
           )
-          CODE=$(curl -sS -L -o /tmp/after-login.html -w '%{http_code}' \
+          CODE=$(curl -sS -o /tmp/action-body.html -D /tmp/action-headers.txt -w '%{http_code}' \
             -c /tmp/cookies.txt -b /tmp/cookies.txt \
+            -H 'Origin: http://127.0.0.1:3000' \
+            -H 'Referer: http://127.0.0.1:3000/login' \
             --data-urlencode "$ACTION=" \
             --data-urlencode "email=$FIXTURE_EMAIL" \
             --data-urlencode "password=$FIXTURE_PASSWORD" \
             http://127.0.0.1:3000/login)
+          echo "Server Action status: $CODE"
+          cat /tmp/action-headers.txt
+          test "$CODE" = "303"
+          LOCATION=$(python - <<'PY'
+          import re
+          text=open('/tmp/action-headers.txt',encoding='utf-8').read()
+          m=re.search(r'(?im)^location:\s*(\S+)',text)
+          if not m: raise SystemExit('redirect location missing')
+          print(m.group(1))
+          PY
+          )
+          test "$LOCATION" = "/"
+          CODE=$(curl -sS -o /tmp/after-login.html -w '%{http_code}' \
+            -c /tmp/cookies.txt -b /tmp/cookies.txt \
+            http://127.0.0.1:3000/)
           test "$CODE" = "200"
           grep -q 'Estoque Mercearia' /tmp/after-login.html
-          if grep -q 'Entrar' /tmp/after-login.html; then
-            echo 'Login remained on login page'
-            cat /tmp/next.log
-            exit 1
-          fi
+          ! grep -q '>Entrar<' /tmp/after-login.html
 
       - name: Verify protected MVP routes with session cookie
         run: |
@@ -89,6 +102,12 @@ jobs:
           test "$code" = "200"
           grep -q 'M7-HTTP-001' /tmp/products.html
 
-      - name: Show server log on failure
+      - name: Show diagnostics on failure
         if: failure()
-        run: cat /tmp/next.log || true
+        run: |
+          echo '--- Next log ---'
+          cat /tmp/next.log || true
+          echo '--- Action headers ---'
+          cat /tmp/action-headers.txt || true
+          echo '--- Action body ---'
+          head -c 4000 /tmp/action-body.html || true

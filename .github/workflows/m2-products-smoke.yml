@@ -1,0 +1,245 @@
+name: M2 Products Smoke
+
+on:
+  push:
+    branches:
+      - feature/m2-products
+
+permissions:
+  contents: read
+
+jobs:
+  products-smoke:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://exwtngpwqgkrkoszpgib.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_dXdPZQclAr5u7yskNNmHhw_AhtmW81_
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Define temporary admin
+        run: |
+          echo "SMOKE_EMAIL=m2-admin-${GITHUB_RUN_ID}@gmail.com" >> "$GITHUB_ENV"
+          echo "SMOKE_PASSWORD=M2-Admin-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
+
+      - name: Ensure temporary account exists and is confirmed
+        run: |
+          RESPONSE=$(curl -sS \
+            -X POST "$NEXT_PUBLIC_SUPABASE_URL/auth/v1/token?grant_type=password" \
+            -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
+            -H "Content-Type: application/json" \
+            --data "{\"email\":\"$SMOKE_EMAIL\",\"password\":\"$SMOKE_PASSWORD\"}")
+          TOKEN=$(jq -r '.access_token // empty' <<< "$RESPONSE")
+          if [ -n "$TOKEN" ]; then
+            echo "Temporary account ready"
+            exit 0
+          fi
+
+          ERROR=$(jq -r '.error_description // .msg // .message // .error // "unknown"' <<< "$RESPONSE")
+          if [[ "$ERROR" == *"Email not confirmed"* ]]; then
+            echo "ACCOUNT_STATE=needs_confirmation"
+            exit 43
+          fi
+
+          SIGNUP=$(curl -sS \
+            -X POST "$NEXT_PUBLIC_SUPABASE_URL/auth/v1/signup" \
+            -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
+            -H "Content-Type: application/json" \
+            --data "{\"email\":\"$SMOKE_EMAIL\",\"password\":\"$SMOKE_PASSWORD\",\"data\":{\"name\":\"M2 Admin Smoke\"}}")
+          SIGNUP_ERROR=$(jq -r '.error_description // .msg // .message // empty' <<< "$SIGNUP")
+          if [ -n "$SIGNUP_ERROR" ]; then
+            echo "SIGNUP_ERROR=$SIGNUP_ERROR"
+            exit 44
+          fi
+          echo "ACCOUNT_STATE=created_needs_confirmation"
+          echo "SMOKE_EMAIL=$SMOKE_EMAIL"
+          exit 42
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: |
+          npm run start -- -H 127.0.0.1 -p 3000 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/login >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/next.log
+          exit 45
+
+      - name: Login as ADMIN through Next.js
+        run: |
+          curl -sS -c /tmp/cookies.txt http://127.0.0.1:3000/login -o /tmp/login.html
+          ACTION_FIELD=$(grep -o '\$ACTION_ID_[^" ]*' /tmp/login.html | head -n 1)
+          test -n "$ACTION_FIELD"
+          curl -sS -D /tmp/login.headers -o /tmp/login.response \
+            -c /tmp/cookies.txt -b /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" -F "email=$SMOKE_EMAIL" -F "password=$SMOKE_PASSWORD" \
+            http://127.0.0.1:3000/login >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/login.headers | tail -n 1)
+          echo "login_location=$LOCATION"
+          [ "$LOCATION" = "/" ]
+          curl -fsS -L -b /tmp/cookies.txt -c /tmp/cookies.txt http://127.0.0.1:3000/ -o /tmp/home.html
+          grep -q 'M2 Admin Smoke' /tmp/home.html
+          grep -q 'ADMIN' /tmp/home.html
+          grep -q 'Produtos' /tmp/home.html
+
+      - name: Create category through Server Action
+        run: |
+          curl -fsS -b /tmp/cookies.txt -c /tmp/cookies.txt http://127.0.0.1:3000/products -o /tmp/products.html
+          ACTION_FIELD=$(python3 - <<'PY'
+          import re
+          html=open('/tmp/products.html').read()
+          for form in re.findall(r'<form[^>]*>(.*?)</form>', html, re.S):
+              if 'name="category_name"' in form:
+                  m=re.search(r'name="(\$ACTION_ID_[^"]+)"', form)
+                  if m:
+                      print(m.group(1)); break
+          PY
+          )
+          test -n "$ACTION_FIELD"
+          curl -sS -D /tmp/category.headers -o /tmp/category.response \
+            -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" -F 'category_name=M2 Smoke Category' \
+            http://127.0.0.1:3000/products >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/category.headers | tail -n 1)
+          echo "category_location=$LOCATION"
+          [[ "$LOCATION" == *"success=category_created"* ]]
+
+      - name: Create product through Server Action
+        run: |
+          curl -fsS -b /tmp/cookies.txt -c /tmp/cookies.txt http://127.0.0.1:3000/products/new -o /tmp/new.html
+          CATEGORY_ID=$(python3 - <<'PY'
+          import re
+          html=open('/tmp/new.html').read()
+          m=re.search(r'<option value="([^"]+)">M2 Smoke Category</option>', html)
+          print(m.group(1) if m else '')
+          PY
+          )
+          ACTION_FIELD=$(python3 - <<'PY'
+          import re
+          html=open('/tmp/new.html').read()
+          for form in re.findall(r'<form[^>]*>(.*?)</form>', html, re.S):
+              if 'name="internal_code"' in form:
+                  m=re.search(r'name="(\$ACTION_ID_[^"]+)"', form)
+                  if m:
+                      print(m.group(1)); break
+          PY
+          )
+          test -n "$CATEGORY_ID"
+          test -n "$ACTION_FIELD"
+          echo "CATEGORY_ID=$CATEGORY_ID" >> "$GITHUB_ENV"
+          curl -sS -D /tmp/create.headers -o /tmp/create.response \
+            -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" \
+            -F 'internal_code=M2-SMOKE-001' \
+            -F 'barcode=' \
+            -F 'name=M2 Café Smoke' \
+            -F "category_id=$CATEGORY_ID" \
+            -F 'unit=un' \
+            -F 'minimum_stock=7' \
+            http://127.0.0.1:3000/products/new >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/create.headers | tail -n 1)
+          echo "create_location=$LOCATION"
+          [[ "$LOCATION" == *"success=created"* ]]
+
+      - name: Search and edit product
+        run: |
+          curl -fsS -G -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            --data-urlencode 'q=M2-SMOKE-001' http://127.0.0.1:3000/products -o /tmp/search.html
+          grep -q 'M2 Café Smoke' /tmp/search.html
+          grep -q 'M2 Smoke Category' /tmp/search.html
+          grep -q '7' /tmp/search.html
+          EDIT_PATH=$(grep -o '/products/[0-9a-f-]\+/edit' /tmp/search.html | head -n 1)
+          test -n "$EDIT_PATH"
+          echo "EDIT_PATH=$EDIT_PATH" >> "$GITHUB_ENV"
+          curl -fsS -b /tmp/cookies.txt -c /tmp/cookies.txt "http://127.0.0.1:3000$EDIT_PATH" -o /tmp/edit.html
+          ACTION_FIELD=$(python3 - <<'PY'
+          import re
+          html=open('/tmp/edit.html').read()
+          for form in re.findall(r'<form[^>]*>(.*?)</form>', html, re.S):
+              if 'name="internal_code"' in form:
+                  m=re.search(r'name="(\$ACTION_ID_[^"]+)"', form)
+                  if m:
+                      print(m.group(1)); break
+          PY
+          )
+          PRODUCT_ID=$(basename "$(dirname "$EDIT_PATH")")
+          test -n "$ACTION_FIELD"
+          curl -sS -D /tmp/update.headers -o /tmp/update.response \
+            -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" -F "id=$PRODUCT_ID" \
+            -F 'internal_code=M2-SMOKE-001' -F 'barcode=' \
+            -F 'name=M2 Café Smoke Atualizado' -F "category_id=$CATEGORY_ID" \
+            -F 'unit=UN' -F 'minimum_stock=9' \
+            "http://127.0.0.1:3000$EDIT_PATH" >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/update.headers | tail -n 1)
+          [[ "$LOCATION" == *"success=updated"* ]]
+          echo "PRODUCT_ID=$PRODUCT_ID" >> "$GITHUB_ENV"
+
+      - name: Block category deactivation while active product uses it
+        run: |
+          curl -fsS -b /tmp/cookies.txt -c /tmp/cookies.txt http://127.0.0.1:3000/products -o /tmp/products2.html
+          ACTION_FIELD=$(python3 - <<'PY'
+          import os,re
+          html=open('/tmp/products2.html').read()
+          cid=os.environ['CATEGORY_ID']
+          for form in re.findall(r'<form[^>]*>(.*?)</form>', html, re.S):
+              if f'name="id" type="hidden" value="{cid}"' in form and 'name="next_active"' in form:
+                  m=re.search(r'name="(\$ACTION_ID_[^"]+)"', form)
+                  if m:
+                      print(m.group(1)); break
+          PY
+          )
+          test -n "$ACTION_FIELD"
+          curl -sS -D /tmp/category-block.headers -o /tmp/category-block.response \
+            -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" -F "id=$CATEGORY_ID" -F 'next_active=false' \
+            http://127.0.0.1:3000/products >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/category-block.headers | tail -n 1)
+          echo "category_block_location=$LOCATION"
+          [[ "$LOCATION" == *"error=category_in_use"* ]]
+
+      - name: Inactivate product through edit Server Action
+        run: |
+          curl -fsS -b /tmp/cookies.txt -c /tmp/cookies.txt "http://127.0.0.1:3000$EDIT_PATH" -o /tmp/edit2.html
+          ACTION_FIELD=$(python3 - <<'PY'
+          import re
+          html=open('/tmp/edit2.html').read()
+          for form in re.findall(r'<form[^>]*>(.*?)</form>', html, re.S):
+              if 'name="next_active"' in form and 'name="id"' in form:
+                  m=re.search(r'name="(\$ACTION_ID_[^"]+)"', form)
+                  if m:
+                      print(m.group(1)); break
+          PY
+          )
+          test -n "$ACTION_FIELD"
+          curl -sS -D /tmp/toggle.headers -o /tmp/toggle.response \
+            -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            -F "$ACTION_FIELD=" -F "id=$PRODUCT_ID" -F 'next_active=false' \
+            "http://127.0.0.1:3000$EDIT_PATH" >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/toggle.headers | tail -n 1)
+          [[ "$LOCATION" == *"success=deactivated"* ]]
+          curl -fsS -G -b /tmp/cookies.txt -c /tmp/cookies.txt \
+            --data-urlencode 'q=M2-SMOKE-001' --data-urlencode 'status=inactive' \
+            http://127.0.0.1:3000/products -o /tmp/inactive.html
+          grep -q 'M2 Café Smoke Atualizado' /tmp/inactive.html
+          grep -q 'Inativo' /tmp/inactive.html
+          grep -q '9' /tmp/inactive.html
+
+      - name: Dump server log on failure
+        if: failure()
+        run: cat /tmp/next.log || true

@@ -1,0 +1,31 @@
+PHASE-06 / M2 SMOKE
+
+HOSTED_DB_RLS_CONSTRAINT_SMOKE=PASS
+NEXTJS_BUILD_SMOKE=PASS
+FULL_PRODUCTS_UI_E2E=INCONCLUSIVE_NOT_PASS
+
+HOSTED_EMAIL_ATTEMPT:
+- run=32006118469
+- result=BLOCKED_EMAIL_RATE_LIMIT
+- user_created=0
+
+LOCAL_ATTEMPTS:
+- run=32006407847
+  result=FIXTURE_PROMOTION_HARNESS_FAILURE
+- run=32006686553
+  rerun_job=95318250145
+  result=LOCAL_SESSION_PROFILE_HARNESS_FAILURE
+- run=32007259482
+  result=LOCAL_SESSION_PROFILE_HARNESS_FAILURE
+
+EVIDENCE_ACCEPTED:
+- migration hosted aplicada;
+- RLS ADMIN/OPERATOR validado;
+- unique/check constraints validados;
+- fixtures hospedados removidos;
+- Server Actions cobertos por testes;
+- Next.js build final PASS;
+- Auth/SSR hospedado do M1 não foi alterado.
+
+RULE:
+Nenhuma tentativa local acima é contabilizada como PASS funcional.

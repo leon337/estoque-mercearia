@@ -64,18 +64,8 @@ jobs:
             -F "email=$FIXTURE_EMAIL" \
             -F "password=$FIXTURE_PASSWORD" \
             http://127.0.0.1:3000/login)
-          echo "Server Action status: $CODE"
-          cat /tmp/action-headers.txt
           test "$CODE" = "303"
-          LOCATION=$(python - <<'PY'
-          import re
-          text=open('/tmp/action-headers.txt',encoding='utf-8').read()
-          m=re.search(r'(?im)^location:\s*(\S+)',text)
-          if not m: raise SystemExit('redirect location missing')
-          print(m.group(1))
-          PY
-          )
-          test "$LOCATION" = "/"
+          grep -qi '^location: /' /tmp/action-headers.txt
           CODE=$(curl -sS -o /tmp/after-login.html -w '%{http_code}' \
             -c /tmp/cookies.txt -b /tmp/cookies.txt \
             http://127.0.0.1:3000/)
@@ -102,12 +92,38 @@ jobs:
           test "$code" = "200"
           grep -q 'M7-HTTP-001' /tmp/products.html
 
+      - name: Logout through Next Server Action
+        run: |
+          curl -fsS -b /tmp/cookies.txt http://127.0.0.1:3000/ > /tmp/home.html
+          ACTION=$(python - <<'PY'
+          import re
+          html=open('/tmp/home.html',encoding='utf-8').read()
+          matches=re.findall(r'name="(\$ACTION_ID_[^"]+)"',html)
+          if not matches:
+              raise SystemExit('logout server action field not found')
+          print(matches[-1])
+          PY
+          )
+          CODE=$(curl -sS -o /tmp/logout-body.html -D /tmp/logout-headers.txt -w '%{http_code}' \
+            -c /tmp/cookies.txt -b /tmp/cookies.txt \
+            -H 'Origin: http://127.0.0.1:3000' \
+            -H 'Referer: http://127.0.0.1:3000/' \
+            -F "$ACTION=" \
+            http://127.0.0.1:3000/)
+          test "$CODE" = "303"
+          grep -qi '^location: /login' /tmp/logout-headers.txt
+          CODE=$(curl -sS -L -o /tmp/after-logout.html -w '%{http_code}' \
+            -c /tmp/cookies.txt -b /tmp/cookies.txt \
+            http://127.0.0.1:3000/)
+          test "$CODE" = "200"
+          grep -q '>Entrar<' /tmp/after-logout.html
+
       - name: Show diagnostics on failure
         if: failure()
         run: |
           echo '--- Next log ---'
           cat /tmp/next.log || true
-          echo '--- Action headers ---'
+          echo '--- Login action headers ---'
           cat /tmp/action-headers.txt || true
-          echo '--- Action body ---'
-          head -c 4000 /tmp/action-body.html || true
+          echo '--- Logout headers ---'
+          cat /tmp/logout-headers.txt || true

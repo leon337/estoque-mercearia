@@ -1,0 +1,29 @@
+PHASE-07 PUBLIC SMOKE
+
+Endpoint:
+https://estoque-mercearia.onrender.com
+
+First attempt:
+- /login => PASS
+- /register => FAIL (HTTP 307)
+- result => NOT PASS; release blocked
+
+Final application:
+- commit: bf8eac22574ba12c0e16a80b432bb3d48fa7d742
+- Render deploy: dep-da1f47m1egvs73a61ri0
+- status: LIVE
+
+Final attempt:
+- workflow run: 32025396201 (rerun after final deployment)
+- login page is public => PASS
+- registration page is public => PASS
+- / => redirects anonymous user to /login => PASS
+- /inventory => redirects anonymous user to /login => PASS
+- /products => redirects anonymous user to /login => PASS
+- /movements/new => redirects anonymous user to /login => PASS
+- /history => redirects anonymous user to /login => PASS
+- /admin/users => redirects anonymous user to /login => PASS
+- /admin/adjustment => redirects anonymous user to /login => PASS
+- final endpoint health request => PASS
+
+Result: PASS

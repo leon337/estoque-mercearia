@@ -12,7 +12,7 @@
 10. M7 inicia automaticamente após gate/merge e serve somente para qualificação/fechamento do MVP.
 
 ## Auditoria
-Pendente de Emily.
+**Emily: APROVADO.** CI e smokes verdes, Security Advisor `0 lints`, zero resíduos e nenhum achado bloqueante.
 
 ## Gate
-Pendente de LÉO.
+**LÉO: APROVAR** → `APROVADO_PARA_INTEGRACAO` após manifesto SHA-256, CI final e zero threads bloqueantes.

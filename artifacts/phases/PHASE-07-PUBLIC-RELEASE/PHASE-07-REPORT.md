@@ -69,6 +69,8 @@ The same external smoke that previously failed was rerun unchanged and passed.
 
 The service runs on a free hosting plan. Availability, cold-start behavior, and provider limits remain platform-level operational risks, not integrity or authorization failures. Backup/restore and first-admin procedures remain those qualified in M7.
 
-## Release status before audit
+## Audit and gate
 
-`AGUARDANDO_AUDITORIA_E_GATE`
+- Emily independent audit: **APROVADO**
+- LÉO final gate: **APROVAR**
+- terminal state: **ENTREGUE**

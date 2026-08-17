@@ -30,6 +30,10 @@ function movementType(value: string | undefined, isAdmin: boolean): MovementType
   return "ENTRY";
 }
 
+function inventoryQuantity(inventory: { quantity: unknown }[] | null) {
+  return Number(inventory?.[0]?.quantity ?? 0);
+}
+
 export default async function NewMovementPage({
   searchParams,
 }: {
@@ -71,7 +75,7 @@ export default async function NewMovementPage({
     internalCode: product.internal_code,
     name: product.name,
     unit: product.unit,
-    currentQuantity: Number(product.inventory?.quantity ?? 0),
+    currentQuantity: inventoryQuantity(product.inventory),
   }));
 
   return (

@@ -1,0 +1,58 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M3-ESTOQUE-CORE
+milestone: M3
+title: Núcleo de Estoque
+risk_class: B
+branch: feature/m3-inventory-core
+pull_request: 5
+current_state: APROVADO_PARA_INTEGRACAO_COM_RESSALVA
+cycle: 1
+
+delivered_scope:
+  - inventory_balance
+  - stock_movements_append_only
+  - initial
+  - entry
+  - exit
+  - adjustment
+  - atomic_rpc
+  - row_lock
+  - idempotency
+  - negative_stock_block
+  - session_actor
+  - rls_and_least_privilege
+  - owner_only_controlled_maintenance
+
+validation:
+  ci_green_before_prf: 32011673779
+  ci_prf_pre_audit: 32012086344
+  hosted_functional: PASS
+  concurrency_non_oversell: PASS
+  concurrency_exact_second_status: INCONCLUSIVE
+  http_concurrency_smoke: INCONCLUSIVE
+  security_critical_high: 0
+  security_warn_expected: 1
+  cleanup_zero_residue: true
+
+reservations:
+  - Exact textual status of the rejected concurrent request was not preserved because the harness compared PostgreSQL boolean text incorrectly.
+  - Hosted HTTP concurrency smoke stopped at Auth before RPC and is not counted as PASS.
+  - Security Advisor WARN for authenticated SECURITY DEFINER RPC is intentional and mitigated.
+
+audit:
+  Emily: APROVADO_COM_RESSALVA
+  blocking_findings: 0
+
+gate:
+  Leo: APROVAR_COM_RESSALVA
+  decision_state: APROVADO_PARA_INTEGRACAO_COM_RESSALVA
+  conditions:
+    - final_prf_manifest_sha256
+    - final_ci_green
+    - no_blocking_review_threads
+
+next_if_merged:
+  phase_id: PHASE-06-M4-OPERACAO-LOJA
+  action: Implementar interface operacional de entrada e saída usando o RPC aprovado.
+
+human_action_required: false

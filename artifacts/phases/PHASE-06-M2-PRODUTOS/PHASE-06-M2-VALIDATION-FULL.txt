@@ -1,0 +1,66 @@
+PHASE-06 / M2 VALIDATION FULL
+
+1. Planejamento
+- Classe B / SCOPED_WRITE.
+- Plano aprovado antes da escrita produtiva.
+- Escopo limitado a categorias e produtos.
+
+2. RED inicial
+- commit `3808ecbb6705dc3d1fc5d8884004b339b897174e`.
+- run `32005141108`.
+- testes anteriores passaram; cinco critérios M2 falharam pela ausência dos arquivos esperados.
+
+3. GREEN inicial
+- commit `1daf9016651de4c75396ee6b2a51740b0f847acd`.
+- run `32005478465`.
+- npm ci, lint, 14 testes, typecheck e build = PASS.
+
+4. Banco hospedado
+- migration `20260817072340 / products`.
+- RLS habilitado em categories/products.
+- OPERATOR write bloqueado por `42501`.
+- ADMIN insert/update comprovados.
+- duplicidade de internal_code normalizado -> `23505`.
+- minimum_stock negativo -> `23514`.
+- barcode duplicado -> `23505`.
+- inativo oculto ao OPERATOR.
+- alteração tentada por OPERATOR não modificou linha.
+- cleanup: produtos/categorias/perfis/users fixtures = 0.
+
+5. Primeira regressão
+- achado: categoria poderia ser inativada enquanto produto ativo a usava e formulário manipulado poderia selecionar categoria inativa.
+- RED commit `e4b0019649c74cb5b970e869e0c1085fc01c2016`.
+- run `32005884754` falhou em testes como esperado.
+- fix commit `07f96d7b5914adcbdf310a147870a0a7ee47fcbf`.
+- run `32005950199`: PASS.
+
+6. Smoke hospedado
+- run `32006118469`.
+- signup bloqueado por `email rate limit exceeded`.
+- banco confirmou zero usuário criado.
+- classificado como dependência externa do harness, não falha do M2.
+
+7. Smoke local
+- run `32006407847`: stack/migrations subiram; criação Auth funcionou; promoção ADMIN via Data API local não tinha permissão.
+- run `32006686553`: tentativa inicial colidiu na porta Mailpit 54324; rerun job `95318250145` subiu stack, criou/promoveu fixtures e buildou app; login redirecionou para `error=inactive`.
+- run `32007259482`: nova tentativa com chave anon JWT local repetiu comportamento de login/perfil.
+- nenhuma dessas execuções foi marcada como PASS funcional.
+
+8. Segunda regressão
+- achado: reativação de produto não validava se sua categoria permanecia ativa; mensagens de categoria eram genéricas.
+- RED commit `859420eae19ae9114d1385e06063e5030e260f53`.
+- run `32007530229`: install/lint PASS; tests FAIL; typecheck/build skipped.
+- fix commit `c932a26ac2bd80d6ab3dbbb230f21b3434b2aff0`.
+- reativação agora consulta category_id e exige categoria ativa.
+- interface explica categoria inativa e categoria usada por produto ativo.
+- run `32007742548`: npm ci, lint, tests, typecheck, build PASS.
+
+9. Segurança final
+- Supabase Security Advisor: zero lints.
+- nenhuma policy DELETE.
+- ações de escrita exigem ADMIN na aplicação e RLS também restringe escrita a ADMIN.
+- sem segredo administrativo versionado.
+
+10. Limitação residual
+- E2E completo de escrita pela UI não foi concluído por limitações do harness Auth local/SMTP hospedado.
+- risco mitigado por validação hospedada de DB/RLS/constraints, TDD dos Server Actions, build verde e Auth/SSR hospedado já validado no M1.

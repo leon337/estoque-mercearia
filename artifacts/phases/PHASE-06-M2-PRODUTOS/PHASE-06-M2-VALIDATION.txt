@@ -1,0 +1,33 @@
+PHASE-06 / M2 VALIDATION
+
+IMPLEMENTATION_HEAD=c932a26ac2bd80d6ab3dbbb230f21b3434b2aff0
+PR=4
+
+INITIAL_RED_RUN=32005141108
+INITIAL_GREEN_RUN=32005478465
+CATEGORY_CONSISTENCY_RED_RUN=32005884754
+CATEGORY_CONSISTENCY_GREEN_RUN=32005950199
+REACTIVATION_UX_RED_RUN=32007530229
+FINAL_GREEN_RUN=32007742548
+
+FINAL_CI:
+- npm_ci=PASS
+- lint=PASS
+- tests=PASS
+- typecheck=PASS
+- build=PASS
+
+HOSTED_SUPABASE:
+- project_ref=exwtngpwqgkrkoszpgib
+- migration=20260817072340_products
+- rls_operator_write_block=PASS
+- admin_write=PASS
+- internal_code_unique_ci=PASS
+- barcode_unique=PASS
+- minimum_stock_nonnegative=PASS
+- inactive_hidden_from_operator=PASS
+- fixture_cleanup=PASS
+- security_advisor=PASS_ZERO_LINTS
+
+LOCAL_UI_SMOKE=NOT_COUNTED_AS_PASS
+LIMITATION=Supabase local apresentou leitura de perfil incompatível após login; smoke hospedado de produto foi bloqueado por email rate limit antes de criar usuário.

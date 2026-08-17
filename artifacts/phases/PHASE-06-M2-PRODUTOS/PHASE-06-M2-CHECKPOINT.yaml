@@ -1,0 +1,37 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M2-PRODUTOS
+risk_class: B
+current_state: PRONTO_PARA_AUDITORIA
+branch: feature/m2-products
+pull_request: 4
+implementation_head: c932a26ac2bd80d6ab3dbbb230f21b3434b2aff0
+ci:
+  final_green_run: 32007742548
+  conclusion: success
+supabase:
+  project_ref: exwtngpwqgkrkoszpgib
+  migration_version: "20260817072340"
+  security_advisor: zero_lints
+validated:
+  - categories/products schema
+  - unique/check constraints
+  - RLS ADMIN/OPERATOR
+  - operator write blocked
+  - inactive visibility
+  - search implementation
+  - admin server-action guards
+  - active-category consistency
+  - reactivation guard
+  - user-facing category errors
+  - fixture cleanup
+limitations:
+  - full products UI E2E inconclusive due hosted email rate limit and local session/profile harness incompatibility
+pending:
+  - remove temporary local smoke workflow
+  - PRF commit CI
+  - Emily audit
+  - Leo gate
+  - merge if approved
+human_action_required: false
+next_action: Remover harness temporário, versionar PRF, validar CI e auditar.
+return_to: MESTRE

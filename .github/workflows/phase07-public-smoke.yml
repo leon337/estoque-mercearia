@@ -1,0 +1,40 @@
+name: Phase 07 Public Smoke
+
+on:
+  push:
+    branches: [docs/phase07-public-release-closeout]
+
+permissions:
+  contents: read
+
+jobs:
+  public-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login page is public
+        run: |
+          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -o /tmp/login.html -w '%{http_code}' https://estoque-mercearia.onrender.com/login)
+          test "$code" = "200"
+          grep -q 'Estoque Mercearia' /tmp/login.html
+          grep -q '>Entrar<' /tmp/login.html
+      - name: Registration page is public
+        run: |
+          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -o /tmp/register.html -w '%{http_code}' https://estoque-mercearia.onrender.com/register)
+          test "$code" = "200"
+          grep -q 'Solicitar acesso' /tmp/register.html
+      - name: Protected routes redirect to login
+        run: |
+          for path in / /inventory /products /movements/new /history /admin/users /admin/adjustment; do
+            curl -sS --retry 5 --retry-all-errors --retry-delay 3 -D /tmp/headers -o /dev/null "https://estoque-mercearia.onrender.com$path"
+            code=$(awk 'toupper($1) ~ /^HTTP\// {c=$2} END {print c}' /tmp/headers)
+            location=$(awk 'BEGIN{IGNORECASE=1} /^location:/ {gsub("\r", "", $2); print $2}' /tmp/headers | tail -1)
+            test "$code" = "307" -o "$code" = "308" -o "$code" = "302" -o "$code" = "303"
+            case "$location" in
+              /login*|https://estoque-mercearia.onrender.com/login*) ;;
+              *) echo "unexpected redirect for $path: $code $location"; cat /tmp/headers; exit 1 ;;
+            esac
+          done
+      - name: Public endpoint remains healthy after requests
+        run: |
+          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -o /tmp/final.html -w '%{http_code}' https://estoque-mercearia.onrender.com/login)
+          test "$code" = "200"

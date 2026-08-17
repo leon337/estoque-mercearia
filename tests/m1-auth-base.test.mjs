@@ -38,7 +38,7 @@ test('migration cria perfis, roles e RLS sem permitir autoelevação de operador
   assert.match(sql, /enable row level security/i);
   assert.match(sql, /create policy "profiles_select_own"/i);
   assert.match(sql, /create policy "profiles_admin_select_all"/i);
-  assert.match(sql, /new\.raw_user_meta_data ->> 'role'/i);
+  assert.doesNotMatch(sql, /new\.raw_user_meta_data\s*->>\s*'role'/i);
   assert.match(sql, /'OPERATOR'::public\.app_role/i);
 });
 

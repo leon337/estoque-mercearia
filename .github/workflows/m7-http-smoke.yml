@@ -60,9 +60,9 @@ jobs:
             -c /tmp/cookies.txt -b /tmp/cookies.txt \
             -H 'Origin: http://127.0.0.1:3000' \
             -H 'Referer: http://127.0.0.1:3000/login' \
-            --data-urlencode "$ACTION=" \
-            --data-urlencode "email=$FIXTURE_EMAIL" \
-            --data-urlencode "password=$FIXTURE_PASSWORD" \
+            -F "$ACTION=" \
+            -F "email=$FIXTURE_EMAIL" \
+            -F "password=$FIXTURE_PASSWORD" \
             http://127.0.0.1:3000/login)
           echo "Server Action status: $CODE"
           cat /tmp/action-headers.txt

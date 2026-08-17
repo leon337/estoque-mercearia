@@ -64,6 +64,16 @@ test('actions não permitem categoria inativa em produto nem inativação de cat
   assert.match(actions, /category_in_use/);
 });
 
+test('reativação de produto exige categoria ativa', async () => {
+  const actions = await readFile(path.join(root, 'src/app/products/actions.ts'), 'utf8');
+  const toggle = actions.split('export async function toggleProductActive')[1] ?? '';
+
+  assert.match(toggle, /if\s*\(nextActive\)/);
+  assert.match(toggle, /\.from\(["']products["']\)[\s\S]*\.select\(["']category_id["']\)/);
+  assert.match(toggle, /ensureActiveCategory\(supabase,\s*product\.category_id\)/);
+  assert.match(toggle, /category_inactive/);
+});
+
 test('listagem pesquisa por nome e código sem usar filtro OR bruto', async () => {
   const page = await readFile(path.join(root, 'src/app/products/page.tsx'), 'utf8');
 
@@ -72,6 +82,15 @@ test('listagem pesquisa por nome e código sem usar filtro OR bruto', async () =
   assert.doesNotMatch(page, /\.or\(/);
   assert.match(page, /Novo produto/);
   assert.match(page, /Categorias/);
+});
+
+test('interface explica categoria inativa e categoria em uso', async () => {
+  const listPage = await readFile(path.join(root, 'src/app/products/page.tsx'), 'utf8');
+  const createPage = await readFile(path.join(root, 'src/app/products/new/page.tsx'), 'utf8');
+  const editPage = await readFile(path.join(root, 'src/app/products/[id]/edit/page.tsx'), 'utf8');
+
+  assert.match(listPage, /category_in_use:[\s\S]*categoria usada por produto ativo/i);
+  assert.match(`${createPage}\n${editPage}`, /category_inactive[\s\S]*categoria ativa/i);
 });
 
 test('formulários expõem os campos aprovados do produto', async () => {

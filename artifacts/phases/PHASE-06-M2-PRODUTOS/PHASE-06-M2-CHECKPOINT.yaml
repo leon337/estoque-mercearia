@@ -1,17 +1,26 @@
 mission_id: ESTOQUE-MERCEARIA-001
 phase_id: PHASE-06-M2-PRODUTOS
 risk_class: B
-current_state: PRONTO_PARA_AUDITORIA
+current_state: APROVADO_PARA_INTEGRACAO_COM_RESSALVA
 branch: feature/m2-products
 pull_request: 4
 implementation_head: c932a26ac2bd80d6ab3dbbb230f21b3434b2aff0
+prf_head: 046f4378795da8245b1785a14c678357085e3d8f
 ci:
-  final_green_run: 32007742548
+  implementation_run: 32007742548
+  prf_run: 32007988461
   conclusion: success
 supabase:
   project_ref: exwtngpwqgkrkoszpgib
   migration_version: "20260817072340"
   security_advisor: zero_lints
+audit:
+  agent: Emily
+  verdict: APROVADO_COM_RESSALVA
+  critical_high_findings: 0
+leo_gate:
+  decision: APROVAR_COM_RESSALVA
+  next_state: APROVADO_PARA_INTEGRACAO_COM_RESSALVA
 validated:
   - categories/products schema
   - unique/check constraints
@@ -24,14 +33,12 @@ validated:
   - reactivation guard
   - user-facing category errors
   - fixture cleanup
-limitations:
-  - full products UI E2E inconclusive due hosted email rate limit and local session/profile harness incompatibility
+reservation:
+  - full products UI write E2E inconclusive; not counted as PASS
 pending:
-  - remove temporary local smoke workflow
-  - PRF commit CI
-  - Emily audit
-  - Leo gate
-  - merge if approved
+  - CI final do registro de auditoria/gate
+  - merge PR 4 em main
+blockers: []
 human_action_required: false
-next_action: Remover harness temporário, versionar PRF, validar CI e auditar.
+next_action: Validar CI final e integrar o PR 4 em main.
 return_to: MESTRE

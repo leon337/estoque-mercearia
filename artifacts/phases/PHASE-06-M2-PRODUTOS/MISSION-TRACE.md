@@ -22,4 +22,6 @@ Rafael/Helena → corrigiram guard de reativação e mensagens de categoria no c
 Renato → CI `32007742548`: `npm ci`, lint, testes, typecheck e build = PASS.
 Ricardo → Security Advisor hospedado após DDL: zero lints.
 Carmem → consolidou este PRF.
-Emily → próxima ação: auditoria independente do PR #4.
+Emily → auditou PR #4: APROVADO COM RESSALVA; nenhum achado crítico/alto; E2E completo de escrita pela UI permaneceu inconclusivo.
+LÉO → gate: APROVAR_COM_RESSALVA; estado `APROVADO_PARA_INTEGRACAO_COM_RESSALVA`.
+Gabriel → próxima ação: validar CI do registro de gate e integrar PR #4 se verde.

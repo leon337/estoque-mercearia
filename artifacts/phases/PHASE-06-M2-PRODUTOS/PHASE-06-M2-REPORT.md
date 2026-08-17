@@ -52,5 +52,10 @@ Cobertura substituta aceita para este gate:
 - build real do Next.js verde;
 - revisão de código sobre autorização, integridade e interface.
 
+## Auditoria e gate
+- Emily: `APROVADO COM RESSALVA`; zero achados críticos/altos.
+- Ressalva: E2E completo de escrita pela UI permaneceu inconclusivo e não é contabilizado como PASS.
+- LÉO: `APROVAR_COM_RESSALVA`; integração liberada após CI final do registro documental.
+
 ## Estado
-Pronto para auditoria independente, com a limitação do smoke E2E de produtos explicitamente registrada.
+Aprovado para integração com ressalva explicitamente preservada.

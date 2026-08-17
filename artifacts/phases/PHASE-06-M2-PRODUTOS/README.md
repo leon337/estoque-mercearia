@@ -11,6 +11,6 @@ Ordem:
 8. `PHASE-06-M2-CHECKPOINT.yaml`
 9. `PHASE-06-M2-ARTIFACT-MANIFEST.sha256`
 
-Estado documental: `PRONTO_PARA_AUDITORIA`.
+Estado documental: `APROVADO_PARA_INTEGRACAO_COM_RESSALVA`.
 
-A camada de banco/RLS/constraints foi validada no Supabase hospedado, e o código passou TDD + CI final. O E2E completo de escrita pela UI permanece explicitamente inconclusivo por limitações do harness Auth/SMTP e não é contabilizado como PASS.
+Emily não encontrou achados críticos/altos e aprovou com ressalva. LÉO aprovou o gate com a mesma ressalva: o E2E completo de escrita pela UI é inconclusivo e **não** é contabilizado como PASS. A integração depende apenas da CI final do registro documental.

@@ -11,3 +11,6 @@
 9. Falhas do smoke hospedado/local foram registradas como limitações do harness; não foram convertidas em PASS.
 10. A ausência de E2E completo de escrita pela UI será apresentada a Emily como limitação residual explícita, sustentada por DB/RLS hospedado, TDD, CI e build.
 11. Workflow local temporário será removido antes do gate/merge.
+12. Emily auditou o PR #4: `APROVADO COM RESSALVA`, sem achados críticos/altos.
+13. LÉO decidiu `APROVAR_COM_RESSALVA` e liberar integração após CI final verde.
+14. A ressalva do E2E de escrita pela UI permanece no checkpoint e não pode ser reinterpretada como PASS em fases posteriores.

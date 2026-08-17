@@ -1,0 +1,74 @@
+PHASE-07 FULL VALIDATION EVIDENCE
+
+1) Baseline
+- M0-M7 technical qualification already terminal before release.
+- Pre-release main SHA: fcd06b3b63cbd1b6b1018c765746e6a66e2e4066.
+- LEANDRO explicitly authorized public release.
+
+2) Initial deployment
+- Render service: srv-da1et8pt0dsc73bn9pgg.
+- First deploy: dep-da1et99t0dsc73bn9qd0.
+- Deployment reached live but was NOT approved.
+
+3) Security finding
+- Initial build reported 3 high severity vulnerabilities.
+- Reproduction: GitHub Actions run 32024595318 / job 95371222956.
+- Release state changed to BLOQUEADO_POR_RISCO.
+
+4) Dependency remediation
+- next 16.2.12 -> 16.3.1.
+- eslint-config-next -> 16.3.1.
+- package-lock regenerated.
+- Verification: run 32024713175 / job 95371585746.
+- Result: lint PASS; tests 46/46 PASS; typecheck PASS; build PASS; npm audit --omit=dev --audit-level=high => found 0 vulnerabilities.
+- Clean normal CI: 32024899480 PASS.
+- PR #10 squash merge: 30ca70843ee6d1c9ac1d45c7147670ae4ce16ea2.
+- Corrected deployment dep-da1f0b942hec73alv7hg reached live, Next.js 16.3.1, npm found 0 vulnerabilities.
+
+5) Public smoke defect
+- External smoke run 32025281283:
+  /login PASS;
+  /register FAILED.
+- Diagnostic run 32025396201:
+  /register returned HTTP 307.
+- Release state changed to BLOQUEADO_POR_RISCO.
+
+6) Routing remediation
+- Root cause: src/lib/supabase/proxy.ts classified only /login as public.
+- RED contract CI: 32025510775, failed before implementation.
+- Implementation: /login and /register treated as public auth routes; protected operational routes unchanged.
+- GREEN CI: 32025568296 PASS (install, lint, tests, typecheck, build).
+- PR #11 squash merge: bf8eac22574ba12c0e16a80b432bb3d48fa7d742.
+
+7) Final deploy
+- Render deploy dep-da1f47m1egvs73a61ri0.
+- Exact commit: bf8eac22574ba12c0e16a80b432bb3d48fa7d742.
+- Status: live.
+- Build: npm audited 376 packages and reported found 0 vulnerabilities.
+- Build/runtime: Next.js 16.3.1.
+- Runtime process ready normally.
+
+8) Final public smoke
+- Exact previously failing workflow was rerun without changing the test.
+- Run 32025396201, latest attempt: SUCCESS.
+- /login public: PASS.
+- /register public: PASS.
+- Anonymous access to /, /inventory, /products, /movements/new, /history, /admin/users, /admin/adjustment redirects to /login: PASS.
+- Final /login health check: PASS.
+
+9) Final security/governance
+- Supabase Security Advisor: zero lints.
+- Only public Supabase URL and publishable key configured in Render.
+- No service_role, DB password or admin secret introduced.
+- No synthetic user/product/movement fixture created for Phase 07.
+- Public release adds no product functionality and changes no database schema.
+- Residual platform risk: free-plan availability/cold start/provider limits.
+
+10) Rollback
+- Render remains linked to main with auto-deploy.
+- Rollback is performed by reverting the offending main commit and allowing auto-deploy, or by redeploying a previously known-good commit through the hosting platform when necessary.
+- Database migrations were not changed in Phase 07, so application rollback does not require database rollback.
+
+OVERALL TECHNICAL VALIDATION: PASS
+INDEPENDENT AUDIT: PENDING
+FINAL LÉO GATE: PENDING

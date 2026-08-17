@@ -1,0 +1,28 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M0-FUNDACAO
+risk_class: B
+state: PRONTO_PARA_GATE
+repository: leon337/estoque-mercearia
+base_branch: main
+base_sha: a112b7f6cda5ab577cba1a2d6d7d71e680439b67
+feature_branch: feature/bootstrap
+implementation_commit: 420f79160b6e2fd98034f88a39d86d450a4eb952
+pull_request: 1
+ci:
+  run_id: 31998999972
+  conclusion: success
+acceptance:
+  branch_isolated: true
+  scaffold_present: true
+  local_bootstrap_tests: pass_2_of_2
+  lint: pass
+  typecheck: pass
+  build: pass
+  pr_open: true
+  prf_available: true
+open_findings:
+  - package-lock.json ainda não versionado; corrigir antes de estabilização/release
+merge_authorized: false
+release_authorized: false
+next_action: executar auditoria e gate interno; manter PR sem merge até decisão aplicável
+checkpoint_recipient: LEO

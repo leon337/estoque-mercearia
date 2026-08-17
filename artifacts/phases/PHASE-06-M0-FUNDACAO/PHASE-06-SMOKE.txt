@@ -1,0 +1,10 @@
+PHASE-06 SMOKE
+
+Objetivo do M0: comprovar que a fundação compila e pode entrar no ciclo de desenvolvimento.
+
+SMOKE EXECUTADO:
+- `npm run build` via GitHub Actions.
+- Resultado: SUCCESS no run 31998999972.
+
+SMOKE DE NEGÓCIO:
+NAO_APLICAVEL nesta fase. O M0 não implementa login, produtos ou estoque; não existe fluxo de negócio para teste ponta a ponta ainda.

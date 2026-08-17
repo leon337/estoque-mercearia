@@ -5,28 +5,29 @@
 - SPEC e plano P8.1 foram versionados.
 - RED inicial validou ausência dos novos contratos.
 - GREEN incremental implementou fundação visual.
-- CI intermediário isolou cada lacuna restante.
-- build detectou typed routes incompatíveis com `href: string`.
-- correção mínima adotou união literal de rotas.
-- revisão integral do diff identificou persistência da sidebar e agrupamento admin.
-- review RED confirmou a lacuna.
-- review GREEN corrigiu a lacuna.
-- CI `32069976350` confirmou gate técnico verde.
-- LEANDRO autorizou explicitamente avançar para revisão/gate MCF, opção 2.
-- PRF foi criado para submissão formal ao gate.
-- merge/deploy permanecem fora da autorização atual.
+- typed routes foram corrigidas sem enfraquecer `typedRoutes: true`.
+- revisão interna corrigiu sidebar persistente e agrupamento `/admin/*` via RED→GREEN.
+- CI `32069976350` confirmou o primeiro gate técnico verde.
+- LEANDRO autorizou avançar o PR para revisão/gate MCF.
+- PRF foi criado e CI `32070619093` validou o HEAD documental.
+- PR #14 foi marcado Ready for review.
+- revisão Codex encontrou P1 de cascade CSS e P2 de integridade do manifest.
+- P1 recebeu teste RED no commit `580c6972...`; CI `32073167386` falhou somente no novo contrato.
+- P1 foi corrigido no commit `24b0a968...`; CI `32073240183` passou lint, 54/54 testes, typecheck e build.
+- P2 foi recalculado com base nos conteúdos do GitHub connector; a checagem integral encontrou também o hash de REPORT inconsistente.
+- LEANDRO autorizou explicitamente o merge do PR #14.
+- merge permanece condicionado ao CI verde do HEAD exato após a consolidação final do PRF.
+- nenhuma ação de deploy manual foi autorizada.
 
-## Handoffs conceituais
-MESTRE → implementação: executar escopo aprovado em branch isolada.
-Implementação → revisão: entregar diff, testes e PR.
-Revisão → validação: verificar regressão e build.
-Validação → auditoria: entregar CI final e diff.
-Auditoria → LÉO gate: entregar `PASS_COM_RESSALVA`.
-LÉO gate → MESTRE: manter PR sem merge e solicitar HUMAN_GATE para integração quando apropriado.
+## Handoffs
+MESTRE → implementação → revisão → validação → auditoria → LÉO gate → HUMAN_GATE → integração.
 
 ## Recuperações
 - typed routes: causa raiz identificada e corrigida;
-- UX de navegação: lacuna capturada por novo teste antes da correção.
+- UX de navegação: lacuna capturada por teste;
+- cascade Tailwind: revisão externa → RED → correção mínima → GREEN;
+- manifest PRF: revisão externa → recálculo integral → correção.
 
 ## Estado do fluxo
-Recuperável, sem gaps ocultos conhecidos além do smoke visual explicitado.
+`MERGE_AUTHORIZED_PENDING_EXECUTION`.
+Lacuna pós-integração: smoke visual real mobile/desktop.

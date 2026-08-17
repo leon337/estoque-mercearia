@@ -16,11 +16,16 @@ Pacote de Rastreabilidade da Fundação Visual do Estoque Mercearia.
 
 ## Resultado
 - gate técnico: verde;
+- revisão Codex: P1/P2 corrigidos;
 - auditoria: `PASS_COM_RESSALVA`;
 - gate de LÉO: `APROVAR_COM_RESSALVAS`;
-- próximo estado: `AGUARDANDO_HUMAN_GATE_PARA_INTEGRACAO`;
-- merge/deploy: não autorizados;
-- lacuna restante: smoke visual real mobile/desktop no primeiro ambiente autorizado.
+- HUMAN_GATE: merge do PR #14 autorizado por LEANDRO;
+- próximo estado: `MERGE_AUTHORIZED_PENDING_EXECUTION`;
+- deploy manual adicional: não autorizado;
+- lacuna restante: smoke visual real mobile/desktop no primeiro ambiente materializado.
+
+## Evidência de validação
+Código qualificado em `24b0a9684f3f228d57d28e962639f01d5fc3c5b1`, CI `32073240183`: lint PASS, 54/54 testes PASS, typecheck PASS, build PASS.
 
 ## Observação de independência
-Os papéis de revisão/auditoria foram executados na mesma instância de assistente por limitação do ambiente. O pacote não reivindica independência cognitiva entre modelos.
+Houve revisão externa automatizada Codex no GitHub. A consolidação do gate MCF foi realizada pela mesma instância de assistente/orquestrador; não se reivindica independência cognitiva completa entre modelos.

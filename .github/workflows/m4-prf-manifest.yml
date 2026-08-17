@@ -1,0 +1,38 @@
+name: M4 PRF Manifest
+
+on:
+  push:
+    branches:
+      - feature/m4-store-operation
+
+permissions:
+  contents: write
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/m4-store-operation
+      - name: Generate SHA-256 manifest
+        run: |
+          cd artifacts/phases/PHASE-06-M4-OPERACAO-LOJA
+          sha256sum \
+            PHASE-06-M4-PLAN.md \
+            MISSION-TRACE.md \
+            PHASE-06-M4-REPORT.md \
+            PHASE-06-M4-VALIDATION.txt \
+            PHASE-06-M4-VALIDATION-FULL.txt \
+            PHASE-06-M4-SMOKE.txt \
+            PHASE-06-M4-CHECKPOINT.yaml \
+            PHASE-06-M4-DECISIONS.md \
+            README.md > PHASE-06-M4-ARTIFACT-MANIFEST.sha256
+      - name: Commit manifest if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/phases/PHASE-06-M4-OPERACAO-LOJA/PHASE-06-M4-ARTIFACT-MANIFEST.sha256
+          git diff --cached --quiet && exit 0
+          git commit -m "docs(mcf): generate M4 PRF manifest"
+          git push origin HEAD:feature/m4-store-operation

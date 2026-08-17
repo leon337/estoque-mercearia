@@ -12,15 +12,19 @@ export async function login(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-  if (error) {
+  if (error || !signInData.user) {
     redirect("/login?error=invalid");
   }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("active")
+    .eq("id", signInData.user.id)
     .single();
 
   if (profileError || !profile?.active) {

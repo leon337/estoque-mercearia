@@ -1,0 +1,8 @@
+M5 VALIDATION FULL
+
+RED CI 32018205694 failed at contract tests because M5 routes/metrics did not exist; install and lint passed, making the RED valid.
+GREEN CI 32018436703 passed install, lint, all repository tests, typecheck and production build.
+
+Hosted validation used disposable users/products/movements inside one transaction. ADMIN created initial quantities 0, 2 and 10 for three products with minimum 5; OPERATOR then added 1 to the low product. Under OPERATOR RLS, assertions required 3 active products, 1 zero, 1 low, 4 visible movements, one matching compound product/type/actor/recent-date filter, no visibility of the ADMIN profile and visibility of the operator's own profile. All assertions passed. Rollback left zero fixture users/products/movements.
+
+Security: M5 changes no DDL, RPC or DML path. Advisor state is unchanged from M3: one intentional authenticated SECURITY DEFINER RPC warning, no critical/high issue introduced by M5.

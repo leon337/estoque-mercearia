@@ -1,0 +1,19 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M5-HISTORICO-DASHBOARD
+milestone: M5
+risk_class: B
+branch: feature/m5-history-dashboard
+pull_request: 7
+current_state: AGUARDANDO_AUDITORIA_E_GATE
+validation:
+  red_ci: 32018205694
+  final_green_ci: 32018436703
+  hosted_smoke: PASS
+  cleanup_zero_residue: true
+  new_security_critical_high: 0
+delivered_scope: [history_page, filters, movement_trace, dashboard_metrics, urgent_stock_list]
+known_security_advisory: [inherited_m3_authenticated_security_definer_rpc_warn]
+next_if_approved:
+  phase_id: PHASE-06-M6-ADMIN-HARDENING
+  action: Implementar ajuste administrativo, usuários/permissões e hardening.
+human_action_required: false

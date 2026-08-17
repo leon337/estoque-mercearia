@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -91,6 +92,7 @@ export default async function NewMovementPage({
       ) : (
         <MovementForm
           errorMessage={params.error ? errorMessages[params.error] ?? errorMessages.database : null}
+          initialOperationId={randomUUID()}
           initialProductId={params.product}
           initialType={movementType(params.type, isAdmin)}
           isAdmin={isAdmin}

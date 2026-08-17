@@ -13,6 +13,8 @@ type ProductInput = {
   minimum_stock: number;
 };
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
 function readText(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
 }
@@ -69,6 +71,24 @@ function parseProductInput(formData: FormData): ProductInput | null {
   };
 }
 
+async function ensureActiveCategory(
+  supabase: SupabaseServerClient,
+  categoryId: string | null,
+) {
+  if (!categoryId) {
+    return true;
+  }
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("id", categoryId)
+    .eq("active", true)
+    .maybeSingle();
+
+  return !error && Boolean(data);
+}
+
 function databaseErrorCode(code: string | undefined) {
   return code === "23505" ? "duplicate" : "database";
 }
@@ -101,6 +121,24 @@ export async function toggleCategoryActive(formData: FormData) {
     redirect("/products?error=category_validation");
   }
 
+  if (!nextActive) {
+    const { data: activeProduct, error: usageError } = await supabase
+      .from("products")
+      .select("id")
+      .eq("category_id", id)
+      .eq("active", true)
+      .limit(1)
+      .maybeSingle();
+
+    if (usageError) {
+      redirect("/products?error=category_database");
+    }
+
+    if (activeProduct) {
+      redirect("/products?error=category_in_use");
+    }
+  }
+
   const { error } = await supabase
     .from("categories")
     .update({ active: nextActive, updated_at: new Date().toISOString() })
@@ -123,6 +161,10 @@ export async function createProduct(formData: FormData) {
     redirect("/products/new?error=validation");
   }
 
+  if (!(await ensureActiveCategory(supabase, input.category_id))) {
+    redirect("/products/new?error=category_inactive");
+  }
+
   const { error } = await supabase.from("products").insert({ ...input, active: true });
 
   if (error) {
@@ -140,6 +182,10 @@ export async function updateProduct(formData: FormData) {
 
   if (!id || !input) {
     redirect(id ? `/products/${id}/edit?error=validation` : "/products?error=validation");
+  }
+
+  if (!(await ensureActiveCategory(supabase, input.category_id))) {
+    redirect(`/products/${id}/edit?error=category_inactive`);
   }
 
   const { error } = await supabase

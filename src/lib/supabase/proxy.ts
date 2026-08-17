@@ -5,10 +5,11 @@ export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  const isLogin = request.nextUrl.pathname.startsWith("/login");
+  const pathname = request.nextUrl.pathname;
+  const isPublicAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
 
   if (!supabaseUrl || !publishableKey) {
-    if (isLogin) return supabaseResponse;
+    if (isPublicAuthRoute) return supabaseResponse;
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("error", "config");
@@ -36,14 +37,14 @@ export async function updateSession(request: NextRequest) {
   const { data, error } = await supabase.auth.getClaims();
   const isAuthenticated = !error && Boolean(data?.claims);
 
-  if (!isAuthenticated && !isLogin) {
+  if (!isAuthenticated && !isPublicAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
     return NextResponse.redirect(url);
   }
 
-  if (isAuthenticated && isLogin) {
+  if (isAuthenticated && isPublicAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

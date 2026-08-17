@@ -14,6 +14,8 @@ jobs:
     env:
       NEXT_PUBLIC_SUPABASE_URL: https://exwtngpwqgkrkoszpgib.supabase.co
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_dXdPZQclAr5u7yskNNmHhw_AhtmW81_
+      SMOKE_EMAIL: m1-nextjs-fixture@gmail.com
+      SMOKE_PASSWORD: M1-Next-Fixture-2026!Aa9
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,25 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
-
-      - name: Define temporary credentials
-        run: |
-          echo "SMOKE_EMAIL=m1-nextjs-${GITHUB_RUN_ID}@gmail.com" >> "$GITHUB_ENV"
-          echo "SMOKE_PASSWORD=M1-Next-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
-
-      - name: Ensure temporary operator exists
-        run: |
-          RESPONSE=$(curl -sS \
-            -X POST "$NEXT_PUBLIC_SUPABASE_URL/auth/v1/signup" \
-            -H "apikey: $NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
-            -H "Content-Type: application/json" \
-            --data "{\"email\":\"$SMOKE_EMAIL\",\"password\":\"$SMOKE_PASSWORD\",\"data\":{\"name\":\"M1 Next Smoke\"}}")
-          ERROR=$(jq -r '.error_description // .msg // .message // empty' <<< "$RESPONSE")
-          if [ -n "$ERROR" ] && [[ "$ERROR" != *"already"* ]]; then
-            echo "SIGNUP_ERROR=$ERROR"
-            exit 51
-          fi
-          echo "Signup available for $SMOKE_EMAIL"
 
       - name: Build application
         run: npm run build

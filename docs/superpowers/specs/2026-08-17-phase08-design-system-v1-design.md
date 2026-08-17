@@ -1,6 +1,6 @@
 # PHASE-08 — Design System v1 / Evolução Visual
 
-Status: `DESIGN_APPROVED_PENDING_WRITTEN_SPEC_REVIEW`
+Status: `DESIGN_SPEC_READY_FOR_REVIEW`
 Issue: #13
 Base funcional: `main@4bac3a964d2cc4aba6e2f8ae55d715db52309647`
 Referência visual: Google Stitch project `16117855143662200347`
@@ -154,6 +154,7 @@ src/
 │   │   ├── StatusBadge.tsx
 │   │   ├── SearchField.tsx
 │   │   ├── PageHeader.tsx
+│   │   ├── DataCard.tsx
 │   │   └── EmptyState.tsx
 │   ├── shell/                 # navegação/layout
 │   │   ├── AppShell.tsx
@@ -257,7 +258,7 @@ Pode incluir:
 - primitives sem regra de domínio;
 - AppShell e navegação responsiva;
 - testes estruturais/semânticos desses componentes;
-- adoção inicial no dashboard apenas se necessária para validar o shell, sem alterar queries ou regras.
+- envolver o dashboard existente com o AppShell para validar a integração, **sem redesenhar o conteúdo do dashboard em P8.1** e sem alterar queries ou regras.
 
 Não pode incluir:
 

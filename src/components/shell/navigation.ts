@@ -16,5 +16,7 @@ export function getNavigation(role: Role): NavItem[] {
 }
 
 export function isNavActive(pathname: string, href: AppRoute): boolean {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  if (href === "/") return pathname === "/";
+  if (href === "/admin/users") return pathname.startsWith("/admin");
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

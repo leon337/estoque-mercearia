@@ -8,7 +8,7 @@ export function DesktopSidebar({ role }: { role: Role }) {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden min-h-screen w-72 shrink-0 border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-container)] p-4 md:flex md:flex-col">
+    <aside className="hidden h-screen w-72 shrink-0 self-start overflow-y-auto border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-container)] p-4 md:sticky md:top-0 md:flex md:flex-col">
       <div className="mb-6 px-3 py-2">
         <p className="text-xl font-bold text-[var(--color-primary)]">Estoque Mercearia</p>
         <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-on-surface-variant)]">

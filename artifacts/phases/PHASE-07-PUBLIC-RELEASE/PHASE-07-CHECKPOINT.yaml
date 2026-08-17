@@ -1,0 +1,29 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-07-PUBLIC-RELEASE
+risk_class: C
+authorization:
+  human_gate: LEANDRO
+  status: GRANTED
+public_release:
+  provider: Render
+  service_id: srv-da1et8pt0dsc73bn9pgg
+  plan: free
+  region: virginia
+  url: https://estoque-mercearia.onrender.com
+application:
+  main_sha: bf8eac22574ba12c0e16a80b432bb3d48fa7d742
+  next_version: 16.3.1
+validation:
+  final_deploy: dep-da1f47m1egvs73a61ri0
+  deploy_status: LIVE
+  public_smoke_run: 32025396201
+  public_smoke: PASS
+  dependency_vulnerabilities: 0
+  supabase_security_advisor_lints: 0
+  privileged_runtime_secrets: false
+  release_fixtures_created: false
+release_blocks_resolved:
+  - runtime_dependency_high_vulnerabilities
+  - public_register_redirect
+current_state: AGUARDANDO_AUDITORIA_E_GATE
+next_if_approved: ENTREGUE

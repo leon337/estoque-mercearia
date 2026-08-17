@@ -1,0 +1,20 @@
+PHASE-08 / P8.1 — SMOKE
+
+STATUS=NAO_APLICAVEL_PRE_MERGE
+
+Justificativa:
+A branch `phase08/p8-1-visual-foundation` não possui ambiente de preview autenticado e não foi implantada. Executar smoke visual real exigiria merge/deploy ou infraestrutura adicional não autorizada neste gate.
+
+Evidência disponível, sem substituir smoke visual:
+- CI final verde;
+- build de produção verde;
+- rotas compiladas;
+- testes de contrato de navegação/acessibilidade verdes.
+
+Lacuna:
+- validar renderização real em viewport mobile (<768px);
+- validar renderização real em desktop (>=768px);
+- confirmar sidebar fixa, TopBar/BottomNav e foco de teclado em navegador.
+
+Próxima ação:
+Executar smoke visual no primeiro ambiente autorizado que materialize o HEAD aprovado. Se o merge em `main` disparar deploy público, essa ação exige HUMAN_GATE explícito antes do merge.

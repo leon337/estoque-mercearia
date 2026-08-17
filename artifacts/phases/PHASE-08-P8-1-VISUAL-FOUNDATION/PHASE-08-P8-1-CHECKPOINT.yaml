@@ -1,0 +1,37 @@
+mission_id: ESTOQUE-PHASE-08
+phase_id: P8.1
+title: Fundacao visual do Design System v1
+risk_class: B
+state: AGUARDANDO_HUMAN_GATE_PARA_INTEGRACAO
+objective_met_pre_merge: true
+production_visual_smoke_complete: false
+repository: leon337/estoque-mercearia
+issue: 13
+pull_request: 14
+base:
+  branch: main
+  sha: 4bac3a964d2cc4aba6e2f8ae55d715db52309647
+candidate:
+  branch: phase08/p8-1-visual-foundation
+  code_head_before_prf: c8af9d75c67094a5a6adbf00b5c536ee345e6432
+validation:
+  ci_run: 32069976350
+  tests:
+    passed: 53
+    failed: 0
+  lint: PASS
+  typecheck: PASS
+  build: PASS
+audit:
+  verdict: PASS_COM_RESSALVA
+  independent_model: false
+  caveat: smoke visual mobile/desktop ainda nao executado em ambiente materializado
+leo_gate:
+  decision: APROVAR_COM_RESSALVAS
+  next_state: AGUARDANDO_HUMAN_GATE_PARA_INTEGRACAO
+human_authorization:
+  current: GATE_REVIEW_ONLY
+  merge: NOT_AUTHORIZED
+  deploy: NOT_AUTHORIZED
+next_action: Solicitar autorizacao explicita de LEANDRO para integrar; depois validar visualmente o ambiente autorizado.
+checkpoint_recipient: MESTRE

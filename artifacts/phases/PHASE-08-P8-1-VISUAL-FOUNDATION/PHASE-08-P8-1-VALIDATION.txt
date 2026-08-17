@@ -1,0 +1,15 @@
+PHASE-08 / P8.1 — VALIDATION SUMMARY
+
+CI_RUN=32069976350
+HEAD_UNDER_TEST=c8af9d75c67094a5a6adbf00b5c536ee345e6432
+RESULT=PASS
+
+install=PASS
+lint=PASS
+tests=PASS (53/53, 0 fail)
+typecheck=PASS
+build=PASS
+
+Regression contracts M0-M7 remained green.
+P8.1 contracts remained green.
+No merge/deploy executed.

@@ -1,0 +1,46 @@
+PHASE-08 / P8.1 — VALIDATION FULL REFERENCE
+
+Final GitHub Actions run:
+- repository: leon337/estoque-mercearia
+- workflow: CI
+- run_id: 32069976350
+- job: verify
+- branch head: c8af9d75c67094a5a6adbf00b5c536ee345e6432
+- pull-request merge ref tested by GitHub Actions
+- outcome: success
+
+Observed steps:
+1. Checkout: success
+2. Setup Node: success
+3. Install dependencies: success
+4. Lint (`npm run lint`): success
+5. Bootstrap tests (`npm test`): success
+   - tests: 53
+   - pass: 53
+   - fail: 0
+6. Typecheck (`npm run typecheck`): success
+7. Build (`npm run build` / `next build`): success
+
+Build route inventory included:
+/
+/admin/adjustment
+/admin/users
+/history
+/inventory
+/login
+/movements/new
+/products
+/products/[id]/edit
+/products/new
+/register
+
+Earlier evidence retained in PR #14:
+- initial RED: CI 32069140665
+- intermediate tokens/primitives: CI 32069372799
+- shell: CI 32069461081
+- dashboard integration/build finding: CI 32069560066
+- typed-routes root-cause fix: CI 32069698791
+- review RED: CI 32069853829
+- final GREEN: CI 32069976350
+
+No claim of browser/visual viewport smoke is made by this file.

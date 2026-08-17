@@ -20,6 +20,10 @@ function stockStatus(quantity: number, minimumStock: number) {
   return { label: "OK", description: "Estoque dentro do mínimo" };
 }
 
+function inventoryQuantity(inventory: { quantity: unknown }[] | null) {
+  return Number(inventory?.[0]?.quantity ?? 0);
+}
+
 export default async function InventoryPage({
   searchParams,
 }: {
@@ -84,7 +88,7 @@ export default async function InventoryPage({
       ) : (
         <section className="mt-8 grid gap-4 md:grid-cols-2" aria-label="Saldos por produto">
           {products.map((product) => {
-            const quantity = Number(product.inventory?.quantity ?? 0);
+            const quantity = inventoryQuantity(product.inventory);
             const minimumStock = Number(product.minimum_stock ?? 0);
             const status = stockStatus(quantity, minimumStock);
 

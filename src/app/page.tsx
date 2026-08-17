@@ -9,7 +9,7 @@ function inventoryQuantity(inventory:{quantity:unknown}[]|null){return Number(in
 export default async function Home(){
  const supabase=await createClient(); const {data:claimsData,error:claimsError}=await supabase.auth.getClaims(); const userId=claimsData?.claims?.sub;
  if(claimsError||!userId) redirect("/login");
- const {data:profile,error:profileError}=await supabase.from("profiles").select("name, role, active").eq("id",claimsData.claims.sub).single();
+ const {data:profile,error:profileError}=await supabase.from("profiles").select("name, role, active").eq("id", claimsData.claims.sub).single();
  if(profileError||!profile?.active){await supabase.auth.signOut();redirect("/login?error=inactive");}
  const {data:products,error:productsError}=await supabase.from("products").select("id, internal_code, name, unit, minimum_stock, inventory(quantity)").eq("active",true).order("name");
  if(productsError) throw new Error("Não foi possível carregar o dashboard.");

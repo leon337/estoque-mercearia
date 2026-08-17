@@ -1,5 +1,6 @@
 export type Role = "ADMIN" | "OPERATOR";
-export type NavItem = { href: string; label: string; adminOnly?: boolean };
+export type AppRoute = "/" | "/products" | "/inventory" | "/movements/new" | "/history" | "/admin/users";
+export type NavItem = { href: AppRoute; label: string; adminOnly?: boolean };
 
 const navigation: NavItem[] = [
   { href: "/", label: "Painel" },
@@ -14,6 +15,6 @@ export function getNavigation(role: Role): NavItem[] {
   return navigation.filter((item) => !item.adminOnly || role === "ADMIN");
 }
 
-export function isNavActive(pathname: string, href: string): boolean {
+export function isNavActive(pathname: string, href: AppRoute): boolean {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }

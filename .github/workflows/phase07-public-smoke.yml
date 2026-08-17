@@ -19,9 +19,15 @@ jobs:
           grep -q '>Entrar<' /tmp/login.html
       - name: Registration page is public
         run: |
-          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -o /tmp/register.html -w '%{http_code}' https://estoque-mercearia.onrender.com/register)
+          code=$(curl -sS --retry 5 --retry-all-errors --retry-delay 3 -D /tmp/register.headers -o /tmp/register.html -w '%{http_code}' https://estoque-mercearia.onrender.com/register)
+          echo "register status=$code bytes=$(wc -c < /tmp/register.html)"
           test "$code" = "200"
-          grep -q 'Solicitar acesso' /tmp/register.html
+          if ! grep -q 'Solicitar acesso' /tmp/register.html; then
+            echo 'expected marker missing; safe response excerpt follows'
+            grep -Eo 'Estoque Mercearia|Entrar|Solicitar acesso|Enviar pedido de acesso|Application error|Internal Server Error|This page could not be found' /tmp/register.html | head -20 || true
+            head -c 1200 /tmp/register.html | sed -E 's/(value|token|key|password)="[^"]*"/\1="[redacted]"/g'
+            exit 1
+          fi
       - name: Protected routes redirect to login
         run: |
           for path in / /inventory /products /movements/new /history /admin/users /admin/adjustment; do

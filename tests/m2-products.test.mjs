@@ -55,6 +55,15 @@ test('actions exigem ADMIN, normalizam barcode vazio e validam estoque mínimo',
   assert.match(actions, /export async function toggleProductActive/);
 });
 
+test('actions não permitem categoria inativa em produto nem inativação de categoria usada por produto ativo', async () => {
+  const actions = await readFile(path.join(root, 'src/app/products/actions.ts'), 'utf8');
+
+  assert.match(actions, /async function ensureActiveCategory/i);
+  assert.match(actions, /\.from\(["']categories["']\)[\s\S]*\.eq\(["']active["'],\s*true\)/);
+  assert.match(actions, /\.from\(["']products["']\)[\s\S]*\.eq\(["']category_id["'],\s*id\)[\s\S]*\.eq\(["']active["'],\s*true\)/);
+  assert.match(actions, /category_in_use/);
+});
+
 test('listagem pesquisa por nome e código sem usar filtro OR bruto', async () => {
   const page = await readFile(path.join(root, 'src/app/products/page.tsx'), 'utf8');
 

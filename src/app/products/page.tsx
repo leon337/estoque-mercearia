@@ -54,6 +54,8 @@ function message(error: string, success: string) {
       category_validation: "Informe um nome de categoria válido.",
       category_duplicate: "Já existe uma categoria com esse nome.",
       category_database: "Não foi possível salvar a categoria.",
+      category_in_use: "Não é possível inativar uma categoria usada por produto ativo.",
+      category_inactive: "Selecione uma categoria ativa antes de ativar o produto.",
     };
     return { kind: "error", text: messages[error] ?? "Não foi possível concluir a operação." };
   }
@@ -171,12 +173,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
       <form className="mt-6 grid gap-3 rounded-lg border p-4 sm:grid-cols-[1fr_auto_auto]" method="get">
         <label className="grid gap-1 text-sm font-medium">
           Buscar
-          <input
-            className="rounded-md border px-3 py-2"
-            defaultValue={q}
-            name="q"
-            placeholder="Nome ou código interno"
-          />
+          <input className="rounded-md border px-3 py-2" defaultValue={q} name="q" placeholder="Nome ou código interno" />
         </label>
         {isAdmin ? (
           <label className="grid gap-1 text-sm font-medium">
@@ -188,23 +185,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
             </select>
           </label>
         ) : null}
-        <button className="self-end rounded-md border px-4 py-2 font-semibold" type="submit">
-          Pesquisar
-        </button>
+        <button className="self-end rounded-md border px-4 py-2 font-semibold" type="submit">Pesquisar</button>
       </form>
 
       <section className="mt-6" aria-labelledby="product-list-title">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-semibold" id="product-list-title">
-            Cadastro
-          </h2>
+          <h2 className="text-xl font-semibold" id="product-list-title">Cadastro</h2>
           <span className="text-sm text-neutral-600">{products.length} resultado(s)</span>
         </div>
-
         {products.length === 0 ? (
-          <div className="mt-4 rounded-lg border border-dashed p-6 text-sm text-neutral-600">
-            Nenhum produto encontrado.
-          </div>
+          <div className="mt-4 rounded-lg border border-dashed p-6 text-sm text-neutral-600">Nenhum produto encontrado.</div>
         ) : (
           <div className="mt-4 grid gap-3">
             {products.map((product) => (
@@ -213,9 +203,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-semibold">{product.name}</h3>
-                      <span className="rounded border px-2 py-0.5 text-xs">
-                        {product.active ? "Ativo" : "Inativo"}
-                      </span>
+                      <span className="rounded border px-2 py-0.5 text-xs">{product.active ? "Ativo" : "Inativo"}</span>
                     </div>
                     <dl className="mt-3 grid gap-x-8 gap-y-1 text-sm sm:grid-cols-2">
                       <div><dt className="inline font-medium">Código: </dt><dd className="inline">{product.internal_code}</dd></div>
@@ -227,15 +215,11 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
                   </div>
                   {isAdmin ? (
                     <div className="flex flex-wrap gap-2">
-                      <Link className="rounded-md border px-3 py-2 text-sm font-semibold" href={`/products/${product.id}/edit`}>
-                        Editar
-                      </Link>
+                      <Link className="rounded-md border px-3 py-2 text-sm font-semibold" href={`/products/${product.id}/edit`}>Editar</Link>
                       <form action={toggleProductActive}>
                         <input name="id" type="hidden" value={product.id} />
                         <input name="next_active" type="hidden" value={String(!product.active)} />
-                        <button className="rounded-md border px-3 py-2 text-sm font-semibold" type="submit">
-                          {product.active ? "Inativar" : "Ativar"}
-                        </button>
+                        <button className="rounded-md border px-3 py-2 text-sm font-semibold" type="submit">{product.active ? "Inativar" : "Ativar"}</button>
                       </form>
                     </div>
                   ) : null}
@@ -254,9 +238,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
               Nome da categoria
               <input className="mt-1 w-full rounded-md border px-3 py-2" name="category_name" required />
             </label>
-            <button className="self-end rounded-md border px-4 py-2 font-semibold" type="submit">
-              Adicionar categoria
-            </button>
+            <button className="self-end rounded-md border px-4 py-2 font-semibold" type="submit">Adicionar categoria</button>
           </form>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {categories.length === 0 ? (
@@ -268,9 +250,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Sea
                   <form action={toggleCategoryActive}>
                     <input name="id" type="hidden" value={category.id} />
                     <input name="next_active" type="hidden" value={String(!category.active)} />
-                    <button className="text-sm font-semibold underline" type="submit">
-                      {category.active ? "Inativar" : "Ativar"}
-                    </button>
+                    <button className="text-sm font-semibold underline" type="submit">{category.active ? "Inativar" : "Ativar"}</button>
                   </form>
                 </div>
               ))

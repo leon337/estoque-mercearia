@@ -211,6 +211,26 @@ export async function toggleProductActive(formData: FormData) {
     redirect("/products?error=validation");
   }
 
+  if (nextActive) {
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("category_id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (productError) {
+      redirect("/products?error=database");
+    }
+
+    if (!product) {
+      redirect("/products?error=validation");
+    }
+
+    if (!(await ensureActiveCategory(supabase, product.category_id))) {
+      redirect("/products?error=category_inactive");
+    }
+  }
+
   const { error } = await supabase
     .from("products")
     .update({ active: nextActive, updated_at: new Date().toISOString() })

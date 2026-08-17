@@ -1,29 +1,33 @@
 PHASE-06 / M1 SMOKE
 
-BUILD_SMOKE=PASS
-CI_RUN=32001672763
-VALIDATED_CODE_SHA=abc421c47ccb430a5d3706b92a5c6e9081c4a99a
+DATABASE_RLS_SMOKE=PASS
+DIRECT_AUTH_PASSWORD_SMOKE=PASS
+NEXTJS_END_TO_END_AUTH_SMOKE=PASS
 
-SUPABASE_PROJECT=exwtngpwqgkrkoszpgib
-SUPABASE_REGION=sa-east-1
-MIGRATION=20260817063444/auth_profiles
+NEXTJS_RUN=32004143103
+NEXTJS_RERUN_JOB=95310379955
 
-LIVE_DATABASE_MIGRATION=PASS
-SECURITY_ADVISOR=PASS_NO_LINTS
-RLS_ENABLED=PASS
-PROFILES_SELECT_OWN=PASS
-PROFILES_ADMIN_SELECT_ALL=PASS
-NEW_USER_DEFAULT_OPERATOR=PASS
-PRIVATE_SECURITY_DEFINER_FUNCTIONS=PASS
-TEMP_FIXTURES_CLEANUP=PASS
+SEQUENCE:
+1. npm ci
+2. next build
+3. next start
+4. GET /login
+5. POST login Server Action com e-mail/senha
+6. redirect /
+7. GET / com cookie Supabase
+8. confirmar nome + OPERATOR
+9. POST logout Server Action
+10. GET / redireciona /login
+11. remover fixture de Auth
+12. confirmar zero resíduos
 
-LIVE_HTTP_AUTH_SESSION=PENDING_EXTERNAL_DEPENDENCY
-JUSTIFICATIVA=O conector Supabase disponível não expõe operação de sign-in e o runtime local falhou ao resolver o host público do projeto. Nenhuma credencial administrativa foi criada, exposta ou reutilizada para contornar essa limitação.
+RESULT:
+LOGIN=PASS
+SESSION=PASS
+PROFILE_RLS=PASS
+PROTECTED_PAGE=PASS
+LOGOUT=PASS
+CLEANUP=PASS
 
-SMOKE_PENDENTE:
-1. criar usuário temporário por Supabase Auth HTTP/SDK;
-2. confirmar e-mail quando necessário;
-3. autenticar via senha;
-4. confirmar sessão/JWT;
-5. consultar `profiles` via API sob RLS;
-6. remover o usuário temporário.
+PREVIEW_DEPLOY=NAO_APLICAVEL_NESTE_GATE
+JUSTIFICATIVA=O conector Vercel não possuía projeto associado e a ação disponível não permitiu materializar o preview. O mesmo artefato Next.js foi executado em modo de produção no runner contra o Supabase hospedado, cobrindo SSR, Server Actions, cookies, Auth e RLS sem publicação pública.

@@ -1,49 +1,65 @@
 PHASE-06 / M1 VALIDATION FULL
 
-Initial acceptance:
-commit 828db0bed67ac164e0a99aee5d00605b17b43209
-expected RED observed in CI before production implementation.
+1. TDD e regressões
+- Initial RED: commit 828db0bed67ac164e0a99aee5d00605b17b43209; falha observada antes do código produtivo.
+- Initial GREEN: commit 2c46e76615243b25b68ce4f2031f24eaa523b8c4; CI 32001296690 verde.
+- Profile-scope RED: commit 671dd4770a12098340bd22d927a35cb782f18682; CI 32001394273 falhou em Bootstrap tests.
+- Profile-scope GREEN: HEAD 6d0327fe0d28479c5659a0c0a73ab3093dac879a; CI 32001473996 verde.
+- Security RED: commit 47a820e49d4f7c6140e3a085ef1491e7db275438; CI 32001534801 falhou em Bootstrap tests.
+- Security GREEN: commit 29cd988345c2d2ef43f255c2745eaf2f9c27591b; CI 32001606274 verde.
+- Private trigger refactor: abc421c47ccb430a5d3706b92a5c6e9081c4a99a; CI 32001672763 verde.
 
-Implementation:
-commit 2c46e76615243b25b68ce4f2031f24eaa523b8c4
-CI run 32001296690: install/lint/tests/typecheck/build PASS.
+2. Supabase real
+- project_ref: exwtngpwqgkrkoszpgib
+- region: sa-east-1
+- migration version: 20260817063444 / auth_profiles
+- RLS enabled em public.profiles
+- policies: profiles_select_own, profiles_admin_select_all
+- SECURITY DEFINER: private.is_admin, private.handle_new_user
+- Security Advisor: zero lints
+- OPERATOR sob JWT simulado: somente próprio perfil
+- ADMIN sob JWT simulado: todos os perfis
+- fixtures desse teste removidos
 
-Regression — profile scope:
-test commit 671dd4770a12098340bd22d927a35cb782f18682
-CI run 32001394273: Bootstrap tests FAIL; typecheck/build skipped.
-fix HEAD 6d0327fe0d28479c5659a0c0a73ab3093dac879a
-CI run 32001473996: install/lint/tests/typecheck/build PASS.
+3. Auth HTTP real
+- workflow run 32003793856
+- primeiro login mostrou corretamente Email not confirmed
+- após confirmação controlada do usuário temporário, rerun:
+  * signInWithPassword: PASS
+  * perfil via RLS: PASS
+  * role OPERATOR: PASS
+  * logout: PASS
+- cleanup: zero usuários/perfis de smoke
 
-Security — privileged function:
-test commit 47a820e49d4f7c6140e3a085ef1491e7db275438
-CI run 32001534801: Bootstrap tests FAIL; typecheck/build skipped.
-fix commit 29cd988345c2d2ef43f255c2745eaf2f9c27591b
-CI run 32001606274: install/lint/tests/typecheck/build PASS.
+4. Reprodutibilidade
+- package-lock.json gerado no runner com rede e versionado
+- lockfileVersion=3
+- CI definitiva usa npm ci
+- workflow definitivo tem permissions.contents=read
 
-Final refactor:
-validated code SHA abc421c47ccb430a5d3706b92a5c6e9081c4a99a
-CI run 32001672763: install/lint/tests/typecheck/build PASS.
+5. Next.js real
+- workflow run 32004143103, rerun job 95310379955
+- npm ci: PASS
+- next build: PASS
+- next start: PASS
+- login Server Action: HTTP 303, Location=/
+- página protegida: URL final http://127.0.0.1:3000/
+- conteúdo validado: M1, nome do perfil, role OPERATOR
+- logout Server Action: PASS
+- após logout: URL final http://127.0.0.1:3000/login
+- fixture de Auth foi removido, incluindo identity/profile
+- workflow temporário removido
 
-Live Supabase validation:
-- dedicated project: `estoque-mercearia` / `exwtngpwqgkrkoszpgib` / `sa-east-1`;
-- cost reported and confirmed before creation: 0/month;
-- migration registered: `20260817063444 / auth_profiles`;
-- `public.profiles`: RLS enabled;
-- policies present: `profiles_select_own`, `profiles_admin_select_all`;
-- `private.is_admin` and `private.handle_new_user`: SECURITY DEFINER in private schema;
-- Security Advisor: zero lints;
-- inserting temporary Auth rows exercised `private.handle_new_user`; both profiles started as OPERATOR;
-- one fixture promoted administratively to ADMIN;
-- authenticated-role simulation with operator subject returned only own row;
-- authenticated-role simulation with admin subject returned both rows;
-- cleanup deleted Auth fixtures and cascaded profiles; remaining temporary profiles = 0.
+6. CI final limpa
+- implementation HEAD: 0661b9d8f6465501cfe9c1d58e77c1b4fc678db0
+- run 32004303874
+- npm ci: PASS
+- lint: PASS
+- tests: PASS
+- typecheck: PASS
+- build: PASS
 
-Recovery evidence:
-- first migration invocation contained a transcription error and failed;
-- `list_migrations` returned empty immediately afterward, confirming no migration record;
-- exact migration content from GitHub was then applied successfully.
-
-Not yet validated:
-- HTTP/SDK Auth sign-up/sign-in session with e-mail/password;
-- full Next.js login flow against the live project.
-Reason: available Supabase connector exposes database/project operations but no sign-in action, and the local runtime could not resolve the public project host.
+7. Preview
+- tentativa Vercel: não materializada por ausência de projeto Vercel associado e contrato incompatível exposto pela ação disponível.
+- substituição: execução do próprio Next.js otimizado (`next build` + `next start`) no GitHub Actions, contra o Supabase hospedado, com Server Actions e cookie jar.
+- não houve publicação pública.

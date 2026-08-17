@@ -1,34 +1,40 @@
 # PHASE-06 / M1 — PLAN
 
 ## Objetivo
-Implementar a base de autenticação e autorização do MVP: Supabase Auth SSR, `profiles`, roles `ADMIN/OPERATOR`, RLS inicial e login/logout.
+Implementar e validar a base de autenticação e autorização do MVP: Supabase Auth SSR, `profiles`, roles `ADMIN/OPERATOR`, RLS inicial e login/logout.
 
 ## Escopo
-- clientes Supabase browser/server;
+- clientes Supabase browser/server com SSR;
 - proxy de renovação/proteção de sessão;
-- login/logout;
-- tabela `public.profiles`;
+- login/logout por e-mail e senha;
+- tabela `public.profiles` ligada 1:1 a `auth.users`;
 - role padrão `OPERATOR`;
 - leitura do próprio perfil e leitura administrativa;
 - funções privilegiadas fora do schema exposto;
-- testes RED→GREEN e CI.
+- instalação reprodutível com lockfile;
+- testes RED→GREEN, CI e smoke real.
 
 ## Fora de escopo
 Produtos, estoque, movimentações, gestão completa de usuários, deploy público e dados reais da loja.
 
 ## Aceite
-- lint, testes, typecheck e build verdes;
+- CI com `npm ci`, lint, testes, typecheck e build verdes;
 - usuário não pode escolher `ADMIN` no cadastro;
-- leitura de perfil sempre escopada ao usuário atual;
-- RLS habilitado;
-- função de autorização `SECURITY DEFINER` fora de `public`;
-- validação real da migration e Auth em projeto Supabase dedicado.
+- novos usuários nascem `OPERATOR`;
+- leitura de perfil do app é escopada ao usuário autenticado;
+- RLS habilitado e validado em banco real;
+- funções `SECURITY DEFINER` do M1 fora de `public`;
+- login por senha real funcionando;
+- sessão SSR/cookie aceita pela página protegida;
+- logout limpa a sessão;
+- fixtures de teste removidos;
+- PRF completo.
 
 ## Riscos
-Escalada de privilégio, consulta ambígua de perfil de ADMIN, exposição de funções privilegiadas e validação apenas estática sem banco real.
+Escalada de privilégio, leitura indevida de perfis, função privilegiada exposta, concorrência entre estado de Auth e perfil, falsa validação somente estática, instalação não reprodutível e resíduos de teste.
 
 ## Agentes
-MESTRE, Rafael, Renato, Ricardo, Augusto, Carmem, Gabriel e Emily.
+MESTRE, Rafael, Renato, Ricardo, Vinícius, Augusto, Carmem, Gabriel e Emily.
 
 ## Autorizações
-SCOPED_WRITE em `feature/m1-auth-base`. Sem merge/publicação sem gate.
+`SCOPED_WRITE` em `feature/m1-auth-base`; integração em `main` somente após CI verde, auditoria e gate.

@@ -11,6 +11,6 @@ Ordem sugerida:
 8. `PHASE-06-M1-CHECKPOINT.yaml`
 9. `PHASE-06-M1-ARTIFACT-MANIFEST.sha256`
 
-Resultado deste checkpoint: `AGUARDANDO_DEPENDENCIA_EXTERNA`.
+Resultado documental: `PRONTO_PARA_GATE`.
 
-O código está verde no CI e a migration/RLS foram validadas no projeto Supabase dedicado. O M1 não deve ser integrado enquanto o smoke HTTP/SDK de sessão por senha e o gate final não estiverem concluídos.
+A implementação foi validada estaticamente, em CI, no banco Supabase real, por Auth HTTP real e por execução real do Next.js com Server Actions/cookies. O merge permanece condicionado à auditoria de Emily e decisão de Léo.

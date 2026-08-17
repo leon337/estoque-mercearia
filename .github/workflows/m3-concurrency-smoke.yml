@@ -25,7 +25,7 @@ jobs:
       - name: Run hosted concurrency and idempotency smoke
         env:
           SUPABASE_URL: https://exwtngpwqgkrkoszpgib.supabase.co
-          SUPABASE_PUBLISHABLE_KEY: sb_publishable_dXdPZQclAr5u7yskNNmHhw_AhtmW81_
+          SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4d3RuZ3B3cWdrcmtvc3pwZ2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MzQyODQsImV4cCI6MjEwMjUxMDI4NH0.GOI7E0VnmPQnF1smTLdTVYnzUGrz-OA6-cmEGanCiio
           TEST_EMAIL: m3-concurrency-operator-20260817@gmail.com
           TEST_PASSWORD: M3-Concurrency-Operator!Aa9
           PRODUCT_ID: 77777777-7777-4777-8777-777777777777

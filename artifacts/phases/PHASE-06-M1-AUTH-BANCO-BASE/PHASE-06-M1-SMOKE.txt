@@ -1,0 +1,16 @@
+PHASE-06 / M1 SMOKE
+
+BUILD_SMOKE=PASS
+CI_RUN=32001672763
+
+LIVE_AUTH_RLS_SMOKE=NAO_APLICAVEL_NESTE_CHECKPOINT
+JUSTIFICATIVA=O projeto Supabase dedicado ainda não foi autorizado/criado. Não reutilizar projetos existentes evita mistura de dados e escopo.
+
+SMOKE_PENDENTE:
+1. aplicar 0001_auth_profiles.sql;
+2. criar ADMIN e OPERATOR de teste;
+3. autenticar ambos;
+4. confirmar perfil próprio;
+5. confirmar ADMIN pode ler perfis;
+6. confirmar OPERATOR não pode ler outro perfil;
+7. confirmar usuário novo nasce OPERATOR.

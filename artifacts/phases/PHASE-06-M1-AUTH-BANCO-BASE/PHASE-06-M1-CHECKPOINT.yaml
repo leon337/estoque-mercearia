@@ -1,0 +1,26 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M1-AUTH-BANCO-BASE
+risk_class: B
+current_state: AGUARDANDO_DEPENDENCIA_EXTERNA
+branch: feature/m1-auth-base
+head_sha: abc421c47ccb430a5d3706b92a5c6e9081c4a99a
+pull_request: 3
+ci:
+  run_id: 32001672763
+  conclusion: success
+delivered:
+  - Supabase Auth SSR foundation
+  - login/logout
+  - protected root
+  - profiles migration
+  - ADMIN/OPERATOR role model
+  - RLS select policies
+  - private privileged functions
+  - regression/security tests
+pending:
+  - dedicated Supabase project
+  - migration execution
+  - live Auth/RLS smoke
+  - package-lock reproducibility debt
+next_action: Confirmar organização Supabase e custo, criar projeto dedicado e executar validação real.
+return_to: MESTRE

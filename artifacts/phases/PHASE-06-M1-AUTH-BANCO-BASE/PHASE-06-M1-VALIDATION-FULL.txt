@@ -1,0 +1,31 @@
+PHASE-06 / M1 VALIDATION FULL
+
+Initial acceptance:
+commit 828db0bed67ac164e0a99aee5d00605b17b43209
+expected RED observed in CI before production implementation.
+
+Implementation:
+commit 2c46e76615243b25b68ce4f2031f24eaa523b8c4
+CI run 32001296690: install/lint/tests/typecheck/build PASS.
+
+Regression — profile scope:
+test commit 671dd4770a12098340bd22d927a35cb782f18682
+CI run 32001394273: Bootstrap tests FAIL; typecheck/build skipped.
+fix HEAD 6d0327fe0d28479c5659a0c0a73ab3093dac879a
+CI run 32001473996: install/lint/tests/typecheck/build PASS.
+
+Security — privileged function:
+test commit 47a820e49d4f7c6140e3a085ef1491e7db275438
+CI run 32001534801: Bootstrap tests FAIL; typecheck/build skipped.
+fix commit 29cd988345c2d2ef43f255c2745eaf2f9c27591b
+CI run 32001606274: install/lint/tests/typecheck/build PASS.
+
+Final refactor:
+HEAD abc421c47ccb430a5d3706b92a5c6e9081c4a99a
+CI run 32001672763: install/lint/tests/typecheck/build PASS.
+
+Not yet validated:
+- actual PostgreSQL migration execution;
+- real Supabase Auth session;
+- ADMIN vs OPERATOR RLS behavior.
+Reason: dedicated Supabase project has not been authorized/created.

@@ -21,4 +21,4 @@ test('manutenção de histórico só permite bypass ao owner postgres', async ()
   assert.match(sql, /return new/i);
   assert.match(sql, /STOCK_MOVEMENT_IMMUTABLE/i);
   assert.doesNotMatch(sql, /service_role[\s\S]*return (old|new)/i);
-}
+});

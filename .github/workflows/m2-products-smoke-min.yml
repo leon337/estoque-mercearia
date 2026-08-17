@@ -1,0 +1,180 @@
+name: M2 Products Smoke Minimal
+
+on:
+  push:
+    branches:
+      - feature/m2-products
+
+permissions:
+  contents: read
+
+jobs:
+  products-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start isolated local Supabase
+        run: |
+          if [ ! -f supabase/config.toml ]; then
+            supabase init
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('supabase/config.toml')
+          s = p.read_text()
+          if 'port = 54324' in s:
+              s = s.replace('port = 54324', 'port = 55324', 1)
+          p.write_text(s)
+          PY
+          supabase start
+
+      - name: Export local credentials
+        run: |
+          supabase status -o env > /tmp/supabase.env
+          set -a
+          source /tmp/supabase.env
+          set +a
+          test -n "${ANON_KEY:-}"
+          test -n "${SERVICE_ROLE_KEY:-}"
+          echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL:-http://127.0.0.1:54321}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY" >> "$GITHUB_ENV"
+          echo "LOCAL_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY" >> "$GITHUB_ENV"
+          echo "LOCAL_DB_URL=${DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}" >> "$GITHUB_ENV"
+          echo "ADMIN_EMAIL=m2-admin-${GITHUB_RUN_ID}@test.local" >> "$GITHUB_ENV"
+          echo "ADMIN_PASSWORD=M2-Admin-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
+          echo "OPERATOR_EMAIL=m2-operator-${GITHUB_RUN_ID}@test.local" >> "$GITHUB_ENV"
+          echo "OPERATOR_PASSWORD=M2-Operator-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
+
+      - name: Create local users and seed products
+        run: |
+          node --input-type=module <<'NODE'
+          import { createClient } from '@supabase/supabase-js'
+          const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.LOCAL_SERVICE_ROLE_KEY, {
+            auth: { persistSession: false, autoRefreshToken: false },
+          })
+          for (const [email, password, name] of [
+            [process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD, 'M2 Admin Smoke'],
+            [process.env.OPERATOR_EMAIL, process.env.OPERATOR_PASSWORD, 'M2 Operator Smoke'],
+          ]) {
+            const { error } = await admin.auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { name } })
+            if (error) throw error
+          }
+          NODE
+          psql "$LOCAL_DB_URL" -v ON_ERROR_STOP=1 <<SQL
+          update public.profiles p
+          set role = 'ADMIN'::public.app_role
+          from auth.users u
+          where p.id = u.id and u.email = '$ADMIN_EMAIL';
+
+          insert into public.categories(name, active)
+          values ('M2 Smoke Category', true);
+
+          insert into public.products(internal_code, barcode, name, category_id, unit, minimum_stock, active)
+          select 'M2-SMOKE-001', null, 'M2 Café Smoke', id, 'UN', 7, true
+          from public.categories where name = 'M2 Smoke Category';
+          SQL
+
+      - name: Build and start application
+        run: |
+          npm run build
+          npm run start -- -H 127.0.0.1 -p 3000 > /tmp/next.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:3000/login >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/next.log
+          exit 50
+
+      - name: Login ADMIN and verify product UI
+        run: |
+          curl -sS -c /tmp/admin.cookies http://127.0.0.1:3000/login -o /tmp/login.html
+          ACTION=$(grep -o '\$ACTION_ID_[^" ]*' /tmp/login.html | head -n 1)
+          test -n "$ACTION"
+          curl -sS -D /tmp/admin.headers -o /tmp/admin.login \
+            -H 'Origin: http://127.0.0.1:3000' \
+            -c /tmp/admin.cookies -b /tmp/admin.cookies \
+            -F "$ACTION=" -F "email=$ADMIN_EMAIL" -F "password=$ADMIN_PASSWORD" \
+            http://127.0.0.1:3000/login >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/admin.headers | tail -n 1)
+          echo "admin_login=$LOCATION"
+          [ "$LOCATION" = "/" ]
+
+          curl -fsS -G -b /tmp/admin.cookies -c /tmp/admin.cookies \
+            --data-urlencode 'q=M2-SMOKE-001' --data-urlencode 'status=all' \
+            http://127.0.0.1:3000/products -o /tmp/admin-products.html
+          grep -q 'M2 Café Smoke' /tmp/admin-products.html
+          grep -q 'M2 Smoke Category' /tmp/admin-products.html
+          grep -q 'Novo produto' /tmp/admin-products.html
+          grep -q '/products/.*\/edit' /tmp/admin-products.html
+
+          curl -fsS -b /tmp/admin.cookies http://127.0.0.1:3000/products/new -o /tmp/new.html
+          for field in internal_code barcode name category_id unit minimum_stock; do
+            grep -q "name=\"$field\"" /tmp/new.html
+          done
+
+      - name: Login OPERATOR and verify read-only UI
+        run: |
+          curl -sS -c /tmp/operator.cookies http://127.0.0.1:3000/login -o /tmp/operator-login.html
+          ACTION=$(grep -o '\$ACTION_ID_[^" ]*' /tmp/operator-login.html | head -n 1)
+          test -n "$ACTION"
+          curl -sS -D /tmp/operator.headers -o /tmp/operator.login \
+            -H 'Origin: http://127.0.0.1:3000' \
+            -c /tmp/operator.cookies -b /tmp/operator.cookies \
+            -F "$ACTION=" -F "email=$OPERATOR_EMAIL" -F "password=$OPERATOR_PASSWORD" \
+            http://127.0.0.1:3000/login >/dev/null
+          LOCATION=$(awk 'BEGIN{IGNORECASE=1} /^location:/{gsub("\r",""); print $2}' /tmp/operator.headers | tail -n 1)
+          echo "operator_login=$LOCATION"
+          [ "$LOCATION" = "/" ]
+
+          curl -fsS -G -b /tmp/operator.cookies -c /tmp/operator.cookies \
+            --data-urlencode 'q=M2 Café' http://127.0.0.1:3000/products -o /tmp/operator-products.html
+          grep -q 'M2 Café Smoke' /tmp/operator-products.html
+          if grep -q 'Novo produto' /tmp/operator-products.html; then
+            echo 'OPERATOR saw write action'
+            exit 61
+          fi
+
+          FINAL_URL=$(curl -sS -L -b /tmp/operator.cookies -c /tmp/operator.cookies \
+            -o /tmp/operator-new.html -w '%{url_effective}' http://127.0.0.1:3000/products/new)
+          echo "operator_new=$FINAL_URL"
+          [[ "$FINAL_URL" == *'/products?error=permission'* ]]
+
+      - name: Inactive product remains visible only to ADMIN
+        run: |
+          psql "$LOCAL_DB_URL" -v ON_ERROR_STOP=1 -c "update public.products set active=false where internal_code='M2-SMOKE-001';"
+
+          curl -fsS -G -b /tmp/admin.cookies -c /tmp/admin.cookies \
+            --data-urlencode 'q=M2-SMOKE-001' --data-urlencode 'status=inactive' \
+            http://127.0.0.1:3000/products -o /tmp/admin-inactive.html
+          grep -q 'M2 Café Smoke' /tmp/admin-inactive.html
+          grep -q 'Inativo' /tmp/admin-inactive.html
+
+          curl -fsS -G -b /tmp/operator.cookies -c /tmp/operator.cookies \
+            --data-urlencode 'q=M2-SMOKE-001' --data-urlencode 'status=all' \
+            http://127.0.0.1:3000/products -o /tmp/operator-inactive.html
+          if grep -q 'M2 Café Smoke' /tmp/operator-inactive.html; then
+            echo 'OPERATOR saw inactive product'
+            exit 62
+          fi
+
+      - name: Stop local Supabase
+        if: always()
+        run: supabase stop --no-backup || true
+
+      - name: Dump app log on failure
+        if: failure()
+        run: cat /tmp/next.log || true

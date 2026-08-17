@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Establish the Estoque Mercearia Design System v1 foundation—semantic tokens, Inter/JetBrains Mono typography, reusable UI primitives, responsive application shell, and a dashboard shell adoption—without changing existing business logic, database behavior, authentication, Server Actions, RLS, or stock invariants.
+**Goal:** Establish the Estoque Mercearia Design System v1 foundation—semantic tokens, Inter/JetBrains Mono typography, reusable UI primitives, responsive application shell, and dashboard shell adoption—without changing business logic, database behavior, authentication, Server Actions, RLS, or stock invariants.
 
-**Architecture:** Keep `src/app` as route/composition and server-data boundary. Add presentation-only components under `src/components/ui` and responsive navigation/layout under `src/components/shell`; shell components receive role/data through props and never access Supabase. P8.1 wraps only the existing dashboard in the new shell as a proof of integration; dashboard queries and functional copy remain intact.
+**Architecture:** Keep `src/app` as the route/composition and server-data boundary. Add presentation-only components under `src/components/ui` and responsive navigation/layout under `src/components/shell`; these components receive role/data through props and never access Supabase. P8.1 wraps only the existing dashboard in the new shell as proof of integration; dashboard queries, calculations, actions, routes, and functional copy remain intact.
 
 **Tech Stack:** Next.js 16.3.1, React 19.2.8, TypeScript 5, Tailwind CSS 4, Node.js test runner (`node --test`).
 
@@ -28,21 +28,21 @@
 
 **Create**
 - `tests/p8-design-system-foundation.test.mjs` — structural contract for tokens, fonts, presentation boundaries, shell accessibility, and dashboard adoption.
-- `src/components/ui/Button.tsx` — base button/link visual primitive without domain logic.
+- `src/components/ui/Button.tsx` — base button primitive without domain logic.
 - `src/components/ui/DataCard.tsx` — generic elevated surface container.
 - `src/components/ui/MetricCard.tsx` — generic metric display surface.
-- `src/components/ui/StatusBadge.tsx` — semantic text badge for success/warning/critical/neutral states.
+- `src/components/ui/StatusBadge.tsx` — semantic text badge for status display.
 - `src/components/ui/PageHeader.tsx` — title/subtitle/actions composition.
-- `src/components/shell/navigation.ts` — canonical route metadata, including ADMIN-only entry.
+- `src/components/shell/navigation.ts` — canonical route metadata and role filtering.
 - `src/components/shell/DesktopSidebar.tsx` — desktop persistent navigation with active state.
-- `src/components/shell/MobileTopBar.tsx` — mobile brand bar with ADMIN shortcut when applicable.
+- `src/components/shell/MobileTopBar.tsx` — mobile brand bar plus ADMIN shortcut.
 - `src/components/shell/MobileBottomNav.tsx` — mobile operational navigation with active state.
 - `src/components/shell/AppShell.tsx` — responsive layout composition around route content.
 
 **Modify**
 - `src/app/globals.css` — semantic CSS variables, font aliases, background/text defaults, focus-visible baseline, touch-target utility.
 - `src/app/layout.tsx` — load Inter and JetBrains Mono with `next/font/google` and expose CSS variables.
-- `src/app/page.tsx` — wrap the existing dashboard UI in `AppShell` and preserve all queries/actions/business logic.
+- `src/app/page.tsx` — wrap existing dashboard UI in `AppShell`, preserving queries/actions/business logic.
 
 ---
 
@@ -53,7 +53,7 @@
 
 **Interfaces:**
 - Consumes: existing source files only.
-- Produces: executable structural contract for Tasks 2–4.
+- Produces: executable structural contract for Tasks 2–5.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -140,17 +140,15 @@ test("P8.1 dashboard adopts AppShell without losing M5 business contracts", asyn
 
 - [ ] **Step 2: Run the focused test and prove RED**
 
-Run:
-
 ```bash
 node --test tests/p8-design-system-foundation.test.mjs
 ```
 
 Expected: FAIL because tokens/components/AppShell do not exist yet.
 
-- [ ] **Step 3: Record RED evidence in the P8.1 issue/PR notes**
+- [ ] **Step 3: Record RED evidence**
 
-Expected record: command, failing assertions/missing files, commit SHA containing only the test.
+Record in Issue #13 / PR notes: command, failing assertions or missing files, and the commit SHA containing only the new RED contract.
 
 - [ ] **Step 4: Commit the RED contract**
 
@@ -169,11 +167,9 @@ git commit -m "test: define P8.1 visual foundation contract"
 - Test: `tests/p8-design-system-foundation.test.mjs`
 
 **Interfaces:**
-- Produces CSS variables `--color-*`, `--font-ui`, `--font-data`, and Next font variables `--font-inter`, `--font-jetbrains-mono` used by all later components.
+- Produces CSS variables `--color-*`, `--font-ui`, `--font-data`, and Next font variables `--font-inter`, `--font-jetbrains-mono` used by later components.
 
-- [ ] **Step 1: Implement semantic global CSS**
-
-Replace the minimal global CSS with a Tailwind 4-compatible semantic baseline:
+- [ ] **Step 1: Replace `src/app/globals.css` with the semantic baseline**
 
 ```css
 @import "tailwindcss";
@@ -207,8 +203,14 @@ Replace the minimal global CSS with a Tailwind 4-compatible semantic baseline:
   --touch-target: 48px;
 }
 
-* { box-sizing: border-box; }
-html { background: var(--color-background); }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-background);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -216,28 +218,63 @@ body {
   color: var(--color-on-surface);
   font-family: var(--font-ui);
 }
-button, input, select, textarea { font: inherit; }
-a { color: inherit; }
-:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
-.font-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
-.touch-target { min-height: var(--touch-target); min-width: var(--touch-target); }
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.font-data {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.touch-target {
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+}
 ```
 
-- [ ] **Step 2: Load approved fonts in the root layout**
-
-Use `next/font/google` and CSS variables:
+- [ ] **Step 2: Replace `src/app/layout.tsx` with approved fonts while preserving metadata**
 
 ```tsx
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const jetBrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
-// keep existing metadata unchanged
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  display: "swap",
+});
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export const metadata: Metadata = {
+  title: "Estoque Mercearia",
+  description: "Controle simples e rastreável de estoque para pequena mercearia.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${jetBrainsMono.variable}`}>{children}</body>
@@ -252,7 +289,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 node --test tests/p8-design-system-foundation.test.mjs
 ```
 
-Expected: token/font assertions PASS; component/shell assertions still FAIL.
+Expected: token/font assertions PASS; presentation/shell assertions still FAIL until Tasks 3–4.
 
 - [ ] **Step 4: Run existing bootstrap/M5 regressions**
 
@@ -282,49 +319,151 @@ git commit -m "feat: add P8.1 design tokens and typography"
 - Test: `tests/p8-design-system-foundation.test.mjs`
 
 **Interfaces:**
-- `Button`: `ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>` with `variant?: "primary" | "secondary" | "danger"`.
-- `DataCard`: `{ children: React.ReactNode; className?: string }`.
-- `MetricCard`: `{ label: string; value: React.ReactNode; hint?: React.ReactNode; tone?: "neutral" | "success" | "warning" | "critical" }`.
-- `StatusBadge`: `{ children: React.ReactNode; tone?: "neutral" | "success" | "warning" | "critical" }`.
-- `PageHeader`: `{ title: string; subtitle?: React.ReactNode; actions?: React.ReactNode }`.
+- `ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>` with `variant?: "primary" | "secondary" | "danger"`.
+- `DataCardProps = { children: React.ReactNode; className?: string }`.
+- `MetricCardProps = { label: string; value: React.ReactNode; hint?: React.ReactNode; tone?: Tone }`.
+- `StatusBadgeProps = { children: React.ReactNode; tone?: Tone }`.
+- `PageHeaderProps = { title: string; subtitle?: React.ReactNode; actions?: React.ReactNode }`.
+- `Tone = "neutral" | "success" | "warning" | "critical"`; primitives do not derive tones from business data.
 
-- [ ] **Step 1: Implement minimal primitives using semantic CSS variables**
+- [ ] **Step 1: Create `Button.tsx`**
 
-Rules:
-- no Supabase imports;
-- no business-state calculations;
-- native HTML controls/elements by default;
-- `Button` keeps a 48px minimum height;
-- focus is inherited from the global `:focus-visible` baseline;
-- tones use `var(--color-...)`, not copied Stitch hex values.
+```tsx
+import type { ButtonHTMLAttributes } from "react";
 
-Representative `StatusBadge` implementation:
+type Variant = "primary" | "secondary" | "danger";
+
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: Variant;
+};
+
+const variants: Record<Variant, string> = {
+  primary: "border-transparent bg-[var(--color-primary)] text-[var(--color-on-primary)]",
+  secondary: "border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] text-[var(--color-primary)]",
+  danger: "border-transparent bg-[var(--color-error)] text-[var(--color-on-primary)]",
+};
+
+export function Button({ className = "", variant = "primary", ...props }: ButtonProps) {
+  return (
+    <button
+      className={`min-h-12 rounded-lg border px-4 py-2 font-semibold transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${className}`}
+      {...props}
+    />
+  );
+}
+```
+
+- [ ] **Step 2: Create `DataCard.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+
+export function DataCard({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <section
+      className={`rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] p-4 shadow-sm ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+```
+
+- [ ] **Step 3: Create `StatusBadge.tsx`**
 
 ```tsx
 import type { ReactNode } from "react";
 
 type Tone = "neutral" | "success" | "warning" | "critical";
+
 const tones: Record<Tone, string> = {
-  neutral: "border-[var(--color-border-subtle)] bg-[var(--color-surface-low)] text-[var(--color-on-surface-variant)]",
-  success: "border-[var(--color-status-success)]/30 bg-[var(--color-status-success)]/10 text-[var(--color-primary)]",
-  warning: "border-[var(--color-status-warning)]/30 bg-[var(--color-status-warning)]/10 text-amber-800",
-  critical: "border-[var(--color-status-critical)]/30 bg-[var(--color-status-critical)]/10 text-red-700",
+  neutral: "border-[var(--color-border-subtle)]",
+  success: "border-[var(--color-status-success)]",
+  warning: "border-[var(--color-status-warning)]",
+  critical: "border-[var(--color-status-critical)]",
 };
 
 export function StatusBadge({ children, tone = "neutral" }: { children: ReactNode; tone?: Tone }) {
-  return <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${tones[tone]}`}>{children}</span>;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border bg-[var(--color-surface-lowest)] px-3 py-1 text-xs font-bold text-[var(--color-on-surface)] ${tones[tone]}`}
+    >
+      {children}
+    </span>
+  );
 }
 ```
 
-- [ ] **Step 2: Run the focused contract**
+- [ ] **Step 4: Create `MetricCard.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+
+type Tone = "neutral" | "success" | "warning" | "critical";
+
+const tones: Record<Tone, string> = {
+  neutral: "border-[var(--color-border-subtle)]",
+  success: "border-[var(--color-status-success)]",
+  warning: "border-[var(--color-status-warning)]",
+  critical: "border-[var(--color-status-critical)]",
+};
+
+export function MetricCard({
+  label,
+  value,
+  hint,
+  tone = "neutral",
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+  tone?: Tone;
+}) {
+  return (
+    <article className={`rounded-xl border bg-[var(--color-surface-lowest)] p-5 shadow-sm ${tones[tone]}`}>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">{label}</p>
+      <div className="mt-1 text-3xl font-bold tracking-tight">{value}</div>
+      {hint ? <div className="mt-2 text-sm text-[var(--color-on-surface-variant)]">{hint}</div> : null}
+    </article>
+  );
+}
+```
+
+- [ ] **Step 5: Create `PageHeader.tsx`**
+
+```tsx
+import type { ReactNode } from "react";
+
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+}: {
+  title: string;
+  subtitle?: ReactNode;
+  actions?: ReactNode;
+}) {
+  return (
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+        {subtitle ? <div className="mt-2 text-sm text-[var(--color-on-surface-variant)]">{subtitle}</div> : null}
+      </div>
+      {actions ? <div className="shrink-0">{actions}</div> : null}
+    </header>
+  );
+}
+```
+
+- [ ] **Step 6: Run the focused contract**
 
 ```bash
 node --test tests/p8-design-system-foundation.test.mjs
 ```
 
-Expected: tokens/fonts/presentation independence PASS; shell/dashboard assertions still FAIL.
+Expected: tokens/fonts and available presentation-independence checks PASS; shell files remain missing until Task 4.
 
-- [ ] **Step 3: Run lint and typecheck on the new primitives**
+- [ ] **Step 7: Run lint and typecheck**
 
 ```bash
 npm run lint
@@ -333,10 +472,10 @@ npm run typecheck
 
 Expected: PASS.
 
-- [ ] **Step 4: Commit primitives**
+- [ ] **Step 8: Commit primitives**
 
 ```bash
-git add src/components/ui tests/p8-design-system-foundation.test.mjs
+git add src/components/ui
 git commit -m "feat: add P8.1 UI primitives"
 ```
 
@@ -356,13 +495,18 @@ git commit -m "feat: add P8.1 UI primitives"
 - `Role = "ADMIN" | "OPERATOR"`.
 - `NavItem = { href: string; label: string; adminOnly?: boolean }`.
 - `getNavigation(role: Role): NavItem[]` returns canonical visible items.
+- `isNavActive(pathname: string, href: string): boolean` provides one active-link rule.
 - `AppShell({ children, role }: { children: React.ReactNode; role: Role })`.
 
-- [ ] **Step 1: Create canonical route metadata**
+- [ ] **Step 1: Create `navigation.ts`**
 
 ```ts
 export type Role = "ADMIN" | "OPERATOR";
-export type NavItem = { href: string; label: string; adminOnly?: boolean };
+export type NavItem = {
+  href: string;
+  label: string;
+  adminOnly?: boolean;
+};
 
 const navigation: NavItem[] = [
   { href: "/", label: "Painel" },
@@ -373,48 +517,132 @@ const navigation: NavItem[] = [
   { href: "/admin/users", label: "Administração", adminOnly: true },
 ];
 
-export function getNavigation(role: Role) {
+export function getNavigation(role: Role): NavItem[] {
   return navigation.filter((item) => !item.adminOnly || role === "ADMIN");
+}
+
+export function isNavActive(pathname: string, href: string): boolean {
+  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 ```
 
-- [ ] **Step 2: Implement active-link rule consistently**
-
-`DesktopSidebar` and `MobileBottomNav` are client components using `usePathname()`.
-
-Active rule:
-
-```ts
-const isActive = (pathname: string, href: string) =>
-  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
-```
-
-Each active link must render:
+- [ ] **Step 2: Create `DesktopSidebar.tsx`**
 
 ```tsx
-aria-current={active ? "page" : undefined}
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getNavigation, isNavActive, type Role } from "./navigation";
+
+export function DesktopSidebar({ role }: { role: Role }) {
+  const pathname = usePathname();
+
+  return (
+    <aside className="hidden min-h-screen w-72 shrink-0 border-r border-[var(--color-border-subtle)] bg-[var(--color-surface-container)] p-4 md:flex md:flex-col">
+      <div className="mb-6 px-3 py-2">
+        <p className="text-xl font-bold text-[var(--color-primary)]">Estoque Mercearia</p>
+        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-on-surface-variant)]">
+          {role === "ADMIN" ? "Administrador" : "Operador"}
+        </p>
+      </div>
+      <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-2">
+        {getNavigation(role).map((item) => {
+          const active = isNavActive(pathname, item.href);
+          return (
+            <Link
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-12 items-center rounded-lg px-3 py-2 font-semibold transition ${
+                active
+                  ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]"
+                  : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-high)]"
+              }`}
+              href={item.href}
+              key={item.href}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
 ```
 
-- [ ] **Step 3: Implement desktop sidebar**
+- [ ] **Step 3: Create `MobileTopBar.tsx`**
 
-Requirements:
-- hidden below `md`;
-- width about 18rem (`w-72`);
-- semantic surface/background variables;
-- `Estoque Mercearia` brand only;
-- ADMIN item filtered by `role`;
-- links at least 48px tall.
+```tsx
+"use client";
 
-- [ ] **Step 4: Implement mobile top bar and bottom nav**
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { Role } from "./navigation";
 
-Requirements:
-- `MobileTopBar`: visible below `md`, brand `Estoque Mercearia`, optional `Administração` shortcut only for ADMIN;
-- `MobileBottomNav`: visible below `md`, fixed bottom, operational items Painel/Produtos/Estoque/Movimentações/Histórico; ADMIN remains available through TopBar shortcut;
-- no generic avatar/photo;
-- no icon library dependency;
-- `aria-current` on active bottom-nav link.
+export function MobileTopBar({ role }: { role: Role }) {
+  const pathname = usePathname();
+  const adminActive = pathname.startsWith("/admin");
 
-- [ ] **Step 5: Compose AppShell**
+  return (
+    <header className="sticky top-0 z-40 flex min-h-12 items-center justify-between border-b border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-4 md:hidden">
+      <Link className="font-bold text-[var(--color-primary)]" href="/">
+        Estoque Mercearia
+      </Link>
+      {role === "ADMIN" ? (
+        <Link
+          aria-current={adminActive ? "page" : undefined}
+          className="flex min-h-12 items-center px-2 text-sm font-semibold text-[var(--color-primary)]"
+          href="/admin/users"
+        >
+          Administração
+        </Link>
+      ) : null}
+    </header>
+  );
+}
+```
+
+- [ ] **Step 4: Create `MobileBottomNav.tsx`**
+
+```tsx
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getNavigation, isNavActive, type Role } from "./navigation";
+
+export function MobileBottomNav({ role }: { role: Role }) {
+  const pathname = usePathname();
+  const items = getNavigation(role).filter((item) => !item.adminOnly);
+
+  return (
+    <nav
+      aria-label="Navegação móvel"
+      className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-1 py-1 shadow-lg md:hidden"
+    >
+      {items.map((item) => {
+        const active = isNavActive(pathname, item.href);
+        return (
+          <Link
+            aria-current={active ? "page" : undefined}
+            className={`flex min-h-12 items-center justify-center rounded-lg px-1 text-center text-[11px] font-semibold leading-tight ${
+              active
+                ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]"
+                : "text-[var(--color-on-surface-variant)]"
+            }`}
+            href={item.href}
+            key={item.href}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+```
+
+- [ ] **Step 5: Create `AppShell.tsx`**
 
 ```tsx
 import type { ReactNode } from "react";
@@ -443,7 +671,7 @@ export function AppShell({ children, role }: { children: ReactNode; role: Role }
 node --test tests/p8-design-system-foundation.test.mjs
 ```
 
-Expected: all assertions except dashboard adoption PASS.
+Expected: token/font/presentation/shell assertions PASS; dashboard-adoption assertion still FAIL.
 
 - [ ] **Step 7: Run lint and typecheck**
 
@@ -457,7 +685,7 @@ Expected: PASS.
 - [ ] **Step 8: Commit shell**
 
 ```bash
-git add src/components/shell tests/p8-design-system-foundation.test.mjs
+git add src/components/shell
 git commit -m "feat: add responsive P8.1 app shell"
 ```
 
@@ -474,29 +702,31 @@ git commit -m "feat: add responsive P8.1 app shell"
 - Consumes: `AppShell({ role, children })` from Task 4.
 - Preserves: existing Supabase claims/profile/products queries, stock calculations, logout action, route links, and M5 metric copy.
 
-- [ ] **Step 1: Add only the AppShell import and wrapper**
-
-Add:
+- [ ] **Step 1: Add the AppShell import**
 
 ```tsx
 import { AppShell } from "@/components/shell/AppShell";
 ```
 
-After the existing role/profile validation, wrap the existing dashboard presentation:
+Do not modify existing Supabase imports or the `logout` import.
+
+- [ ] **Step 2: Wrap only the returned dashboard presentation**
+
+Keep all code before `return` unchanged. Replace only the outer returned `<main>` with the `AppShell` wrapper below, and move the exact current JSX children of `<main>` into the new inner `<main>` without modifying their text, links, conditions, form actions, or data expressions:
 
 ```tsx
 return (
-  <AppShell role={profile.role}>
+  <AppShell role={profile.role === "ADMIN" ? "ADMIN" : "OPERATOR"}>
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
-      {/* existing dashboard content remains functionally unchanged */}
+      CURRENT_DASHBOARD_CHILDREN_UNCHANGED
     </main>
   </AppShell>
 );
 ```
 
-If Supabase typing does not narrow `profile.role` to `"ADMIN" | "OPERATOR"`, narrow it locally only after the existing active-profile validation; do not change the database query or role model.
+`CURRENT_DASHBOARD_CHILDREN_UNCHANGED` is not literal source code: it denotes the existing header, metrics section, module navigation, ADMIN section, and urgent-stock section already present in `src/app/page.tsx`. The resulting source file must contain those existing JSX nodes and must not contain the marker string.
 
-- [ ] **Step 2: Verify P8.1 and M5 focused tests**
+- [ ] **Step 3: Verify P8.1 and M5 focused tests**
 
 ```bash
 node --test tests/p8-design-system-foundation.test.mjs tests/m5-history-dashboard.test.mjs
@@ -504,20 +734,22 @@ node --test tests/p8-design-system-foundation.test.mjs tests/m5-history-dashboar
 
 Expected: PASS.
 
-- [ ] **Step 3: Confirm dashboard business-source invariants are unchanged**
+- [ ] **Step 4: Inspect the dashboard diff for functional invariants**
 
-Inspect diff and ensure no edits to:
-- `createClient()` call;
+Confirm the diff has no edits to:
+- `createClient()`;
 - `auth.getClaims()`;
-- profile `.select(...)` / `.eq(...)`;
-- products `.select(...)` / `.eq(...)` / `.order(...)`;
-- `zeroStock`, `lowStock`, `urgent` calculations;
-- `logout` Server Action import/call.
+- profile `.select(...)` and `.eq(...)`;
+- products `.select(...)`, `.eq(...)`, and `.order(...)`;
+- `inventoryQuantity()`;
+- `zeroStock`, `lowStock`, and `urgent` calculations;
+- `logout` Server Action import/call;
+- ADMIN visibility condition for the existing admin section.
 
-- [ ] **Step 4: Commit dashboard adoption**
+- [ ] **Step 5: Commit dashboard adoption**
 
 ```bash
-git add src/app/page.tsx tests/p8-design-system-foundation.test.mjs
+git add src/app/page.tsx
 git commit -m "feat: adopt P8.1 shell on dashboard"
 ```
 
@@ -526,12 +758,12 @@ git commit -m "feat: adopt P8.1 shell on dashboard"
 ### Task 6: Full regression and implementation gate
 
 **Files:**
-- No functional file changes unless a validation failure reveals a P8.1 regression.
-- Update implementation evidence in Issue #13 / PR description.
+- No functional file changes unless a validation failure proves a P8.1 regression.
+- Record implementation evidence in Issue #13 and the review PR.
 
 **Interfaces:**
-- Consumes the complete P8.1 branch.
-- Produces gate evidence for review; does not authorize merge by itself.
+- Consumes: complete P8.1 branch.
+- Produces: review evidence; it does not authorize merge by itself.
 
 - [ ] **Step 1: Run full tests**
 
@@ -539,7 +771,7 @@ git commit -m "feat: adopt P8.1 shell on dashboard"
 npm test
 ```
 
-Expected: all legacy tests plus P8.1 contract PASS.
+Expected: all legacy tests plus the P8.1 contract PASS.
 
 - [ ] **Step 2: Run lint**
 
@@ -567,38 +799,51 @@ Expected: PASS.
 
 - [ ] **Step 5: Inspect changed-file scope**
 
-Expected changed functional scope only:
+Allowed functional scope:
 - `src/app/globals.css`
 - `src/app/layout.tsx`
 - `src/app/page.tsx`
 - `src/components/ui/*`
 - `src/components/shell/*`
 - `tests/p8-design-system-foundation.test.mjs`
-- P8.1 docs/evidence
+- P8.1 design/plan/evidence docs.
 
-No expected changes to migrations, Supabase proxy/client code, Server Actions, package dependencies, inventory module, or database policy files.
+Expected absent changes:
+- `supabase/migrations/*`
+- `src/lib/supabase/*`
+- `src/proxy.ts`
+- any `actions.ts`
+- `src/modules/inventory/*`
+- `package.json` / `package-lock.json`.
 
 - [ ] **Step 6: Perform accessibility/source review**
 
-Check:
+Confirm:
 - `lang="pt-BR"` retained;
-- all navigation links remain textual and understandable without icons;
+- navigation is understandable without icons;
 - active navigation exposes `aria-current="page"`;
-- global `:focus-visible` is visible;
-- mobile nav actions are >=48px;
-- ADMIN-only navigation is role-filtered;
-- no status/domain meaning is expressed by color alone in newly introduced primitives.
+- global `:focus-visible` is present;
+- mobile navigation actions are at least 48px high;
+- ADMIN navigation is role-filtered;
+- newly introduced status primitives display textual content and never rely on color alone.
 
 - [ ] **Step 7: Open review PR without merging**
 
-PR title:
+Title:
 
 ```text
 feat: P8.1 visual foundation and app shell
 ```
 
-PR body must include RED evidence, GREEN commands/results, changed-file scope, explicit statement `NO DB/RLS/AUTH/BUSINESS RULE CHANGE`, accessibility review, and linkage to Issue #13.
+Body must contain:
+- link to Issue #13;
+- RED commit/run evidence;
+- GREEN CI commands/results;
+- changed-file scope;
+- exact statement `NO DB/RLS/AUTH/BUSINESS RULE CHANGE`;
+- accessibility review result;
+- explicit hold at integration gate.
 
 - [ ] **Step 8: Hold at integration gate**
 
-Do not merge or trigger production deployment until the applicable MCF review/gate is satisfied.
+Do not merge and do not intentionally trigger a production deployment until the applicable MCF review/gate is satisfied.

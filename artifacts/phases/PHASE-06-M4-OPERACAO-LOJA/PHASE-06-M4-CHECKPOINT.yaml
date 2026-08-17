@@ -4,7 +4,7 @@ milestone: M4
 risk_class: B
 branch: feature/m4-store-operation
 pull_request: 6
-current_state: AGUARDANDO_AUDITORIA_E_GATE
+current_state: APROVADO_PARA_INTEGRACAO
 cycle: 1
 delivered_scope:
   - inventory_read_ui
@@ -24,7 +24,17 @@ validation:
   blocking_review_threads: 0
 known_security_advisory:
   - inherited_m3_authenticated_security_definer_rpc_warn
-next_if_approved:
+audit:
+  Emily: APROVADO
+  blocking_findings: 0
+gate:
+  Leo: APROVAR
+  decision_state: APROVADO_PARA_INTEGRACAO
+  conditions:
+    - final_prf_manifest_sha256
+    - final_ci_green
+    - no_blocking_review_threads
+next_if_merged:
   phase_id: PHASE-06-M5-HISTORICO-DASHBOARD
   action: Implementar histórico e dashboard sem interromper a execução contínua M4-M7.
 human_action_required: false

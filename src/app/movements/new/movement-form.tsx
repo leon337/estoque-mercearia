@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { registerMovementAction } from "../actions";
 
 type MovementType = "ENTRY" | "EXIT" | "INITIAL";
@@ -17,6 +17,7 @@ type MovementFormProps = {
   products: ProductOption[];
   isAdmin: boolean;
   initialType: MovementType;
+  initialOperationId: string;
   initialProductId?: string;
   errorMessage?: string | null;
 };
@@ -25,10 +26,11 @@ export function MovementForm({
   products,
   isAdmin,
   initialType,
+  initialOperationId,
   initialProductId,
   errorMessage,
 }: MovementFormProps) {
-  const [operationId, setOperationId] = useState("");
+  const [operationId, setOperationId] = useState(initialOperationId);
   const [type, setType] = useState<MovementType>(
     initialType === "INITIAL" && !isAdmin ? "ENTRY" : initialType,
   );
@@ -38,10 +40,6 @@ export function MovementForm({
       : products[0]?.id ?? "",
   );
   const [quantityText, setQuantityText] = useState(type === "INITIAL" ? "0" : "");
-
-  useEffect(() => {
-    setOperationId(crypto.randomUUID());
-  }, []);
 
   const product = useMemo(
     () => products.find((candidate) => candidate.id === productId) ?? products[0],

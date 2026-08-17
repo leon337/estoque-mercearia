@@ -1,0 +1,12 @@
+M4 VALIDATION FULL
+
+Chronology:
+- f2bcc76 / CI 32016698099: valid RED. Missing M4 files caused contract test failure after install/lint PASS.
+- 3e6a99c / CI 32016973641: implementation existed; lint failed on React set-state-in-effect. Not PASS.
+- 410d7a9 / CI 32017089246: lint PASS; M4 contract tests PASS; legacy M1 profile-scope regression failed because an equivalent variable replaced the canonical expression. Not PASS.
+- 1571778 / CI 32017152044: 31/31 tests PASS; typecheck failed on Supabase embedded relation shape. Not PASS.
+- be2e964 / CI 32017253510: install, lint, 31/31 tests, typecheck and build PASS.
+
+Hosted validation used a transaction-only fixture and simulated authenticated claims. ADMIN registered INITIAL 5. Profile was changed to OPERATOR; ENTRY 3 and EXIT 2 succeeded. A second INITIAL as OPERATOR was rejected with ADMIN_REQUIRED. Assertions required final balance 6, exactly three movements, correct performed_by, and readable active-product inventory row. ROLLBACK completed and final counts for fixture user/product/movements were all zero.
+
+Security review: M4 adds no DDL and no direct inventory/stock_movements write. `registerMovementAction` calls the existing wrapper; browser payload contains product/type/quantity/operation_id only. Supabase Security Advisor retains the pre-existing M3 WARN for authenticated execution of the SECURITY DEFINER RPC; no new critical/high issue was introduced.

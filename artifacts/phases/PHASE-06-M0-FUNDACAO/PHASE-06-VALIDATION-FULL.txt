@@ -1,0 +1,28 @@
+PHASE-06 VALIDATION-FULL
+
+[LOCAL RED]
+TAP version 13
+Subtest: M0 contém os arquivos mínimos da fundação -> FAIL (ENOENT package.json)
+Subtest: package.json expõe scripts essenciais do M0 -> FAIL (ENOENT package.json)
+Resumo: tests 2; pass 0; fail 2.
+Motivo esperado: fundação ainda inexistente.
+
+[LOCAL GREEN]
+TAP version 13
+Subtest: M0 contém os arquivos mínimos da fundação -> PASS
+Subtest: package.json expõe scripts essenciais do M0 -> PASS
+Resumo: tests 2; pass 2; fail 0.
+
+[GITHUB ACTIONS]
+run_id: 31998999972
+head_sha: 420f79160b6e2fd98034f88a39d86d450a4eb952
+branch: feature/bootstrap
+job_id: 95295701272
+status: completed
+conclusion: success
+Passos verificados: checkout, setup node, npm install, eslint, bootstrap tests, tsc --noEmit, next build.
+
+[REVIEW]
+PR #1, 13 arquivos alterados no scaffold inicial.
+Nenhum achado bloqueante no diff.
+Ressalva: ausência de package-lock.json; manter como finding de reprodutibilidade para correção antes de estabilização/release.

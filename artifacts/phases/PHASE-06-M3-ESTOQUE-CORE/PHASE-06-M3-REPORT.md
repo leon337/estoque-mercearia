@@ -29,12 +29,6 @@ O M3 entrega o núcleo transacional de estoque sem antecipar telas do M4.
 - wrapper `src/modules/inventory/register-stock-movement.ts` envia somente intenção: produto, tipo, quantidade/contagem, operation_id e motivo.
 - não recebe `performed_by`, saldo anterior ou saldo resultante do navegador.
 
-## Migrations hospedadas
-
-- `20260817082020 / inventory_core`
-- `20260817083117 / inventory_core_maintenance`
-- `inventory_core_privileges` aplicada após o hardening de privilégios.
-
 ## Validação
 
 - cenário principal 20 + 10 - 4 = 26: PASS.
@@ -48,13 +42,26 @@ O M3 entrega o núcleo transacional de estoque sem antecipar telas do M4.
 - concorrência real: duas sessões sobre saldo 10 resultaram em somente uma saída persistida, 10→3, sem oversell.
 - captura textual exata do erro da segunda sessão: inconclusiva por erro do helper de teste (`false` vs `f`).
 - smoke HTTP concorrente via GitHub Actions: inconclusivo no Auth antes do RPC.
+- cleanup final: zero resíduos de fixtures, role temporária, extensão `dblink` e workflow temporário.
 
-## Risco residual
+## Segurança / Advisor
 
-1. O Security Advisor mantém WARN esperado por permitir que `authenticated` execute um RPC `SECURITY DEFINER`. Esse comportamento é deliberado e é o mecanismo de encapsulamento da escrita; a função aplica validação de identidade/papel, `search_path` vazio e tabelas sem DML direto.
-2. A resposta exata da segunda sessão do teste concorrente não foi preservada. A propriedade crítica observada foi mantida: uma única saída foi persistida e o saldo não ficou negativo.
-3. UI de entrada/saída/ajuste continua fora de escopo e pertence ao M4.
+- crítico: 0
+- alto: 0
+- WARN: 1 — `authenticated_security_definer_function_executable` em `register_stock_movement`.
+
+O WARN é intencional: `authenticated` precisa executar o RPC privilegiado enquanto as tabelas permanecem sem DML direto. Mitigações: `search_path=''`, `auth.uid()` como ator, papel/perfil ativo, produto ativo, validações, locks e EXECUTE negado a anon/service_role.
+
+## Auditoria e gate
+
+- **Emily:** `APROVADO_COM_RESSALVA`, sem achado bloqueante.
+- **LÉO:** `APROVAR_COM_RESSALVA` → `APROVADO_PARA_INTEGRACAO_COM_RESSALVA`.
+
+Ressalvas obrigatórias:
+1. resposta exata da segunda sessão concorrente não preservada pelo harness;
+2. smoke HTTP concorrente inconclusivo antes do RPC;
+3. WARN de `SECURITY DEFINER` permanece monitorado.
 
 ## Estado
 
-Implementação e validação técnica concluídas. Aguardando auditoria independente de Emily e gate de LÉO.
+Aprovado para integração com ressalva, condicionado a manifesto SHA-256 final, CI final verde e ausência de thread de revisão bloqueante.

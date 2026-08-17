@@ -13,7 +13,7 @@
 11. Release público exige HUMAN_GATE separado de LEANDRO.
 
 ## Auditoria final
-Pendente de Emily.
+**Emily: APROVADO.** CI do PRF `32022615896` verde; aceite hospedado completo PASS; HTTP final `32022300390` PASS; cleanup zero; Security Advisor `0 lints`; nenhum achado bloqueante.
 
 ## Gate final
-Pendente de LÉO.
+**LÉO: APROVAR → `MVP_PRONTO_VALIDADO`.** Integração autorizada após manifesto SHA-256, CI final do HEAD e zero threads bloqueantes. O gate não autoriza publicação pública.

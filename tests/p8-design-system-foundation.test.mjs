@@ -30,6 +30,11 @@ test("P8.1 defines semantic tokens and global accessibility defaults", async () 
   assert.match(css, /48px/);
 });
 
+test("P8.1 global CSS does not override Tailwind link color utilities", async () => {
+  const css = await read("src/app/globals.css");
+  assert.doesNotMatch(css, /^\s*a\s*\{\s*color:\s*inherit;\s*\}\s*$/m);
+});
+
 test("P8.1 loads approved fonts through Next font variables", async () => {
   const layout = await read("src/app/layout.tsx");
   assert.match(layout, /Inter/);

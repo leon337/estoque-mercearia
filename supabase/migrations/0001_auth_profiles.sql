@@ -1,3 +1,7 @@
+create schema if not exists private;
+revoke all on schema private from public;
+grant usage on schema private to authenticated;
+
 create type public.app_role as enum ('ADMIN', 'OPERATOR');
 
 create table public.profiles (
@@ -11,7 +15,7 @@ create table public.profiles (
 
 alter table public.profiles enable row level security;
 
-create or replace function public.is_admin()
+create or replace function private.is_admin()
 returns boolean
 language sql
 stable
@@ -27,8 +31,8 @@ as $$
   );
 $$;
 
-revoke all on function public.is_admin() from public;
-grant execute on function public.is_admin() to authenticated;
+revoke all on function private.is_admin() from public;
+grant execute on function private.is_admin() to authenticated;
 
 create policy "profiles_select_own"
 on public.profiles
@@ -40,7 +44,7 @@ create policy "profiles_admin_select_all"
 on public.profiles
 for select
 to authenticated
-using ((select public.is_admin()));
+using ((select private.is_admin()));
 
 create or replace function public.handle_new_user()
 returns trigger

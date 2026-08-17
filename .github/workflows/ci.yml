@@ -6,6 +6,9 @@ on:
     branches:
       - "feature/**"
 
+permissions:
+  contents: write
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -21,11 +24,18 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Upload generated lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: package-lock
-          path: package-lock.json
+      - name: Commit generated lockfile
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/m1-auth-base'
+        run: |
+          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+            echo "package-lock.json already tracked"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "chore: add package-lock for reproducible installs"
+          git push origin HEAD:feature/m1-auth-base
 
       - name: Lint
         run: npm run lint

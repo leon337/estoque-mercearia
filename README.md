@@ -14,6 +14,7 @@ Roadmap de implementação:
 - **M5 — Histórico + Dashboard:** filtros, rastreabilidade, estoque zerado/baixo.
 - **M6 — Administração + Hardening:** cadastro pendente, usuários, ajuste físico, last-admin guard e hardening dos RPCs.
 - **M7 — Qualificação:** runbook, backup/recuperação, aceite completo, CI, segurança e gate final do MVP.
+- **Phase 07 — Public Release:** deploy público, correções de segurança/roteamento encontradas no smoke real e qualificação do endpoint de produção.
 
 ## Stack
 
@@ -23,6 +24,7 @@ Roadmap de implementação:
 - PostgreSQL / Supabase
 - Supabase Auth + RLS
 - GitHub Actions
+- Render
 
 ## Requisitos locais
 
@@ -73,4 +75,6 @@ O `MVP-RUNBOOK.md` define backup lógico periódico com Supabase CLI (`supabase 
 
 ## Release
 
-A qualificação M7 comprova o **MVP pronto tecnicamente**. Publicação/deploy público é uma decisão separada e não é realizada automaticamente por este repositório.
+Produção pública: https://estoque-mercearia.onrender.com
+
+A Phase 07 publica o MVP qualificado em Render e mantém evidências de deploy, smoke público, segurança, rollback, auditoria e gate em `artifacts/phases/PHASE-07-PUBLIC-RELEASE/`.

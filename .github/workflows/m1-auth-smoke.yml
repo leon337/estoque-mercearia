@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Define temporary credentials
         run: |
-          echo "SMOKE_EMAIL=m1-smoke-${GITHUB_RUN_ID}@example.com" >> "$GITHUB_ENV"
+          echo "SMOKE_EMAIL=m1-smoke-${GITHUB_RUN_ID}@gmail.com" >> "$GITHUB_ENV"
           echo "SMOKE_PASSWORD=M1-Smoke-${GITHUB_RUN_ID}!Aa9" >> "$GITHUB_ENV"
 
       - name: Create temporary operator

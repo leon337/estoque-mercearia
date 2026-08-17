@@ -1,0 +1,53 @@
+PHASE-08 / P8.1 — VALIDATION FULL REFERENCE
+
+Qualified code GitHub Actions run:
+- repository: leon337/estoque-mercearia
+- workflow: CI
+- run_id: 32073240183
+- job: verify
+- branch head: 24b0a9684f3f228d57d28e962639f01d5fc3c5b1
+- pull-request merge ref tested by GitHub Actions
+- outcome: success
+
+Observed steps:
+1. Checkout: success
+2. Setup Node: success
+3. Install dependencies: success
+4. Lint (`npm run lint`): success
+5. Tests (`npm test`): success
+   - tests: 54
+   - pass: 54
+   - fail: 0
+6. Typecheck (`npm run typecheck`): success
+7. Build (`npm run build` / `next build`): success
+
+Review regression evidence:
+- Codex P1 identified unlayered `a { color: inherit; }`.
+- RED commit: `580c6972ab0e8040d8ec4bb37e11ba0899db18ac`.
+- RED CI: `32073167386`.
+- RED result: 53/54 PASS; only the new link-color contract failed.
+- GREEN commit: `24b0a9684f3f228d57d28e962639f01d5fc3c5b1`.
+- GREEN CI: `32073240183`.
+- GREEN result: lint PASS, 54/54 tests PASS, typecheck PASS, build PASS.
+
+Build route inventory includes:
+/
+/admin/adjustment
+/admin/users
+/history
+/inventory
+/login
+/movements/new
+/products
+/products/[id]/edit
+/products/new
+/register
+
+Earlier evidence retained in PR #14 includes the initial P8.1 RED→GREEN cycles, typed-routes correction and navigation review cycle.
+
+PRF integrity:
+- hashes recalculated from final UTF-8 contents returned by GitHub connector;
+- all ten package entries are represented in the manifest;
+- local raw-GitHub validation was unavailable because the container could not resolve `raw.githubusercontent.com`, so no claim based on that unavailable path is made.
+
+No claim of browser/visual viewport smoke is made by this file.

@@ -1,0 +1,37 @@
+mission_id: ESTOQUE-PHASE-08
+phase_id: P8.1
+title: Fundacao visual do Design System v1
+risk_class: B
+state: MERGE_AUTHORIZED_PENDING_EXECUTION
+objective_met_pre_merge: true
+production_visual_smoke_complete: false
+repository: leon337/estoque-mercearia
+issue: 13
+pull_request: 14
+base:
+  branch: main
+  sha: 4bac3a964d2cc4aba6e2f8ae55d715db52309647
+candidate:
+  branch: phase08/p8-1-visual-foundation
+  qualified_code_head: 24b0a9684f3f228d57d28e962639f01d5fc3c5b1
+validation:
+  ci_run: 32073240183
+  tests:
+    passed: 54
+    failed: 0
+  lint: PASS
+  typecheck: PASS
+  build: PASS
+audit:
+  verdict: PASS_COM_RESSALVA
+  external_codex_review: true
+  caveat: smoke visual mobile/desktop ainda nao executado em ambiente materializado
+leo_gate:
+  decision: APROVAR_COM_RESSALVAS
+human_authorization:
+  date: 2026-08-17
+  current: MERGE_AUTHORIZED
+  merge: AUTHORIZED
+  manual_deploy: NOT_AUTHORIZED
+next_action: Integrar o PR 14 somente se o CI do HEAD exato estiver verde; depois verificar main e observar o ambiente materializado sem iniciar deploy manual adicional.
+checkpoint_recipient: MESTRE

@@ -1,0 +1,24 @@
+PHASE-08 / P8.1 — SMOKE
+
+STATUS=NAO_APLICAVEL_PRE_MERGE
+
+Justificativa:
+A branch `phase08/p8-1-visual-foundation` não possui ambiente de preview autenticado e não foi implantada. Não existe evidência honesta de renderização real mobile/desktop antes da integração.
+
+Evidência disponível, sem substituir smoke visual:
+- CI do código qualificado `32073240183` verde;
+- 54/54 testes PASS;
+- lint, typecheck e build PASS;
+- rotas compiladas;
+- contratos de navegação/acessibilidade verdes.
+
+HUMAN_GATE:
+LEANDRO autorizou explicitamente o merge do PR #14 em 2026-08-17.
+
+Lacuna:
+- validar renderização real em viewport mobile (<768px);
+- validar renderização real em desktop (>=768px);
+- confirmar sidebar fixa, TopBar/BottomNav, cores de links e foco de teclado em navegador.
+
+Próxima ação:
+Após integrar somente um HEAD com CI verde, verificar `main` e observar o primeiro ambiente materializado. Não iniciar deploy manual adicional sem autorização.

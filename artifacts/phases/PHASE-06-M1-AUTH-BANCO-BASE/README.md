@@ -11,6 +11,6 @@ Ordem sugerida:
 8. `PHASE-06-M1-CHECKPOINT.yaml`
 9. `PHASE-06-M1-ARTIFACT-MANIFEST.sha256`
 
-Resultado documental: `PRONTO_PARA_GATE`.
+Resultado documental: `APROVADO_PARA_INTEGRACAO`.
 
-A implementação foi validada estaticamente, em CI, no banco Supabase real, por Auth HTTP real e por execução real do Next.js com Server Actions/cookies. O merge permanece condicionado à auditoria de Emily e decisão de Léo.
+A implementação foi validada estaticamente, em CI, no banco Supabase real, por Auth HTTP real e por execução real do Next.js com Server Actions/cookies. Emily aprovou a auditoria e LÉO aprovou o gate. O merge permanece condicionado apenas à CI final do commit que registra essas decisões.

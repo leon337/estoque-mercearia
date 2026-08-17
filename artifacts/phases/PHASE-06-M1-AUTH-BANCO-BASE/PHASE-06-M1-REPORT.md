@@ -29,5 +29,9 @@
 - a chave usada nos workflows temporários era publishable/client-side;
 - nenhum merge ocorreu antes do gate.
 
+## Auditoria e gate
+- Emily: `APROVADO`, sem achados críticos/altos; preview Vercel registrado como observação não bloqueante.
+- LÉO: `APROVAR`, liberando integração após CI final do registro documental.
+
 ## Estado
-Objetivo técnico do M1 atendido; pronto para auditoria, gate e integração.
+Objetivo técnico do M1 atendido e gate aprovado; aguardando somente CI final do registro e merge do PR #3.

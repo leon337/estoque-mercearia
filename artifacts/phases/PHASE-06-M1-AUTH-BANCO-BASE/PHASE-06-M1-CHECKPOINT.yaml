@@ -1,12 +1,14 @@
 mission_id: ESTOQUE-MERCEARIA-001
 phase_id: PHASE-06-M1-AUTH-BANCO-BASE
 risk_class: B
-current_state: PRONTO_PARA_GATE
+current_state: APROVADO_PARA_INTEGRACAO
 branch: feature/m1-auth-base
 pull_request: 3
 validated_implementation_head: 0661b9d8f6465501cfe9c1d58e77c1b4fc678db0
+audited_head: 6eaf13626e7d4cdf77eb9c585f0e96cda71ee305
 ci:
-  run_id: 32004303874
+  implementation_run_id: 32004303874
+  audited_head_run_id: 32004516188
   conclusion: success
 live_validation:
   supabase_project_ref: exwtngpwqgkrkoszpgib
@@ -15,6 +17,13 @@ live_validation:
   direct_auth: pass
   nextjs_ssr_auth: pass
   cleanup: pass
+audit:
+  agent: Emily
+  verdict: APROVADO
+  critical_high_findings: 0
+leo_gate:
+  decision: APROVAR
+  next_state: APROVADO_PARA_INTEGRACAO
 delivered:
   - Supabase Auth SSR foundation
   - login/logout
@@ -27,11 +36,11 @@ delivered:
   - package-lock and npm ci
   - live Auth/RLS smoke
   - Next.js SSR/cookie smoke
+  - PRF Classe B
 pending:
-  - Emily audit
-  - Leo gate
-  - merge PR 3 if approved
+  - CI final do commit que registra auditoria e gate
+  - merge PR 3 em main
 blockers: []
 human_action_required: false
-next_action: Auditar o PRF, decidir o gate e integrar o PR se aprovado.
+next_action: Validar a CI final do registro de gate e integrar o PR 3 em main.
 return_to: MESTRE

@@ -21,4 +21,6 @@ Gabriel → removeu workflow temporário.
 Renato → CI do HEAD limpo `0661b9d...`, run `32004303874`, totalmente verde.
 Augusto → confirmou recuperação de falhas sem loops cegos, sem falso PASS e com handoffs recuperáveis.
 Carmem → consolidou o PRF final.
-Emily → próxima ação: auditoria independente sobre diff, evidências e PRF.
+Emily → auditou o HEAD `6eaf136...`: APROVADO, zero achados críticos/altos e observação não bloqueante sobre ausência de preview Vercel.
+LÉO → gate operacional: APROVAR; próximo estado `APROVADO_PARA_INTEGRACAO`.
+Gabriel → próxima ação: validar CI do registro de gate e integrar PR #3 em `main`.

@@ -12,3 +12,6 @@
 10. Não transformar limitação de Vercel em alegação de deploy; substituir por smoke verificável do Next.js real no runner.
 11. Tratar rate limit de e-mail como falha externa e usar fixture Auth temporário, limitado ao teste e removido.
 12. Não fazer merge até CI limpa, PRF, auditoria e gate.
+
+13. Emily auditou o HEAD `6eaf13626e7d4cdf77eb9c585f0e96cda71ee305`: APROVADO, sem achados críticos/altos; preview Vercel tratado como observação não bloqueante.
+14. LÉO decidiu `APROVAR` o M1 e liberar integração após registro do gate e CI final verde.

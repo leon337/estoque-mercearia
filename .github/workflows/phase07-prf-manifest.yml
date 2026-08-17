@@ -1,0 +1,40 @@
+name: Phase 07 PRF Manifest
+
+on:
+  push:
+    branches: [docs/phase07-public-release-final]
+
+permissions:
+  contents: write
+
+jobs:
+  manifest:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: docs/phase07-public-release-final
+      - name: Generate SHA-256 manifest
+        run: |
+          cd artifacts/phases/PHASE-07-PUBLIC-RELEASE
+          sha256sum \
+            PHASE-07-PLAN.md \
+            MISSION-TRACE.md \
+            PHASE-07-REPORT.md \
+            PHASE-07-VALIDATION.txt \
+            PHASE-07-VALIDATION-FULL.txt \
+            PHASE-07-SMOKE.txt \
+            PHASE-07-CHECKPOINT.yaml \
+            PHASE-07-DECISIONS.md \
+            DEPLOY-ROLLBACK.md \
+            README.md \
+            > PHASE-07-ARTIFACT-MANIFEST.sha256
+      - name: Commit manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add artifacts/phases/PHASE-07-PUBLIC-RELEASE/PHASE-07-ARTIFACT-MANIFEST.sha256
+          git diff --cached --quiet && exit 0
+          git commit -m "docs(mcf): generate Phase 07 PRF manifest"
+          git push origin HEAD:docs/phase07-public-release-final

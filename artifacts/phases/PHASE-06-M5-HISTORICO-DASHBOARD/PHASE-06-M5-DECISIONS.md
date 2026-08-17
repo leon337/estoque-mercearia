@@ -6,10 +6,10 @@
 4. Perfis de outros atores não são liberados a OPERATOR. Quando a RLS não fornece nome, a UI identifica o ator por prefixo estável do UUID.
 5. Dashboard calcula zerado/baixo a partir de `products + inventory`; não duplica saldo em nova tabela.
 6. A expressão canônica de escopo de perfil da home permanece intacta para preservar a regressão M1.
-7. M6 inicia automaticamente após gate/merge.
+7. M6 inicia automaticamente após merge.
 
 ## Auditoria
-Pendente Emily.
+**Emily: APROVADO.** CI/smoke verdes, RLS preservada e zero achados bloqueantes.
 
 ## Gate
-Pendente LÉO.
+**LÉO: APROVAR** → `APROVADO_PARA_INTEGRACAO` após manifesto, CI final e zero threads bloqueantes.

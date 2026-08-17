@@ -46,7 +46,7 @@ for select
 to authenticated
 using ((select private.is_admin()));
 
-create or replace function public.handle_new_user()
+create or replace function private.handle_new_user()
 returns trigger
 language plpgsql
 security definer
@@ -63,11 +63,11 @@ begin
 end;
 $$;
 
-revoke all on function public.handle_new_user() from public;
+revoke all on function private.handle_new_user() from public;
 
 create trigger on_auth_user_created
 after insert on auth.users
-for each row execute function public.handle_new_user();
+for each row execute function private.handle_new_user();
 
 comment on table public.profiles is 'Perfil operacional ligado 1:1 ao usuário do Supabase Auth.';
 comment on column public.profiles.role is 'Novos usuários sempre iniciam como OPERATOR; promoção para ADMIN é administrativa.';

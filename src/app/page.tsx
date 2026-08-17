@@ -17,7 +17,7 @@ export default async function Home() {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("name, role, active")
-    .eq("id", userId)
+    .eq("id", claimsData.claims.sub)
     .single();
 
   if (profileError || !profile?.active) {

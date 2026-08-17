@@ -1,0 +1,41 @@
+name: Release Security Upgrade
+
+on:
+  push:
+    branches: [release/mvp-public]
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade-and-verify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release/mvp-public
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Apply focused security upgrade
+        run: |
+          npm install next@16.3.1 --save-exact
+          npm install --save-dev eslint-config-next@16.3.1 --save-exact
+      - name: Verify
+        run: |
+          npm run lint
+          npm test
+          npm run typecheck
+          npm run build
+          npm audit --omit=dev --audit-level=high
+      - name: Commit verified dependency update
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --cached --quiet && exit 0
+          git commit -m "fix(security): upgrade Next.js to 16.3.1"
+          git push origin HEAD:release/mvp-public

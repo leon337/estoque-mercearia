@@ -1,14 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Arial, Helvetica, sans-serif;
+  --color-primary: #006c49;
+  --color-primary-container: #10b981;
+  --color-on-primary: #ffffff;
+  --color-background: #f8f9fa;
+  --color-surface: #f8f9fa;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f3f4f5;
+  --color-surface-container: #edeeef;
+  --color-surface-high: #e7e8e9;
+  --color-surface-highest: #e1e3e4;
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #3c4a42;
+  --color-outline: #6c7a71;
+  --color-outline-variant: #bbcabf;
+  --color-border-subtle: #e5e7eb;
+  --color-status-success: #10b981;
+  --color-status-warning: #f59e0b;
+  --color-status-critical: #ef4444;
+  --color-error: #ba1a1a;
+  --color-secondary: #0058be;
+  --font-ui: var(--font-inter), Inter, Arial, Helvetica, sans-serif;
+  --font-data: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --touch-target: 48px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-}
+* { box-sizing: border-box; }
+html { background: var(--color-background); }
+body { margin: 0; min-height: 100vh; background: var(--color-background); color: var(--color-on-surface); font-family: var(--font-ui); }
+button, input, select, textarea { font: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.font-data { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.touch-target { min-height: var(--touch-target); min-width: var(--touch-target); }

@@ -1,0 +1,39 @@
+PHASE-06-M3-VALIDATION
+status=PASS_WITH_RESERVATION
+
+ci_initial_red=32009651368 PASS_AS_RED
+ci_initial_green=32009794344 PASS
+ci_invalid_maintenance_cycle=32010751883 NOT_VALID_RED_PARSE_FAILURE
+ci_maintenance_red=32011317459 PASS_AS_RED
+ci_maintenance_green=32011367037 PASS
+ci_privilege_red=32011620798 PASS_AS_RED
+ci_privilege_green=32011673779 PASS
+
+hosted_functional_scenario_20_plus_10_minus_4=PASS result=26
+idempotent_replay=PASS
+idempotency_conflict=PASS
+negative_stock_block=PASS
+admin_adjustment=PASS
+adjustment_reason_required=PASS
+inactive_product_block=PASS
+inactive_user_block=PASS
+performed_by_session_identity=PASS
+movement_immutability=PASS
+authenticated_direct_write=DENIED
+service_role_direct_write=DENIED
+anon_rpc_execute=DENIED
+service_role_rpc_execute=DENIED
+authenticated_rpc_execute=ALLOWED
+
+concurrency_non_negative=PASS
+concurrency_persisted_exit_count=1
+concurrency_observed_transition=10_to_3
+concurrency_second_exact_status=INCONCLUSIVE_HARNESS_ASSERTION
+hosted_http_concurrency_smoke=INCONCLUSIVE_AUTH_BEFORE_RPC
+
+security_advisor_critical=0
+security_advisor_high=0
+security_advisor_warn=1
+security_advisor_warn_expected=authenticated_security_definer_function_executable
+
+fixture_cleanup=PASS_ZERO_RESIDUE

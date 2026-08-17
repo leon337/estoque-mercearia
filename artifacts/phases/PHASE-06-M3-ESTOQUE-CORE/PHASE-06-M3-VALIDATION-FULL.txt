@@ -1,0 +1,90 @@
+# PHASE-06 / M3 — VALIDATION FULL
+
+## CI / TDD
+
+| Etapa | Run | Resultado |
+|---|---:|---|
+| RED inicial núcleo | 32009651368 | RED válido: migration/wrapper ausentes |
+| GREEN inicial | 32009794344 | install/lint/tests/typecheck/build PASS |
+| tentativa manutenção com teste inválido | 32010751883 | parser/lint FAIL; não contado como RED |
+| RED manutenção corrigido | 32011317459 | RED válido: migration 0004 ausente |
+| GREEN manutenção | 32011367037 | install/lint/tests/typecheck/build PASS |
+| RED least privilege | 32011620798 | RED válido: migration 0005 ausente |
+| GREEN least privilege | 32011673779 | install/lint/tests/typecheck/build PASS |
+
+## Integração funcional hospedada
+
+Fixtures foram executados dentro de transação descartável e revertidos.
+
+Verificado:
+- INITIAL(20): 0 → 20.
+- replay do mesmo operation_id/payload: uma única linha, `replayed=true`.
+- mesmo operation_id com payload incompatível: `IDEMPOTENCY_CONFLICT`.
+- ENTRY(10): 20 → 30.
+- EXIT(4): 30 → 26.
+- EXIT(30): `STOCK_INSUFFICIENT`, saldo permanece 26.
+- OPERATOR tentando ADJUSTMENT: `ADMIN_REQUIRED`.
+- ADMIN ADJUSTMENT sem motivo: `REASON_REQUIRED`.
+- ADMIN ADJUSTMENT(25): 26 → 25, delta -1.
+- INITIAL depois de histórico: `INITIAL_ALREADY_REGISTERED`.
+- produto inativo: `INACTIVE_PRODUCT`.
+- usuário inativo: `USER_INACTIVE_OR_MISSING`.
+- `performed_by` corresponde ao usuário da sessão.
+- UPDATE de movimento pela aplicação: `STOCK_MOVEMENT_IMMUTABLE`.
+- rollback: 0 perfis/produtos/saldos/movimentos de fixture.
+
+## Concorrência
+
+Foi criado harness temporário com duas conexões PostgreSQL independentes ao banco hospedado. Ambas executaram saídas concorrentes sobre saldo 10:
+- tentativa A: EXIT 7;
+- tentativa B: EXIT 6.
+
+Evidência persistida após ambas as consultas concluírem:
+- somente 1 movimento EXIT;
+- movimento persistido: `previous_quantity=10`, `quantity_delta=-7`, `resulting_quantity=3`;
+- nenhuma segunda saída foi gravada;
+- não houve saldo negativo/oversell.
+
+O helper devolvia boolean PostgreSQL em forma textual `f/t`, mas a asserção esperava `false/true`. Por isso o harness terminou com `CONCURRENCY_TEST_FAIL` e a tabela temporária contendo o texto exato das duas respostas não foi preservada. A propriedade de segurança do critério 17 foi observada; o texto exato da rejeição da segunda sessão permanece uma ressalva de evidência.
+
+O smoke HTTP hospedado via GitHub Actions também é INCONCLUSIVO: falhou em `signInWithPassword` antes de qualquer chamada ao RPC. Não é contabilizado como PASS.
+
+## Privilégios efetivos após hardening
+
+- authenticated:
+  - inventory SELECT: true
+  - inventory DML/TRUNCATE: false
+  - stock_movements SELECT: true
+  - stock_movements DML/TRUNCATE: false
+  - RPC EXECUTE: true
+- anon:
+  - RPC EXECUTE: false
+- service_role:
+  - inventory DML/TRUNCATE: false
+  - stock_movements DML/TRUNCATE: false
+  - RPC EXECUTE: false
+
+## Security Advisor
+
+0 lints críticos/altos.  
+1 WARN: `authenticated_security_definer_function_executable` em `register_stock_movement`.
+
+Classificação: esperado/intencional. O RPC precisa operar com privilégios do owner para manter as tabelas sem DML direto do cliente; mitigações aplicadas:
+- `search_path=''`;
+- `auth.uid()` como ator;
+- consulta de perfil ativo e papel;
+- produto ativo;
+- validações de quantidade/motivo;
+- lock de linha;
+- EXECUTE apenas `authenticated`;
+- anon e service_role sem EXECUTE;
+- sem parâmetros de ator/saldo resultante.
+
+## Cleanup
+
+Recursos temporários removidos:
+- usuários/perfis/produtos/saldos/movimentos: 0 resíduos;
+- role temporária dblink: removida;
+- extensão dblink: removida;
+- helpers temporários: removidos;
+- workflow temporário de concorrência: removido da branch.

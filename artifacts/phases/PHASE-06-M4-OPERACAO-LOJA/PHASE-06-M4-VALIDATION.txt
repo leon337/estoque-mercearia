@@ -1,0 +1,20 @@
+M4 VALIDATION
+
+contract_red=PASS (CI 32016698099 failed for absent implementation after install/lint PASS)
+implementation_ci=PASS (CI 32017253510)
+npm_ci=PASS
+lint=PASS
+tests=31/31 PASS
+typecheck=PASS
+build=PASS
+hosted_supabase_smoke=PASS
+admin_initial=PASS
+operator_entry=PASS
+operator_exit=PASS
+operator_initial_rejected=PASS
+final_quantity=6
+movement_count=3
+actor_correct=PASS
+cleanup_zero_residue=PASS
+new_critical_high_security_findings=0
+blocking_review_threads=0

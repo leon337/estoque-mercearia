@@ -1,0 +1,30 @@
+mission_id: ESTOQUE-MERCEARIA-001
+phase_id: PHASE-06-M4-OPERACAO-LOJA
+milestone: M4
+risk_class: B
+branch: feature/m4-store-operation
+pull_request: 6
+current_state: AGUARDANDO_AUDITORIA_E_GATE
+cycle: 1
+delivered_scope:
+  - inventory_read_ui
+  - entry_ui
+  - exit_ui
+  - initial_inventory_admin_ui
+  - projected_balance_preview
+  - operational_error_states
+  - responsive_navigation
+validation:
+  red_ci: 32016698099
+  final_green_ci: 32017253510
+  tests: 31/31
+  hosted_smoke: PASS
+  cleanup_zero_residue: true
+  new_security_critical_high: 0
+  blocking_review_threads: 0
+known_security_advisory:
+  - inherited_m3_authenticated_security_definer_rpc_warn
+next_if_approved:
+  phase_id: PHASE-06-M5-HISTORICO-DASHBOARD
+  action: Implementar histórico e dashboard sem interromper a execução contínua M4-M7.
+human_action_required: false

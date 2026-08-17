@@ -1,0 +1,7 @@
+M4 SMOKE RESULT
+PASS
+Hosted database transaction validated initial quantity 5, entry plus 3 and exit minus 2, ending at 6.
+Operator attempt to perform initial inventory was rejected as expected.
+Actor trace matched the authenticated fixture.
+Rollback completed and temporary records count returned to zero.
+Full application end-to-end qualification is reserved for M7.

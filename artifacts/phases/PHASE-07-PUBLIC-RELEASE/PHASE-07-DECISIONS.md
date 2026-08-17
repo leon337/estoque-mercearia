@@ -13,8 +13,24 @@
 11. Public release is considered technically valid only after final deployment, smoke, security review, PRF, independent audit and LÉO gate.
 12. Free-hosting cold starts/provider availability are accepted residual operational risks for the MVP; they do not relax integrity or authorization controls.
 
-## Audit
-Pending Emily.
+## Audit — Emily
 
-## Final gate
-Pending LÉO.
+Decision: **APROVADO**.
+
+Basis:
+- pre-audit closeout CI `32026324718` passed install, lint, tests, typecheck and build;
+- PR #12 changes only PRF/rollback/public README;
+- zero review threads;
+- the record preserves both release-blocking failures and does not count them as PASS;
+- final Render deployment is live on the corrected application SHA;
+- external public smoke passes after the production routing fix;
+- runtime dependency audit and Render build report zero vulnerabilities;
+- Supabase Security Advisor reports zero lints;
+- no privileged application secret or Phase 07 fixture was introduced.
+
+## Final gate — LÉO
+
+Decision: **APROVAR**.
+Terminal state: **ENTREGUE**.
+
+Conditions satisfied: HUMAN_GATE, production deployment, public smoke, security review, rollback readiness, Class C PRF, independent audit and traceability.

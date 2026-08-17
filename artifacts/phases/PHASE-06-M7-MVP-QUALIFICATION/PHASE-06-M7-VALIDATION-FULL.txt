@@ -1,0 +1,18 @@
+M7 VALIDATION FULL
+
+TDD and qualification chronology:
+- CI 32021317175: valid M7 RED; required final operational documents were absent.
+- CI 32021459931: runbook/acceptance/README passed all repository tests, typecheck and production build.
+
+Hosted full acceptance executed entirely inside a transaction with disposable users/category/product. It asserted the real database path rather than a mock: pending profiles, owner bootstrap, ADMIN approval, INITIAL 20, OPERATOR ENTRY 10, identical ENTRY replay, OPERATOR EXIT 4, STOCK_INSUFFICIENT on excessive exit, OPERATOR rejection for ADJUSTMENT/admin RPC, direct inventory write rejection, inactive RLS lockout, LAST_ACTIVE_ADMIN guard and ADMIN ADJUSTMENT to 25. Final assertions required four movements with exact previous/delta/resulting quantities and actors. ROLLBACK left zero fixtures.
+
+HTTP qualification history is preserved honestly:
+1. Initial synthetic Auth fixture was invalid because token columns were NULL and GoTrue failed while scanning confirmation_token. No app endpoint was reached; not PASS.
+2. After correcting the fixture, hosted password Auth and Next build passed, but the test harness posted an incorrectly simulated Server Action form; not PASS.
+3. Run 32022074887 added same-origin headers but still used urlencoded encoding; the rendered Next form required multipart; not PASS.
+4. Run 32022187217 used multipart and passed hosted Auth, Next build/start, Server Action login, cookie session and protected MVP routes.
+5. Run 32022300390 repeated those proofs and additionally passed logout through Server Action plus session invalidation.
+
+The persistent synthetic HTTP fixture and its temporary workflow were then deleted. Database verification returned zero users, identities, profiles, categories, products, inventory rows and movements for the fixture.
+
+Final Supabase Security Advisor returned zero lints. No public deployment or release was executed.

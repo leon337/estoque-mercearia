@@ -55,7 +55,10 @@ test("P8.1 shell has canonical navigation and accessible active state", async ()
     assert.match(nav, new RegExp(label));
   }
   assert.match(nav, /ADMIN/);
+  assert.match(nav, /href === "\/admin\/users"[\s\S]*pathname\.startsWith\("\/admin"\)/);
   assert.match(desktop, /aria-current/);
+  assert.match(desktop, /sticky/);
+  assert.match(desktop, /h-screen/);
   assert.match(mobile, /aria-current/);
   assert.match(shell, /DesktopSidebar/);
   assert.match(shell, /MobileTopBar/);

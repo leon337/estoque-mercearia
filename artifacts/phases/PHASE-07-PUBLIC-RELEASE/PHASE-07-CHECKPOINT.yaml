@@ -11,7 +11,7 @@ public_release:
   region: virginia
   url: https://estoque-mercearia.onrender.com
 application:
-  main_sha: bf8eac22574ba12c0e16a80b432bb3d48fa7d742
+  release_sha: bf8eac22574ba12c0e16a80b432bb3d48fa7d742
   next_version: 16.3.1
 validation:
   final_deploy: dep-da1f47m1egvs73a61ri0
@@ -22,8 +22,14 @@ validation:
   supabase_security_advisor_lints: 0
   privileged_runtime_secrets: false
   release_fixtures_created: false
+audit:
+  agent: Emily
+  decision: APROVADO
+gate:
+  authority: LEO
+  decision: APROVAR
 release_blocks_resolved:
   - runtime_dependency_high_vulnerabilities
   - public_register_redirect
-current_state: AGUARDANDO_AUDITORIA_E_GATE
-next_if_approved: ENTREGUE
+current_state: ENTREGUE
+human_action_required: false

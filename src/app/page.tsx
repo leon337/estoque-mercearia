@@ -8,13 +8,14 @@ export default async function Home() {
   const supabase = await createClient();
   const { data: claimsData, error: claimsError } = await supabase.auth.getClaims();
 
-  if (claimsError || !claimsData?.claims) {
+  if (claimsError || !claimsData?.claims?.sub) {
     redirect("/login");
   }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("name, role, active")
+    .eq("id", claimsData.claims.sub)
     .single();
 
   if (profileError || !profile?.active) {

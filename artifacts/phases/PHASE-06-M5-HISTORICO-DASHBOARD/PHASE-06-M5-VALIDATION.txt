@@ -1,0 +1,18 @@
+M5 VALIDATION
+red_ci=32018205694 VALID_RED
+final_green_ci=32018436703 PASS
+npm_ci=PASS
+lint=PASS
+tests=PASS
+typecheck=PASS
+build=PASS
+hosted_read_smoke=PASS
+active_products=3
+zero_stock=1
+low_stock=1
+movements_visible=4
+compound_filter=PASS
+operator_other_profile_hidden=PASS
+operator_own_profile_visible=PASS
+cleanup_zero_residue=PASS
+new_critical_high_security_findings=0

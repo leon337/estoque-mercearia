@@ -1,0 +1,7 @@
+M5 SMOKE RESULT
+PASS
+Hosted read-only behavior validated through existing RLS and inventory RPC-created fixture data.
+Dashboard source counts: active 3, zero 1, low 1.
+History source: 4 movements; compound filtering matched one expected entry.
+Operator could not read another user's profile; fallback actor identifier remains required.
+Rollback completed with zero temporary records.

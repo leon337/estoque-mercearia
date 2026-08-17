@@ -21,11 +21,29 @@ fix commit 29cd988345c2d2ef43f255c2745eaf2f9c27591b
 CI run 32001606274: install/lint/tests/typecheck/build PASS.
 
 Final refactor:
-HEAD abc421c47ccb430a5d3706b92a5c6e9081c4a99a
+validated code SHA abc421c47ccb430a5d3706b92a5c6e9081c4a99a
 CI run 32001672763: install/lint/tests/typecheck/build PASS.
 
+Live Supabase validation:
+- dedicated project: `estoque-mercearia` / `exwtngpwqgkrkoszpgib` / `sa-east-1`;
+- cost reported and confirmed before creation: 0/month;
+- migration registered: `20260817063444 / auth_profiles`;
+- `public.profiles`: RLS enabled;
+- policies present: `profiles_select_own`, `profiles_admin_select_all`;
+- `private.is_admin` and `private.handle_new_user`: SECURITY DEFINER in private schema;
+- Security Advisor: zero lints;
+- inserting temporary Auth rows exercised `private.handle_new_user`; both profiles started as OPERATOR;
+- one fixture promoted administratively to ADMIN;
+- authenticated-role simulation with operator subject returned only own row;
+- authenticated-role simulation with admin subject returned both rows;
+- cleanup deleted Auth fixtures and cascaded profiles; remaining temporary profiles = 0.
+
+Recovery evidence:
+- first migration invocation contained a transcription error and failed;
+- `list_migrations` returned empty immediately afterward, confirming no migration record;
+- exact migration content from GitHub was then applied successfully.
+
 Not yet validated:
-- actual PostgreSQL migration execution;
-- real Supabase Auth session;
-- ADMIN vs OPERATOR RLS behavior.
-Reason: dedicated Supabase project has not been authorized/created.
+- HTTP/SDK Auth sign-up/sign-in session with e-mail/password;
+- full Next.js login flow against the live project.
+Reason: available Supabase connector exposes database/project operations but no sign-in action, and the local runtime could not resolve the public project host.

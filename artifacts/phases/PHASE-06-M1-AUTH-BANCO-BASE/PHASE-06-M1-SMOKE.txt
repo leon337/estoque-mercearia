@@ -2,15 +2,28 @@ PHASE-06 / M1 SMOKE
 
 BUILD_SMOKE=PASS
 CI_RUN=32001672763
+VALIDATED_CODE_SHA=abc421c47ccb430a5d3706b92a5c6e9081c4a99a
 
-LIVE_AUTH_RLS_SMOKE=NAO_APLICAVEL_NESTE_CHECKPOINT
-JUSTIFICATIVA=O projeto Supabase dedicado ainda não foi autorizado/criado. Não reutilizar projetos existentes evita mistura de dados e escopo.
+SUPABASE_PROJECT=exwtngpwqgkrkoszpgib
+SUPABASE_REGION=sa-east-1
+MIGRATION=20260817063444/auth_profiles
+
+LIVE_DATABASE_MIGRATION=PASS
+SECURITY_ADVISOR=PASS_NO_LINTS
+RLS_ENABLED=PASS
+PROFILES_SELECT_OWN=PASS
+PROFILES_ADMIN_SELECT_ALL=PASS
+NEW_USER_DEFAULT_OPERATOR=PASS
+PRIVATE_SECURITY_DEFINER_FUNCTIONS=PASS
+TEMP_FIXTURES_CLEANUP=PASS
+
+LIVE_HTTP_AUTH_SESSION=PENDING_EXTERNAL_DEPENDENCY
+JUSTIFICATIVA=O conector Supabase disponível não expõe operação de sign-in e o runtime local falhou ao resolver o host público do projeto. Nenhuma credencial administrativa foi criada, exposta ou reutilizada para contornar essa limitação.
 
 SMOKE_PENDENTE:
-1. aplicar 0001_auth_profiles.sql;
-2. criar ADMIN e OPERATOR de teste;
-3. autenticar ambos;
-4. confirmar perfil próprio;
-5. confirmar ADMIN pode ler perfis;
-6. confirmar OPERATOR não pode ler outro perfil;
-7. confirmar usuário novo nasce OPERATOR.
+1. criar usuário temporário por Supabase Auth HTTP/SDK;
+2. confirmar e-mail quando necessário;
+3. autenticar via senha;
+4. confirmar sessão/JWT;
+5. consultar `profiles` via API sob RLS;
+6. remover o usuário temporário.

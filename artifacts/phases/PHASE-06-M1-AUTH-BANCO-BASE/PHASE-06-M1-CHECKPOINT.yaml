@@ -3,11 +3,16 @@ phase_id: PHASE-06-M1-AUTH-BANCO-BASE
 risk_class: B
 current_state: AGUARDANDO_DEPENDENCIA_EXTERNA
 branch: feature/m1-auth-base
-head_sha: abc421c47ccb430a5d3706b92a5c6e9081c4a99a
+validated_code_sha: abc421c47ccb430a5d3706b92a5c6e9081c4a99a
 pull_request: 3
 ci:
   run_id: 32001672763
   conclusion: success
+supabase:
+  project_ref: exwtngpwqgkrkoszpgib
+  region: sa-east-1
+  migration: 20260817063444/auth_profiles
+  security_advisor_lints: 0
 delivered:
   - Supabase Auth SSR foundation
   - login/logout
@@ -17,10 +22,14 @@ delivered:
   - RLS select policies
   - private privileged functions
   - regression/security tests
-pending:
   - dedicated Supabase project
-  - migration execution
-  - live Auth/RLS smoke
+  - live migration execution
+  - live RLS validation for OPERATOR and ADMIN
+  - default OPERATOR trigger validation
+  - cleanup of all validation fixtures
+pending:
+  - live HTTP/SDK Auth session by email/password
+  - full Next.js login smoke against live Supabase
   - package-lock reproducibility debt
-next_action: Confirmar organização Supabase e custo, criar projeto dedicado e executar validação real.
+next_action: Executar smoke HTTP/SDK de Auth em runtime com acesso de rede; somente então atualizar gate final do M1.
 return_to: MESTRE

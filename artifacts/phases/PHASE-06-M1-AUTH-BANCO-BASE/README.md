@@ -13,4 +13,4 @@ Ordem sugerida:
 
 Resultado deste checkpoint: `AGUARDANDO_DEPENDENCIA_EXTERNA`.
 
-O código está verde no CI. O M1 não deve ser integrado até existir validação real de Auth/RLS em projeto Supabase dedicado e gate atualizado.
+O código está verde no CI e a migration/RLS foram validadas no projeto Supabase dedicado. O M1 não deve ser integrado enquanto o smoke HTTP/SDK de sessão por senha e o gate final não estiverem concluídos.

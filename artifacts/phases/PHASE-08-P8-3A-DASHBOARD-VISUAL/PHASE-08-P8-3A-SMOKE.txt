@@ -1,0 +1,8 @@
+PHASE-08/P8.3a SMOKE
+
+pre_merge_static_contracts=PASS
+pre_merge_build=PASS
+pr_preview_authenticated_visual_smoke=NOT_AVAILABLE
+reason=Render service deploys main and no authenticated browser session is available in this execution
+post_merge_public_root_smoke=PENDING
+authenticated_dashboard_mobile_desktop_smoke=PENDING_POST_MERGE_OR_P8.6

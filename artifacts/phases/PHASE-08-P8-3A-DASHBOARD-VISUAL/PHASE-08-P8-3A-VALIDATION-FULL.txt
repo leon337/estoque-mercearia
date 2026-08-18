@@ -1,0 +1,47 @@
+PHASE-08/P8.3a FULL VALIDATION
+
+BASE
+main=6acf364c4fbf336e002fb1752b0dc8d2ef501191
+
+TDD VISUAL
+RED_INITIAL=871b61b73cc1c4713953c44fcec40fb36c69e228
+RED_INITIAL_CI=32092755741
+RESULT=60/63 PASS; 3 expected P8.3a presentation failures
+
+RED_REFINED=b927f4d3803033a57d95bb90288bd0c22e236091
+RED_REFINED_CI=32092823526
+RESULT=60/63 PASS; functional-boundary contract PASS; 3 presentation failures
+
+GREEN_INITIAL=ed51a7c6c46953abb15755ab36a026508590f1b0
+GREEN_INITIAL_CI=32092898087
+RESULT=63/63 PASS; lint/typecheck/build PASS
+
+CODEX
+reviewed=ed51a7c6c46953abb15755ab36a026508590f1b0
+finding=P2 DataCard padding conflict
+classification=defeito_confirmado
+
+TDD REVIEW FIX
+RED=6ec391ec0995f546e89c190b3a13007f608e1cfe
+RED_CI=32093205129
+RESULT=63/64 PASS; sole failure new padding contract
+
+GREEN=ab3b708a62d8014fef9b7f4cc10e9ce009e16ebe
+GREEN_CI=32093280676
+RESULT=64/64 PASS; lint/typecheck/build PASS
+
+BOUNDARY
+dashboard_logic=preserved
+auth_profile_scope=preserved
+products_query=preserved
+stock_calculations=preserved
+urgent_limit_8=preserved
+admin_role_condition=preserved
+migrations=unchanged
+RLS=unchanged
+Server_Actions=unchanged
+Supabase_infra=unchanged
+dependencies=unchanged
+
+FINAL_REVIEW
+status=PENDING_EXACT_FINAL_HEAD_REVIEW_AFTER_PRF

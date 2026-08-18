@@ -53,3 +53,13 @@ test("P8.3a dashboard stays mobile-first and does not invent unsupported analyti
   assert.doesNotMatch(source, /<canvas|<svg[^>]*chart|recharts|chart\.js/i);
   assert.doesNotMatch(source, /Vendas do mês|Faturamento|Relatórios de vendas/i);
 });
+
+test("P8.3a alert card removes base padding through the DataCard API", async () => {
+  const dashboard = await read("src/app/page.tsx");
+  const dataCard = await read("src/components/ui/DataCard.tsx");
+
+  assert.match(dataCard, /padding\??:/);
+  assert.match(dataCard, /none/);
+  assert.match(dashboard, /<DataCard padding="none">/);
+  assert.doesNotMatch(dashboard, /<DataCard className="p-0">/);
+});

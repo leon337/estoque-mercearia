@@ -1,0 +1,28 @@
+mission_id: PHASE-08
+phase_id: P8.3b
+slug: PRODUCTS-VISUAL
+risk_class: B
+state: MERGE_AUTHORIZED_PENDING_FINAL_REVIEW
+base_main: 6e4d4e302b01f1219327936f418bd9c4b2a501fa
+qualified_head: 2ad92318ff1e4464ce9562acb115dbfe165c4068
+visual_code_head: 87729087ff4b90bae86d9f3819ef78660d1ccd2e
+qualified_ci: 32094740975
+tests:
+  total: 69
+  passed: 69
+  failed: 0
+lint: PASS
+typecheck: PASS
+build: PASS
+actions_blob_unchanged: true
+codex:
+  exact_qualified_head_review: COMPLETE_NO_MAJOR_ISSUES
+  blocking_findings_open: 0
+leo_gate: APROVAR_COM_RESSALVAS
+human_gate:
+  design_approved: true
+  continuous_phase08_authorization: true
+merge: AUTHORIZED_WHEN_FINAL_REVIEW_CLEAR
+manual_deploy: NOT_REQUIRED
+smoke:
+  authenticated_visual: PENDING_POST_MERGE_OR_P8.6

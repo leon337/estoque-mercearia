@@ -1,0 +1,13 @@
+PHASE-08/P8.3b VALIDATION
+risk=B
+qualified_head=2ad92318ff1e4464ce9562acb115dbfe165c4068
+visual_code_head=87729087ff4b90bae86d9f3819ef78660d1ccd2e
+green_ci=32094740975
+tests=69/69 PASS
+lint=PASS
+typecheck=PASS
+build=PASS
+actions_blob_base=b6566a8e79dcb8b19336cef74c128b8e35c75776
+actions_blob_branch=b6566a8e79dcb8b19336cef74c128b8e35c75776
+db_rls_auth_business_rules=UNCHANGED
+leo_gate=APROVAR_COM_RESSALVAS

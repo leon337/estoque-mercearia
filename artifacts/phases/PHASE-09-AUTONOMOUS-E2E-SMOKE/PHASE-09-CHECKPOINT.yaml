@@ -1,0 +1,37 @@
+mission_id: ESTOQUE-MERCEARIA-PHASE-09
+phase_id: PHASE-09
+title: Autonomous Production Smoke
+risk_class: B
+state: QUALIFIED_AWAITING_HUMAN_MERGE_GATE
+objective_met: true
+qualified_code_head: 050b8bd1b285ba7238fe7653289f3ceb00ab045f
+pr: 20
+issue: 19
+ci:
+  run_id: 32127079936
+  job_id: 95679914814
+  status: PASS
+  tests: "87/87"
+production_smoke:
+  run_id: 32127079958
+  job_id: 95679915345
+  status: PASS
+  artifact_id: 9320807695
+  artifact_digest: "sha256:ff2782f2292990c876ddbb13731849ddbbd48a4ae6c50b7191d10bf482873037"
+  routes_pass: "11/11"
+  critical_review: PASS
+qa:
+  product_id: 11d216da-e09f-41bd-aa33-468b7c701bf4
+  cleanup: inactivated
+credential_gate:
+  status: CONSUMED
+  values_exposed: false
+merge_gate:
+  status: REQUIRED
+  authorized: false
+blockers:
+  - HUMAN_GATE de merge ainda não concedido
+unresolved_findings:
+  - "Observação não bloqueante: audit summary de 2 HIGH na instalação efêmera do Playwright; nenhuma dependência/lockfile da aplicação mudou."
+next_action: "Solicitar a LEANDRO autorização explícita para integrar a PR #20 após validação do PRF/CI documental."
+checkpoint_recipient: MESTRE

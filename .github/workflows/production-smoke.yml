@@ -1,0 +1,92 @@
+name: Production Smoke E2E
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/production-smoke.yml"
+      - "scripts/e2e/**"
+      - "tests/p9-autonomous-smoke-infrastructure.test.mjs"
+      - "docs/superpowers/specs/2026-08-18-phase09-autonomous-e2e-smoke-design.md"
+      - "docs/superpowers/plans/2026-08-18-phase09-autonomous-e2e-smoke.md"
+  workflow_dispatch:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    if: >-
+      github.event_name != 'issue_comment' ||
+      (github.event.issue.number == 19 && contains(github.event.comment.body, '/smoke-production'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Playwright runner ephemerally
+        run: npm install --no-save --package-lock=false @playwright/test@1.55.0
+
+      - name: Install Chromium
+        run: npx playwright install chromium
+
+      - name: Run normal production smoke
+        id: normal_smoke
+        continue-on-error: true
+        env:
+          E2E_BASE_URL: https://estoque-mercearia.onrender.com
+          E2E_OUTPUT_DIR: e2e-output
+          E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+        run: node scripts/e2e/production-smoke.mjs
+
+      - name: Run independent critical review
+        id: critical_review
+        if: always()
+        continue-on-error: true
+        env:
+          E2E_BASE_URL: https://estoque-mercearia.onrender.com
+          E2E_OUTPUT_DIR: e2e-output
+        run: >-
+          node scripts/e2e/critical-review.mjs
+          --base-url "$E2E_BASE_URL"
+          --storage-state ".e2e-auth-state.json"
+          --output-dir "$E2E_OUTPUT_DIR"
+          --routes-json "$E2E_OUTPUT_DIR/route-inventory.json"
+
+      - name: Upload production smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-smoke-${{ github.run_id }}
+          path: e2e-output/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce evidence-backed result
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const reportPath = 'e2e-output/report.json';
+          if (!fs.existsSync(reportPath)) {
+            console.error('BLOCKED: production smoke report was not generated.');
+            process.exit(1);
+          }
+          const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+          const status = report?.dimensions?.overall?.status ?? 'BLOCKED';
+          console.log(`PHASE-09 overall=${status}`);
+          if (status === 'FAIL' || status === 'BLOCKED') process.exit(1);
+          NODE

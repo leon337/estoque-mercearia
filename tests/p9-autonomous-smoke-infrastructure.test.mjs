@@ -144,3 +144,11 @@ test("P9 retries transient Render cold-start failures before giving up", async (
   assert.equal(attempts, 4);
   assert.deepEqual(observedDelays, [0, 10, 20]);
 });
+
+test("P9 status aggregation does not let a fallback override real PASS evidence", async () => {
+  const { worstStatus } = await import("../scripts/e2e/smoke-lib.mjs");
+  assert.equal(worstStatus([], "BLOCKED"), "BLOCKED");
+  assert.equal(worstStatus(["PASS", "PASS"], "BLOCKED"), "PASS");
+  assert.equal(worstStatus(["PASS", "PASS_COM_RESSALVA"], "BLOCKED"), "PASS_COM_RESSALVA");
+  assert.equal(worstStatus(["PASS", "FAIL"], "BLOCKED"), "FAIL");
+});

@@ -1,0 +1,4 @@
+PHASE-08/P8.2 SMOKE
+STATUS=NAO_APLICAVEL_PRE_MERGE
+JUSTIFICATIVA=Render PR previews are disabled for estoque-mercearia; no authorized branch preview exists.
+POST_MERGE_REQUIRED=Observe automatic Render deploy and smoke public /login and /register, including mobile/desktop visual verification when browser evidence is available.

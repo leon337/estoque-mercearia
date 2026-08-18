@@ -10,7 +10,7 @@ const messages: Record<string, string> = {
   config: "A autenticação ainda não foi configurada neste ambiente.",
 };
 
-const inputClass = "min-h-12 w-full rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-lowest)] px-3 py-2 text-[var(--color-on-surface)] outline-none transition placeholder:text-[var(--color-outline)] focus:border-[var(--color-primary)]";
+const inputClass = "min-h-12 w-full rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface-lowest)] px-3 py-2 text-[var(--color-on-surface)] outline-none transition placeholder:text-[var(--color-outline)] focus:border-[var(--color-primary)]";
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string; registered?: string }> }) {
   const { error, registered } = await searchParams;

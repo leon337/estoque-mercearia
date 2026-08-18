@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { DataCard } from "@/components/ui/DataCard";
 import { registerMovementAction } from "../actions";
 
 type MovementType = "ENTRY" | "EXIT" | "INITIAL";
@@ -21,6 +23,9 @@ type MovementFormProps = {
   initialProductId?: string;
   errorMessage?: string | null;
 };
+
+const controlClass =
+  "min-h-12 w-full rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-lowest)] px-3 py-2 text-[var(--color-on-surface)] focus:border-[var(--color-primary)]";
 
 export function MovementForm({
   products,
@@ -89,90 +94,105 @@ export function MovementForm({
       <input name="operation_id" type="hidden" value={operationId} />
 
       {errorMessage ? (
-        <p className="rounded-md border p-3 text-sm" role="alert">{errorMessage}</p>
+        <p
+          className="rounded-lg border border-[var(--color-error)] bg-[var(--color-surface-lowest)] px-4 py-3 text-sm text-[var(--color-error)]"
+          role="alert"
+        >
+          {errorMessage}
+        </p>
       ) : null}
 
-      <div>
-        <label className="mb-2 block text-sm font-semibold" htmlFor="movement-type">Tipo de movimentação</label>
-        <select
-          className="w-full rounded-md border px-3 py-3"
-          id="movement-type"
-          name="type"
-          onChange={(event) => handleTypeChange(event.target.value as MovementType)}
-          value={type}
-        >
-          {typeOptions.map((option) => (
-            <option key={option} value={option}>
-              {option === "ENTRY" ? "Entrada" : option === "EXIT" ? "Saída" : "Inventário inicial"}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-semibold" htmlFor="product">Produto</label>
-        <select
-          className="w-full rounded-md border px-3 py-3"
-          id="product"
-          name="product_id"
-          onChange={(event) => {
-            setProductId(event.target.value);
-            setOperationId(crypto.randomUUID());
-          }}
-          value={productId}
-        >
-          {products.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.internalCode} · {option.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="mb-2 block text-sm font-semibold" htmlFor="quantity">
-          {type === "INITIAL" ? "Contagem inicial" : "Quantidade"}
-        </label>
-        <input
-          className="w-full rounded-md border px-3 py-3 text-lg"
-          id="quantity"
-          inputMode="decimal"
-          min={type === "INITIAL" ? 0 : 0.000001}
-          name="quantity"
-          onChange={(event) => setQuantityText(event.target.value)}
-          required
-          step="any"
-          type="number"
-          value={quantityText}
-        />
-      </div>
-
-      <section className="rounded-lg border p-4" aria-live="polite">
-        <dl className="grid grid-cols-2 gap-4">
+      <DataCard>
+        <div className="grid gap-5">
           <div>
-            <dt className="text-sm text-neutral-600">Saldo atual</dt>
-            <dd className="text-xl font-bold">{currentQuantity} {unit}</dd>
+            <label className="mb-2 block text-sm font-semibold" htmlFor="movement-type">Tipo de movimentação</label>
+            <select
+              className={controlClass}
+              id="movement-type"
+              name="type"
+              onChange={(event) => handleTypeChange(event.target.value as MovementType)}
+              value={type}
+            >
+              {typeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option === "ENTRY" ? "Entrada" : option === "EXIT" ? "Saída" : "Inventário inicial"}
+                </option>
+              ))}
+            </select>
           </div>
-          <div>
-            <dt className="text-sm text-neutral-600">Saldo após</dt>
-            <dd className="text-xl font-bold">{projectedQuantity} {unit}</dd>
-          </div>
-        </dl>
-        {insufficient ? (
-          <p className="mt-3 text-sm font-semibold" role="alert">Estoque insuficiente para esta saída.</p>
-        ) : null}
-        {type === "INITIAL" ? (
-          <p className="mt-3 text-sm text-neutral-600">Use somente para a primeira contagem do produto. O banco rejeita um segundo inventário inicial.</p>
-        ) : null}
-      </section>
 
-      <button
-        className="w-full rounded-md bg-black px-4 py-4 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+          <div>
+            <label className="mb-2 block text-sm font-semibold" htmlFor="product">Produto</label>
+            <select
+              className={controlClass}
+              id="product"
+              name="product_id"
+              onChange={(event) => {
+                setProductId(event.target.value);
+                setOperationId(crypto.randomUUID());
+              }}
+              value={productId}
+            >
+              {products.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.internalCode} · {option.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold" htmlFor="quantity">
+              {type === "INITIAL" ? "Contagem inicial" : "Quantidade"}
+            </label>
+            <input
+              className={`${controlClass} font-data text-lg`}
+              id="quantity"
+              inputMode="decimal"
+              min={type === "INITIAL" ? 0 : 0.000001}
+              name="quantity"
+              onChange={(event) => setQuantityText(event.target.value)}
+              required
+              step="any"
+              type="number"
+              value={quantityText}
+            />
+          </div>
+        </div>
+      </DataCard>
+
+      <div aria-live="polite">
+        <DataCard>
+          <dl className="grid grid-cols-2 gap-4">
+            <div>
+              <dt className="text-sm text-[var(--color-on-surface-variant)]">Saldo atual</dt>
+              <dd className="font-data mt-1 text-xl font-bold">{currentQuantity} {unit}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-[var(--color-on-surface-variant)]">Saldo após</dt>
+              <dd className="font-data mt-1 text-xl font-bold">{projectedQuantity} {unit}</dd>
+            </div>
+          </dl>
+          {insufficient ? (
+            <p className="mt-3 text-sm font-semibold text-[var(--color-error)]" role="alert">
+              Estoque insuficiente para esta saída.
+            </p>
+          ) : null}
+          {type === "INITIAL" ? (
+            <p className="mt-3 text-sm text-[var(--color-on-surface-variant)]">
+              Use somente para a primeira contagem do produto. O banco rejeita um segundo inventário inicial.
+            </p>
+          ) : null}
+        </DataCard>
+      </div>
+
+      <Button
+        className="w-full"
         disabled={!operationId || !product || !validQuantity || insufficient}
         type="submit"
       >
         Confirmar movimentação
-      </button>
+      </Button>
     </form>
   );
 }

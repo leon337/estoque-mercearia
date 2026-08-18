@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AppShell } from "@/components/shell/AppShell";
+import { DataCard } from "@/components/ui/DataCard";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -10,19 +14,24 @@ type InventorySearchParams = Promise<{
 
 function stockStatus(quantity: number, minimumStock: number) {
   if (quantity <= 0) {
-    return { label: "ZERADO", description: "Sem estoque disponível" };
+    return { label: "ZERADO", description: "Sem estoque disponível", tone: "critical" as const };
   }
 
   if (quantity <= minimumStock) {
-    return { label: "BAIXO", description: "Estoque baixo" };
+    return { label: "BAIXO", description: "Estoque baixo", tone: "warning" as const };
   }
 
-  return { label: "OK", description: "Estoque dentro do mínimo" };
+  return { label: "OK", description: "Estoque dentro do mínimo", tone: "success" as const };
 }
 
 function inventoryQuantity(inventory: { quantity: unknown }[] | null) {
   return Number(inventory?.[0]?.quantity ?? 0);
 }
+
+const secondaryLinkClass =
+  "inline-flex min-h-12 items-center justify-center rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-4 py-2 font-semibold text-[var(--color-primary)]";
+const primaryLinkClass =
+  "inline-flex min-h-12 items-center justify-center rounded-lg border border-transparent bg-[var(--color-primary)] px-4 py-2 font-semibold text-[var(--color-on-primary)]";
 
 export default async function InventoryPage({
   searchParams,
@@ -60,69 +69,90 @@ export default async function InventoryPage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-5xl px-4 py-8 sm:px-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide">M4 · Operação</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Estoque atual</h1>
-          <p className="mt-2 text-sm text-neutral-600">Consulte o saldo antes de registrar entradas ou saídas.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link className="rounded-md border px-4 py-3 font-semibold" href="/">Início</Link>
-          <Link className="rounded-md bg-black px-4 py-3 font-semibold text-white" href="/movements/new">Nova movimentação</Link>
-        </div>
-      </header>
+    <AppShell role={profile.role}>
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <PageHeader
+          title="Estoque atual"
+          subtitle="Consulte o saldo antes de registrar entradas ou saídas."
+          actions={(
+            <div className="flex flex-wrap gap-2">
+              <Link className={secondaryLinkClass} href="/">Painel</Link>
+              <Link className={primaryLinkClass} href="/movements/new">Nova movimentação</Link>
+            </div>
+          )}
+        />
 
-      {params.success === "movement_registered" ? (
-        <p className="mt-6 rounded-md border p-3" role="status">Movimentação registrada com sucesso.</p>
-      ) : null}
+        {params.success === "movement_registered" ? (
+          <p
+            className="mt-6 rounded-lg border border-[var(--color-status-success)] bg-[var(--color-surface-lowest)] px-4 py-3 text-sm text-[var(--color-on-surface)]"
+            role="status"
+          >
+            Movimentação registrada com sucesso.
+          </p>
+        ) : null}
 
-      {!products?.length ? (
-        <section className="mt-8 rounded-lg border border-dashed p-6">
-          <h2 className="font-semibold">Nenhum produto ativo</h2>
-          <p className="mt-1 text-sm text-neutral-600">Cadastre ou ative produtos antes de movimentar o estoque.</p>
-          {profile.role === "ADMIN" ? (
-            <Link className="mt-4 inline-block rounded-md border px-4 py-2 font-semibold" href="/products">Ir para produtos</Link>
-          ) : null}
-        </section>
-      ) : (
-        <section className="mt-8 grid gap-4 md:grid-cols-2" aria-label="Saldos por produto">
-          {products.map((product) => {
-            const quantity = inventoryQuantity(product.inventory);
-            const minimumStock = Number(product.minimum_stock ?? 0);
-            const status = stockStatus(quantity, minimumStock);
+        {!products?.length ? (
+          <DataCard className="mt-8 border-dashed">
+            <h2 className="text-lg font-semibold">Nenhum produto ativo</h2>
+            <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
+              Cadastre ou ative produtos antes de movimentar o estoque.
+            </p>
+            {profile.role === "ADMIN" ? (
+              <Link className={`${secondaryLinkClass} mt-4`} href="/products">Ir para produtos</Link>
+            ) : null}
+          </DataCard>
+        ) : (
+          <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Saldos por produto">
+            {products.map((product) => {
+              const quantity = inventoryQuantity(product.inventory);
+              const minimumStock = Number(product.minimum_stock ?? 0);
+              const status = stockStatus(quantity, minimumStock);
 
-            return (
-              <article className="rounded-lg border p-5" key={product.id}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{product.internal_code}</p>
-                    <h2 className="mt-1 text-xl font-semibold">{product.name}</h2>
+              return (
+                <DataCard className="flex h-full flex-col" key={product.id}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-data text-xs font-semibold uppercase tracking-wide text-[var(--color-on-surface-variant)]">
+                        {product.internal_code}
+                      </p>
+                      <h2 className="mt-1 text-xl font-semibold">{product.name}</h2>
+                    </div>
+                    <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                   </div>
-                  <span className="rounded-full border px-3 py-1 text-xs font-bold" aria-label={`Status ${status.label}`}>
-                    {status.label}
-                  </span>
-                </div>
-                <dl className="mt-5 grid grid-cols-2 gap-3">
-                  <div>
-                    <dt className="text-sm text-neutral-600">Saldo atual</dt>
-                    <dd className="text-2xl font-bold">{quantity} {product.unit}</dd>
+
+                  <dl className="mt-5 grid grid-cols-2 gap-3">
+                    <div>
+                      <dt className="text-sm text-[var(--color-on-surface-variant)]">Saldo atual</dt>
+                      <dd className="font-data mt-1 text-2xl font-bold">{quantity} {product.unit}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-sm text-[var(--color-on-surface-variant)]">Estoque mínimo</dt>
+                      <dd className="font-data mt-1 text-lg font-semibold">{minimumStock} {product.unit}</dd>
+                    </div>
+                  </dl>
+
+                  <p className="mt-3 text-sm text-[var(--color-on-surface-variant)]">{status.description}</p>
+
+                  <div className="mt-auto grid grid-cols-2 gap-2 pt-5">
+                    <Link
+                      className={secondaryLinkClass}
+                      href={`/movements/new?type=ENTRY&product=${product.id}`}
+                    >
+                      Entrada
+                    </Link>
+                    <Link
+                      className={secondaryLinkClass}
+                      href={`/movements/new?type=EXIT&product=${product.id}`}
+                    >
+                      Saída
+                    </Link>
                   </div>
-                  <div>
-                    <dt className="text-sm text-neutral-600">Estoque mínimo</dt>
-                    <dd className="text-lg font-semibold">{minimumStock} {product.unit}</dd>
-                  </div>
-                </dl>
-                <p className="mt-3 text-sm text-neutral-600">{status.description}</p>
-                <div className="mt-5 grid grid-cols-2 gap-2">
-                  <Link className="rounded-md border px-3 py-3 text-center font-semibold" href={`/movements/new?type=ENTRY&product=${product.id}`}>Entrada</Link>
-                  <Link className="rounded-md border px-3 py-3 text-center font-semibold" href={`/movements/new?type=EXIT&product=${product.id}`}>Saída</Link>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-      )}
-    </main>
+                </DataCard>
+              );
+            })}
+          </section>
+        )}
+      </main>
+    </AppShell>
   );
 }

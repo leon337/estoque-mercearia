@@ -1,0 +1,23 @@
+mission_id: PHASE-08
+phase_id: P8.6
+slug: QUALIFICATION
+risk_class: B
+state: CODE_REVIEW_AND_FINAL_CI_PENDING
+base_main: e83dd6a8efd514ddd5452e80b3b1c45698389a76
+green_code_head: fbac665619aae4fc7efac637a02b8f051b38c033
+red_ci: 32096143760
+green_ci: 32096331188
+tests:
+  total: 77
+  passed: 77
+  failed: 0
+lint: PASS
+typecheck: PASS
+build: PASS
+db_rls_rpc_actions: UNCHANGED
+leo_gate: APROVAR_COM_RESSALVA_VISUAL
+human_gate:
+  continuous_phase08_authorization: true
+smoke:
+  static_and_build: PASS
+  authenticated_visual_final: PENDING_POST_DEPLOY

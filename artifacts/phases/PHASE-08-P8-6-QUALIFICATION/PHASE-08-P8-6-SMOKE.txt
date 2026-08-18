@@ -1,0 +1,7 @@
+PHASE-08/P8.6 SMOKE
+pre_merge_static_contracts=PASS
+pre_merge_production_build=PASS
+pre_merge_authenticated_browser=NOT_AVAILABLE_TO_AUTOMATION
+user_provided_authenticated_reference_screenshots=AVAILABLE
+final_authenticated_visual_smoke=PENDING_POST_DEPLOY
+public_route_guard_smoke=PENDING_POST_MERGE

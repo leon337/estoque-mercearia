@@ -355,10 +355,22 @@ async function functionalQaFlow() {
     await gotoWithRetry(page, `/movements/new?type=ENTRY&product=${encodeURIComponent(productId)}`);
     const movementProduct = page.locator('select[name="product_id"]');
     if ((await movementProduct.inputValue()) !== productId) await movementProduct.selectOption(productId);
-    await page.locator('input[name="quantity"]').fill("1");
+    const movementQuantity = page.locator('input[name="quantity"]');
     const movementButton = page.getByRole("button", { name: "Confirmar movimentação", exact: true });
+
+    await movementQuantity.fill("11.000001");
+    await page.locator("#quantity-precision-error").filter({ hasText: "quantidades inteiras" }).waitFor({ timeout: 10_000 });
+    if (!(await movementButton.isDisabled())) {
+      throw new Error("Fractional UN quantity must keep movement submit disabled.");
+    }
+    await captureEvidence(page, outputDir, "desktop", "movement-new", "fractional-un-rejected");
+
+    await movementQuantity.fill("1");
+    if (await page.locator("#quantity-precision-error").count()) {
+      throw new Error("Unit-aware precision error remained after valid integer input.");
+    }
     if (await movementButton.isDisabled()) throw new Error("Movement submit remained disabled after valid QA input.");
-    recordFunctional(report, "/movements/new", "PASS", "QA product selection, balance preview input and enabled submit state verified without committing stock mutation.");
+    recordFunctional(report, "/movements/new", "PASS", "Unit-aware precision rejects fractional UN input, then accepts integer QA input; stock mutation remains intentionally unsubmitted.");
 
     await gotoWithRetry(page, "/history");
     for (const selector of ['select[name="product"]', 'select[name="type"]', 'input[name="actor"]', 'input[name="from"]', 'input[name="to"]']) {

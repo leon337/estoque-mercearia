@@ -136,6 +136,42 @@ async function publicSmoke() {
     }
   }
 
+  const publicFunctionalContext = await browser.newContext({ viewport: PRIMARY_VIEWPORTS.desktop });
+  const publicPage = await publicFunctionalContext.newPage();
+  try {
+    try {
+      await gotoWithRetry(publicPage, "/register");
+      for (const selector of [
+        'input[name="name"]',
+        'input[name="email"]',
+        'input[name="password"]',
+        'input[name="password_confirm"]',
+      ]) {
+        await publicPage.locator(selector).waitFor({ state: "visible", timeout: 30_000 });
+      }
+      await publicPage.getByRole("button", { name: "Enviar pedido de acesso", exact: true }).waitFor({ state: "visible" });
+      await publicPage.getByRole("link", { name: "Já tenho acesso", exact: true }).waitFor({ state: "visible" });
+      recordFunctional(report, "/register", "PASS", "Registration fields, submit control and login-return link were inspected without creating an unnecessary account.");
+    } catch (error) {
+      recordFunctional(report, "/register", "FAIL", `Public registration form smoke failed: ${String(error?.message ?? error)}`);
+    }
+
+    try {
+      await gotoWithRetry(publicPage, "/login");
+      await publicPage.locator('input[name="email"]').waitFor({ state: "visible", timeout: 30_000 });
+      await publicPage.locator('input[name="password"]').waitFor({ state: "visible", timeout: 30_000 });
+      await publicPage.getByRole("button", { name: "Entrar", exact: true }).waitFor({ state: "visible" });
+      await publicPage.getByRole("link", { name: "Solicitar acesso", exact: true }).waitFor({ state: "visible" });
+      if (!report.credentials.available) {
+        recordFunctional(report, "/login", "BLOCKED", "Public login form was inspected, but successful authenticated login requires E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD.");
+      }
+    } catch (error) {
+      recordFunctional(report, "/login", "FAIL", `Public login form smoke failed: ${String(error?.message ?? error)}`);
+    }
+  } finally {
+    await publicFunctionalContext.close();
+  }
+
   const guardContext = await browser.newContext({ viewport: PRIMARY_VIEWPORTS.desktop });
   const page = await guardContext.newPage();
   try {
@@ -384,6 +420,7 @@ async function main() {
     if (!report.credentials.available) {
       const reason = "GitHub Actions secrets E2E_ADMIN_EMAIL and/or E2E_ADMIN_PASSWORD are unavailable.";
       report.runNotes.push(reason);
+      recordFunctional(report, "/login", "BLOCKED", reason);
       blockAuthenticatedCoverage(reason);
       await writeReports(report, outputDir);
       process.exitCode = 2;

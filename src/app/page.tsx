@@ -100,7 +100,7 @@ export default async function Home() {
         </section>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
-          <DataCard className="p-0">
+          <DataCard padding="none">
             <div className="flex flex-col gap-3 border-b border-[var(--color-border-subtle)] p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold">Atenção no estoque</h2>

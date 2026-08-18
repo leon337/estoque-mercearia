@@ -152,3 +152,9 @@ test("P9 status aggregation does not let a fallback override real PASS evidence"
   assert.equal(worstStatus(["PASS", "PASS_COM_RESSALVA"], "BLOCKED"), "PASS_COM_RESSALVA");
   assert.equal(worstStatus(["PASS", "FAIL"], "BLOCKED"), "FAIL");
 });
+
+test("P9 browser install avoids redundant apt dependency provisioning on hosted runners", async () => {
+  const source = await read(files.workflow);
+  assert.match(source, /npx playwright install chromium/);
+  assert.doesNotMatch(source, /playwright install --with-deps chromium/);
+});

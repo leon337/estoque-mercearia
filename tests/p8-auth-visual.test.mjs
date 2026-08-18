@@ -50,6 +50,20 @@ test("P8.2 registration preserves approval flow and accessible form contracts", 
   assert.match(source, /min-h-12/);
 });
 
+test("P8.2 auth controls and desktop copy preserve accessible contrast", async () => {
+  const login = await read("src/app/login/page.tsx");
+  const register = await read("src/app/register/page.tsx");
+  const card = await read("src/components/auth/AuthCard.tsx");
+
+  for (const source of [login, register]) {
+    assert.match(source, /border-\[var\(--color-outline\)\]/);
+    assert.doesNotMatch(source, /const inputClass = .*border-\[var\(--color-outline-variant\)\]/);
+  }
+
+  assert.match(card, /text-white\/80/);
+  assert.doesNotMatch(card, /text-white\/(?:65|75)/);
+});
+
 test("P8.2 presentation layer remains isolated from Supabase", async () => {
   for (const path of [
     "src/app/login/page.tsx",

@@ -1,0 +1,39 @@
+PHASE-08/P8.2 FULL VALIDATION
+Base: main@c3b0ff72397e19871bcbeaba8d0852a0eb575d8e
+Code HEAD: a6577a603dc5ce9bff8faf28bfea771c5f9998fa
+
+Initial RED
+- commit 089ebeca0d20cf64836ebbb2e0d2c8f2671e097b
+- CI 32086623515
+- 54 existing tests PASS
+- 4 new P8.2 contracts FAIL as expected
+
+Initial GREEN
+- CI 32086720144
+- 58/58 tests PASS
+- lint PASS
+- typecheck PASS
+- build PASS
+
+Codex review
+- P2: insufficient unfocused input boundary contrast
+- P2: insufficient muted desktop-panel text contrast
+
+Review RED
+- commit 220926441b705e2546ca58b8c08e2e5f7d087d00
+- CI 32087212058
+- 58/59 tests PASS
+- only new contrast contract FAIL
+
+Review GREEN
+- code HEAD a6577a603dc5ce9bff8faf28bfea771c5f9998fa
+- CI 32087298661
+- 59/59 tests PASS
+- lint PASS
+- typecheck PASS
+- build PASS
+
+Boundary verification
+- login/actions.ts unchanged from main
+- register/actions.ts unchanged from main
+- no migrations/RLS/proxy/dependency/auth-rule changes

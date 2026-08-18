@@ -1,0 +1,23 @@
+mission_id: ESTOQUE-MERCEARIA-PHASE-08
+phase_id: P8.2
+objective: Redesenhar login e solicitacao de acesso sem alterar comportamento de autenticacao
+risk_class: B
+branch: phase08/p8-2-auth-visual
+pr: 15
+base_sha: c3b0ff72397e19871bcbeaba8d0852a0eb575d8e
+code_head: a6577a603dc5ce9bff8faf28bfea771c5f9998fa
+validation:
+  lint: PASS
+  tests: "59/59 PASS"
+  typecheck: PASS
+  build: PASS
+review:
+  codex_findings: 2
+  codex_findings_status: CORRIGIDOS
+gate:
+  leo: APROVAR_COM_RESSALVAS
+  ressalva: smoke visual real somente apos merge
+human_gate:
+  merge: AUTHORIZED_FROM_CURRENT_USER_TURN
+  deploy_manual: NOT_REQUIRED
+next_action: FINAL_CI_ON_PRF_HEAD_THEN_MERGE

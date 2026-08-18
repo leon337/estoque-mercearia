@@ -33,7 +33,8 @@ test("P9 workflow is MCF-triggerable, evidence-preserving and credential-safe", 
 
   assert.match(source, /workflow_dispatch:/);
   assert.match(source, /issue_comment:/);
-  assert.match(source, /issue\.number\s*==\s*19/);
+  assert.match(source, /author_association/);
+  assert.match(source, /OWNER|MEMBER|COLLABORATOR/);
   assert.match(source, /smoke-production/);
   assert.match(source, /pull_request:/);
   assert.match(source, /E2E_ADMIN_EMAIL:\s*\$\{\{\s*secrets\.E2E_ADMIN_EMAIL\s*\}\}/);

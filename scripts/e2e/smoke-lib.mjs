@@ -37,9 +37,9 @@ const STATUS_RANK = Object.freeze({
 export function worstStatus(statuses, fallback = "PASS") {
   const values = statuses.filter(Boolean);
   if (!values.length) return fallback;
-  return values.reduce((worst, current) =>
+  return values.slice(1).reduce((worst, current) =>
     (STATUS_RANK[current] ?? -1) > (STATUS_RANK[worst] ?? -1) ? current : worst,
-  fallback);
+  values[0]);
 }
 
 export function createReport(baseURL) {

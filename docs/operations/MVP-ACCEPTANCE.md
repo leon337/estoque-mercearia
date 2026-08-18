@@ -1,5 +1,7 @@
 # MVP Acceptance — Estoque Mercearia
 
+> **Documento histórico de critérios da PHASE-06/M7.** Os itens abaixo preservam o checklist original e **não representam o estado atual do projeto**. O MVP foi qualificado, publicado na PHASE-07, redesenhado na PHASE-08 e recebeu smoke E2E autônomo na PHASE-09. Para o estado atual, consulte [`../CURRENT-STATE.md`](../CURRENT-STATE.md) e confirme itens voláteis no GitHub/produção live.
+
 O MVP só pode ser declarado pronto quando todos os itens abaixo possuem evidência verificável.
 
 ## Funcional
@@ -69,8 +71,8 @@ O MVP só pode ser declarado pronto quando todos os itens abaixo possuem evidên
 - [ ] `.env.example` contém somente variáveis públicas permitidas;
 - [ ] release/deploy público não é confundido com qualificação técnica do MVP.
 
-## Gate final
+## Gate final histórico
 
-A sequência final é: cenário hospedado completo → CI final → Security Advisor → auditoria Emily → gate LÉO → merge M7 → verificação pós-merge da `main`.
+A sequência final prevista era: cenário hospedado completo → CI final → Security Advisor → auditoria Emily → gate LÉO → merge M7 → verificação pós-merge da `main`.
 
-Resultado terminal pretendido: `MVP_PRONTO_VALIDADO`, sem alegar publicação pública.
+Resultado terminal pretendido naquele boundary: `MVP_PRONTO_VALIDADO`, sem alegar publicação pública. Esse boundary foi posteriormente sucedido pelas PHASE-07, PHASE-08 e PHASE-09.

@@ -1,0 +1,30 @@
+PHASE-09 PRODUCTION SMOKE
+=========================
+Run: 32127079958
+Job: 95679915345
+Qualified code HEAD: 050b8bd1b285ba7238fe7653289f3ceb00ab045f
+Target: https://estoque-mercearia.onrender.com
+
+Credentials available: YES (masked GitHub Actions secrets)
+Normal production smoke: PASS
+Independent RC: PASS
+Artifact upload: PASS
+Enforcement: PASS
+Final report: overall=PASS
+
+Dimensions:
+desktop_visual=PASS
+mobile_visual=PASS
+functional_smoke=PASS
+responsive_consistency=PASS
+critical_review=PASS
+overall=PASS
+
+Route inventory: 11/11 overall PASS.
+RC: 22 route/viewport checks; no findings.
+QA product cleanup: inactivated.
+
+Artifact ID: 9320807695
+Digest: sha256:ff2782f2292990c876ddbb13731849ddbbd48a4ae6c50b7191d10bf482873037
+
+RESULT: PASS

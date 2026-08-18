@@ -1,0 +1,70 @@
+PHASE-09 VALIDATION — FULL EVIDENCE
+===================================
+
+1. CI qualification
+HEAD: 050b8bd1b285ba7238fe7653289f3ceb00ab045f
+Run: 32127079936
+Job: 95679914814
+Steps:
+- checkout PASS
+- setup Node PASS
+- install PASS
+- lint PASS
+- npm test PASS: 87 tests, 87 passed, 0 failed
+- typecheck PASS
+- Next.js production build PASS
+
+2. Root-cause correction
+Observed authenticated rerun false-failed only `/login` desktop because console 503 from a superseded Render retry remained in a page-lifetime error collector.
+RED: 9401b0dd2938d930f6296fa1008ba20e010ef610; CI 32126887263; 86/87 PASS; focused contract failed as expected.
+GREEN: 050b8bd1b285ba7238fe7653289f3ceb00ab045f; collector resets on main-frame navigation only; subframe navigation does not erase final-page errors.
+
+3. Production smoke
+Run: 32127079958
+Job: 95679915345
+Production target: https://estoque-mercearia.onrender.com
+Playwright install: PASS
+Chromium install: PASS
+Normal smoke: PASS
+Independent critical review: PASS
+Evidence upload: PASS
+Final enforcement: PASS (`PHASE-09 overall=PASS`)
+
+4. Artifact
+ID: 9320807695
+Name: production-smoke-32127079958
+Digest: sha256:ff2782f2292990c876ddbb13731849ddbbd48a4ae6c50b7191d10bf482873037
+Files uploaded: 50
+Retention: 30 days from run
+Credential values: not present in report; GitHub logs show masked `***`.
+
+5. Route result
+PASS: /login
+PASS: /register
+PASS: /
+PASS: /products
+PASS: /products/new
+PASS: /products/[id]/edit (materialized as /products/11d216da-e09f-41bd-aa33-468b7c701bf4/edit)
+PASS: /inventory
+PASS: /movements/new
+PASS: /history
+PASS: /admin/users
+PASS: /admin/adjustment
+
+Primary viewports: 1440x900 and 375x812.
+RC viewports: 320x568 and 1024x768.
+RC findings: none.
+
+6. QA lifecycle
+Initial name: QA-E2E-32127079958
+Edited name: QA-E2E-32127079958-EDIT
+Internal code: QA2127079958
+ID: 11d216da-e09f-41bd-aa33-468b7c701bf4
+Final cleanup: inactivated
+
+7. Non-blocking toolchain observations
+The ephemeral `npm install --no-save @playwright/test@1.55.0` printed an npm audit summary of 2 high-severity findings across the temporary install tree. PHASE-09 does not change runtime dependencies or lockfiles, and this PRF does not reinterpret that console summary as an application-runtime vulnerability assessment. It is preserved as an observation for future toolchain hardening.
+GitHub also emitted Node 20 deprecation warnings for action internals forced to Node 24; application Node setup is 22.
+
+RESULT: PASS_COM_RESSALVA_TOOLCHAIN_OBSERVATION
+APPLICATION/SMOKE GATE: PASS

@@ -1,0 +1,37 @@
+PHASE-08/P8.3b FULL VALIDATION
+
+BASE
+main=6e4d4e302b01f1219327936f418bd9c4b2a501fa
+
+TDD
+RED=c288233744660f2142b953237bab7d6de248a653
+RED_CI=32094506519
+RESULT=65/69 PASS; 4 expected P8.3b presentation failures; business-rule contract PASS
+
+GREEN_VISUAL=87729087ff4b90bae86d9f3819ef78660d1ccd2e
+GREEN_VISUAL_CI=32094672293
+RESULT=P8.3b contracts PASS; 68/69 overall because legacy M2 source-location contract was stale
+
+CONTRACT_ADAPTATION=2ad92318ff1e4464ce9562acb115dbfe165c4068
+GREEN_CI=32094740975
+GREEN_JOB=95583759909
+RESULT=69/69 PASS; lint/typecheck/build PASS
+
+BOUNDARY
+products_actions_blob_base=b6566a8e79dcb8b19336cef74c128b8e35c75776
+products_actions_blob_branch=b6566a8e79dcb8b19336cef74c128b8e35c75776
+search_name=preserved
+search_internal_code=preserved
+status_filter_admin=preserved
+create_update_toggle_actions=preserved
+category_rules=preserved
+migrations=unchanged
+RLS=unchanged
+Supabase_infra=unchanged
+dependencies=unchanged
+
+CODEX
+initial_exact_head_review=COMPLETE_NO_MAJOR_ISSUES
+
+FINAL_REVIEW
+status=PENDING_EXACT_FINAL_HEAD_REVIEW_AFTER_PRF

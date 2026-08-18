@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AppShell } from "@/components/shell/AppShell";
+import { DataCard } from "@/components/ui/DataCard";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { createClient } from "@/lib/supabase/server";
 import { MovementForm } from "./movement-form";
 
@@ -33,6 +36,9 @@ function movementType(value: string | undefined, isAdmin: boolean): MovementType
 function inventoryQuantity(inventory: { quantity: unknown }[] | null) {
   return Number(inventory?.[0]?.quantity ?? 0);
 }
+
+const secondaryLinkClass =
+  "inline-flex min-h-12 items-center justify-center rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-4 py-2 font-semibold text-[var(--color-primary)]";
 
 export default async function NewMovementPage({
   searchParams,
@@ -79,30 +85,39 @@ export default async function NewMovementPage({
   }));
 
   return (
-    <main className="mx-auto min-h-screen max-w-2xl px-4 py-8 sm:px-6">
-      <header>
-        <Link className="text-sm font-semibold underline" href="/inventory">← Voltar ao estoque</Link>
-        <p className="mt-6 text-sm font-semibold uppercase tracking-wide">M4 · Operação</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">Nova movimentação</h1>
-        <p className="mt-2 text-sm text-neutral-600">Usuário: {profile.name || "Sem nome"} · {profile.role}</p>
-      </header>
-
-      {!options.length ? (
-        <section className="mt-8 rounded-lg border border-dashed p-6">
-          <h2 className="font-semibold">Nenhum produto ativo</h2>
-          <p className="mt-1 text-sm text-neutral-600">Cadastre ou ative um produto antes de registrar movimentações.</p>
-          {isAdmin ? <Link className="mt-4 inline-block underline" href="/products">Abrir produtos</Link> : null}
-        </section>
-      ) : (
-        <MovementForm
-          errorMessage={params.error ? errorMessages[params.error] ?? errorMessages.database : null}
-          initialOperationId={randomUUID()}
-          initialProductId={params.product}
-          initialType={movementType(params.type, isAdmin)}
-          isAdmin={isAdmin}
-          products={options}
+    <AppShell role={profile.role}>
+      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <PageHeader
+          title="Nova movimentação"
+          subtitle={(
+            <span>
+              Usuário: <strong>{profile.name || "Sem nome"}</strong> · {profile.role}
+            </span>
+          )}
+          actions={<Link className={secondaryLinkClass} href="/inventory">Voltar ao estoque</Link>}
         />
-      )}
-    </main>
+
+        {!options.length ? (
+          <DataCard className="mt-8 border-dashed">
+            <h2 className="text-lg font-semibold">Nenhum produto ativo</h2>
+            <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
+              Cadastre ou ative um produto antes de registrar movimentações.
+            </p>
+            {isAdmin ? (
+              <Link className={`${secondaryLinkClass} mt-4`} href="/products">Abrir produtos</Link>
+            ) : null}
+          </DataCard>
+        ) : (
+          <MovementForm
+            errorMessage={params.error ? errorMessages[params.error] ?? errorMessages.database : null}
+            initialOperationId={randomUUID()}
+            initialProductId={params.product}
+            initialType={movementType(params.type, isAdmin)}
+            isAdmin={isAdmin}
+            products={options}
+          />
+        )}
+      </main>
+    </AppShell>
   );
 }

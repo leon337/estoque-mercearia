@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { quantityStepForUnit } from "@/modules/inventory/quantity-policy.mjs";
+
 type CategoryOption = {
   id: string;
   name: string;
@@ -23,6 +28,8 @@ export function ProductFormFields({
   categories: CategoryOption[];
   values?: ProductFormValues;
 }) {
+  const [unit, setUnit] = useState(String(values.unit ?? ""));
+
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       <label className="grid gap-2 text-sm font-medium">
@@ -66,10 +73,11 @@ export function ProductFormFields({
         Unidade *
         <input
           className={fieldClass}
-          defaultValue={values.unit ?? ""}
           name="unit"
+          onChange={(event) => setUnit(event.target.value)}
           placeholder="UN, KG, L, CX..."
           required
+          value={unit}
         />
       </label>
 
@@ -81,9 +89,12 @@ export function ProductFormFields({
           min="0"
           name="minimum_stock"
           required
-          step="0.001"
+          step={quantityStepForUnit(unit)}
           type="number"
         />
+        <span className="text-xs font-normal text-[var(--color-on-surface-variant)]">
+          UN, CX e PCT usam valores inteiros; demais unidades aceitam até 3 casas decimais.
+        </span>
       </label>
     </div>
   );

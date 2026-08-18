@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isQuantityTextValidForUnit } from "@/modules/inventory/quantity-policy.mjs";
 
 type ProductInput = {
   internal_code: string;
@@ -14,6 +15,11 @@ type ProductInput = {
 };
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
+type DatabaseError = {
+  code?: string;
+  message?: string;
+};
 
 function readText(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -47,14 +53,16 @@ function parseProductInput(formData: FormData): ProductInput | null {
   const name = readText(formData, "name");
   const categoryRaw = readText(formData, "category_id");
   const unit = readText(formData, "unit").toUpperCase();
-  const minimumStock = Number(readText(formData, "minimum_stock") || "0");
+  const minimumStockText = readText(formData, "minimum_stock") || "0";
+  const minimumStock = Number(minimumStockText.replace(",", "."));
 
   if (
     !internalCode ||
     !name ||
     !unit ||
     !Number.isFinite(minimumStock) ||
-    minimumStock < 0
+    minimumStock < 0 ||
+    !isQuantityTextValidForUnit(minimumStockText, unit)
   ) {
     return null;
   }
@@ -91,6 +99,13 @@ async function ensureActiveCategory(
 
 function databaseErrorCode(code: string | undefined) {
   return code === "23505" ? "duplicate" : "database";
+}
+
+function productDatabaseErrorCode(error: DatabaseError) {
+  if (error.message?.includes("INVALID_MINIMUM_STOCK_PRECISION")) {
+    return "validation";
+  }
+  return databaseErrorCode(error.code);
 }
 
 export async function createCategory(formData: FormData) {
@@ -168,7 +183,7 @@ export async function createProduct(formData: FormData) {
   const { error } = await supabase.from("products").insert({ ...input, active: true });
 
   if (error) {
-    redirect(`/products/new?error=${databaseErrorCode(error.code)}`);
+    redirect(`/products/new?error=${productDatabaseErrorCode(error)}`);
   }
 
   revalidatePath("/products");
@@ -194,7 +209,7 @@ export async function updateProduct(formData: FormData) {
     .eq("id", id);
 
   if (error) {
-    redirect(`/products/${id}/edit?error=${databaseErrorCode(error.code)}`);
+    redirect(`/products/${id}/edit?error=${productDatabaseErrorCode(error)}`);
   }
 
   revalidatePath("/products");

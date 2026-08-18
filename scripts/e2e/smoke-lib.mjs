@@ -460,15 +460,33 @@ export async function writeReports(report, outputDir) {
   return report;
 }
 
-export async function retryOnce(operation) {
-  try {
-    return await operation();
-  } catch (firstError) {
+export async function retryWithBackoff(
+  operation,
+  {
+    maxAttempts = 8,
+    delays = [0, 2_000, 4_000, 8_000, 12_000, 16_000, 20_000, 25_000],
+    sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay)),
+  } = {},
+) {
+  let firstError = null;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    if (attempt > 0 || (delays[attempt] ?? 0) > 0) {
+      await sleep(delays[Math.min(attempt - 1, delays.length - 1)] ?? 0);
+    }
     try {
-      return await operation();
-    } catch (secondError) {
-      secondError.cause = secondError.cause ?? firstError;
-      throw secondError;
+      return await operation(attempt + 1);
+    } catch (error) {
+      firstError ??= error;
+      const retryable = error?.retryable === true || /HTTP (429|502|503|504)\b/.test(String(error?.message ?? error));
+      if (!retryable || attempt === maxAttempts - 1) {
+        if (error && typeof error === "object") error.cause = error.cause ?? firstError;
+        throw error;
+      }
     }
   }
+  throw firstError ?? new Error("Retry operation exhausted without a result.");
+}
+
+export async function retryOnce(operation) {
+  return retryWithBackoff(operation);
 }

@@ -117,3 +117,30 @@ test("P9 evidence classification prevents false PASS and preserves non-secret sc
   assert.match(source, /fullPage:\s*true/);
   assert.doesNotMatch(source, /E2E_ADMIN_PASSWORD\s*[:=]\s*["'][^"']+["']/);
 });
+
+test("P9 retries transient Render cold-start failures before giving up", async () => {
+  const { retryWithBackoff } = await import("../scripts/e2e/smoke-lib.mjs");
+  let attempts = 0;
+  const observedDelays = [];
+
+  const result = await retryWithBackoff(
+    async () => {
+      attempts += 1;
+      if (attempts < 4) {
+        const error = new Error("HTTP 503 during Render cold start");
+        error.retryable = true;
+        throw error;
+      }
+      return "ready";
+    },
+    {
+      maxAttempts: 4,
+      delays: [0, 10, 20],
+      sleep: async (delay) => observedDelays.push(delay),
+    },
+  );
+
+  assert.equal(result, "ready");
+  assert.equal(attempts, 4);
+  assert.deepEqual(observedDelays, [0, 10, 20]);
+});

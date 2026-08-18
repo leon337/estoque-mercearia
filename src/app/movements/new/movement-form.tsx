@@ -3,6 +3,12 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { DataCard } from "@/components/ui/DataCard";
+import {
+  formatQuantityPtBr,
+  isQuantityTextValidForUnit,
+  quantityScaleForUnit,
+  quantityStepForUnit,
+} from "@/modules/inventory/quantity-policy.mjs";
 import { registerMovementAction } from "../actions";
 
 type MovementType = "ENTRY" | "EXIT" | "INITIAL";
@@ -50,8 +56,16 @@ export function MovementForm({
     () => products.find((candidate) => candidate.id === productId) ?? products[0],
     [productId, products],
   );
-  const quantity = Number(quantityText);
-  const validQuantity = Number.isFinite(quantity) && quantity >= 0 && (type === "INITIAL" || quantity > 0);
+  const unit = product?.unit ?? "";
+  const quantityScale = quantityScaleForUnit(unit);
+  const quantityStep = quantityStepForUnit(unit);
+  const precisionValid = isQuantityTextValidForUnit(quantityText, unit);
+  const quantity = Number(quantityText.replace(",", "."));
+  const validQuantity =
+    precisionValid &&
+    Number.isFinite(quantity) &&
+    quantity >= 0 &&
+    (type === "INITIAL" || quantity > 0);
   const currentQuantity = product?.currentQuantity ?? 0;
   const projectedQuantity = !validQuantity
     ? currentQuantity
@@ -61,7 +75,8 @@ export function MovementForm({
         ? currentQuantity + quantity
         : currentQuantity - quantity;
   const insufficient = type === "EXIT" && validQuantity && quantity > currentQuantity;
-  const unit = product?.unit ?? "";
+  const invalidPrecision = quantityText !== "" && !precisionValid;
+  const minimumQuantity = type === "INITIAL" ? "0" : quantityScale === 0 ? "1" : quantityStep;
 
   function handleTypeChange(nextType: MovementType) {
     setType(nextType);
@@ -77,7 +92,7 @@ export function MovementForm({
 
     const label = type === "ENTRY" ? "entrada" : type === "EXIT" ? "saída" : "inventário inicial";
     const accepted = window.confirm(
-      `Confirmar ${label} de ${quantity} ${unit} para ${product.name}? Saldo após: ${projectedQuantity} ${unit}.`,
+      `Confirmar ${label} de ${formatQuantityPtBr(quantity, unit)} ${unit} para ${product.name}? Saldo após: ${formatQuantityPtBr(projectedQuantity, unit)} ${unit}.`,
     );
 
     if (!accepted) {
@@ -146,17 +161,30 @@ export function MovementForm({
               {type === "INITIAL" ? "Contagem inicial" : "Quantidade"}
             </label>
             <input
+              aria-describedby={invalidPrecision ? "quantity-precision-error" : undefined}
+              aria-invalid={invalidPrecision || undefined}
               className={`${controlClass} font-data text-lg`}
               id="quantity"
-              inputMode="decimal"
-              min={type === "INITIAL" ? 0 : 0.000001}
+              inputMode={quantityScale === 0 ? "numeric" : "decimal"}
+              min={minimumQuantity}
               name="quantity"
               onChange={(event) => setQuantityText(event.target.value)}
               required
-              step="any"
+              step={quantityStep}
               type="number"
               value={quantityText}
             />
+            {invalidPrecision ? (
+              <p
+                className="mt-2 text-sm font-semibold text-[var(--color-error)]"
+                id="quantity-precision-error"
+                role="alert"
+              >
+                {quantityScale === 0
+                  ? `A unidade ${unit} aceita somente quantidades inteiras.`
+                  : `A unidade ${unit} aceita no máximo ${quantityScale} casas decimais.`}
+              </p>
+            ) : null}
           </div>
         </div>
       </DataCard>
@@ -166,11 +194,11 @@ export function MovementForm({
           <dl className="grid grid-cols-2 gap-4">
             <div>
               <dt className="text-sm text-[var(--color-on-surface-variant)]">Saldo atual</dt>
-              <dd className="font-data mt-1 text-xl font-bold">{currentQuantity} {unit}</dd>
+              <dd className="font-data mt-1 text-xl font-bold">{formatQuantityPtBr(currentQuantity, unit)} {unit}</dd>
             </div>
             <div>
               <dt className="text-sm text-[var(--color-on-surface-variant)]">Saldo após</dt>
-              <dd className="font-data mt-1 text-xl font-bold">{projectedQuantity} {unit}</dd>
+              <dd className="font-data mt-1 text-xl font-bold">{formatQuantityPtBr(projectedQuantity, unit)} {unit}</dd>
             </div>
           </dl>
           {insufficient ? (

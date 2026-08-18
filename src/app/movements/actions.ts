@@ -7,6 +7,7 @@ import {
   registerStockMovement,
   type StockMovementType,
 } from "@/modules/inventory/register-stock-movement";
+import { isQuantityTextValidForUnit } from "@/modules/inventory/quantity-policy.mjs";
 
 function readText(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -26,7 +27,11 @@ function movementErrorCode(error: unknown) {
   if (message.includes("ADMIN_REQUIRED")) return "permission";
   if (message.includes("INITIAL_ALREADY_REGISTERED")) return "initial_already_registered";
   if (message.includes("IDEMPOTENCY_CONFLICT")) return "operation_conflict";
-  if (message.includes("INVALID_QUANTITY") || message.includes("INVALID_MOVEMENT_INPUT")) return "validation";
+  if (
+    message.includes("INVALID_QUANTITY") ||
+    message.includes("INVALID_QUANTITY_PRECISION") ||
+    message.includes("INVALID_MOVEMENT_INPUT")
+  ) return "validation";
   if (message.includes("AUTH_REQUIRED") || message.includes("USER_INACTIVE_OR_MISSING")) return "session";
   return "database";
 }
@@ -54,7 +59,8 @@ export async function registerMovementAction(formData: FormData) {
   const productId = readText(formData, "product_id");
   const rawType = readText(formData, "type");
   const operationId = readText(formData, "operation_id");
-  const quantity = Number(readText(formData, "quantity"));
+  const quantityText = readText(formData, "quantity");
+  const quantity = Number(quantityText.replace(",", "."));
   const allowedTypes: StockMovementType[] = ["ENTRY", "EXIT", "INITIAL"];
 
   if (
@@ -72,6 +78,20 @@ export async function registerMovementAction(formData: FormData) {
 
   if (type === "INITIAL" && profile.role !== "ADMIN") {
     redirect("/movements/new?error=permission");
+  }
+
+  const { data: movementProduct, error: movementProductError } = await supabase
+    .from("products")
+    .select("unit")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (movementProductError || !movementProduct) {
+    redirect(`/movements/new?error=product_unavailable&product=${encodeURIComponent(productId)}&type=${type}`);
+  }
+
+  if (!isQuantityTextValidForUnit(quantityText, movementProduct.unit)) {
+    redirect(`/movements/new?error=validation&product=${encodeURIComponent(productId)}&type=${type}`);
   }
 
   try {

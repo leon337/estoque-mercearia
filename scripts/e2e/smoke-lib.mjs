@@ -168,6 +168,9 @@ export function statusFromFindings(findings) {
 
 export function attachErrorCollector(page) {
   const errors = [];
+  page.on("framenavigated", (frame) => {
+    if (frame === page.mainFrame()) errors.length = 0;
+  });
   page.on("pageerror", (error) => {
     errors.push({ type: "pageerror", text: String(error?.message ?? error) });
   });

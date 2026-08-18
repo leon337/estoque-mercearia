@@ -16,11 +16,11 @@ export function AuthCard({ title, description, children, footer }: AuthCardProps
           <span className="font-semibold">Estoque Mercearia</span>
         </div>
         <div className="max-w-xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white/75">Controle de estoque</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white/80">Controle de estoque</p>
           <p className="mt-4 text-4xl font-bold leading-tight">Operação simples, rastreável e pronta para a rotina da mercearia.</p>
           <p className="mt-4 max-w-lg text-base leading-7 text-white/80">Produtos, saldos e movimentações em um único fluxo operacional.</p>
         </div>
-        <p className="text-sm text-white/65">Acesso protegido para usuários autorizados.</p>
+        <p className="text-sm text-white/80">Acesso protegido para usuários autorizados.</p>
       </section>
 
       <section className="flex min-h-[calc(100vh-3rem)] items-center justify-center py-6 lg:py-0">

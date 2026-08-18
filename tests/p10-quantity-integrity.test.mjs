@@ -37,3 +37,12 @@ test("P10 database migration enforces quantity precision at the authoritative bo
   assert.match(source, /inventory/i);
   assert.match(source, /stock_movements/i);
 });
+
+test("P10 production smoke covers fractional UN rejection before valid movement input", async () => {
+  const source = await read("scripts/e2e/production-smoke.mjs");
+
+  assert.match(source, /11\.000001/);
+  assert.match(source, /quantity-precision-error|quantidades inteiras|precision/i);
+  assert.match(source, /isDisabled\(\)/);
+  assert.match(source, /unit-aware|precision|fractional/i);
+});

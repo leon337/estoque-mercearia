@@ -1,0 +1,24 @@
+PHASE-08/P8.6 VALIDATION
+risk=B
+base_main=e83dd6a8efd514ddd5452e80b3b1c45698389a76
+green_code_head=fbac665619aae4fc7efac637a02b8f051b38c033
+red_ci=32096143760
+red_tests=70/77 PASS; 7 expected presentation-contract failures
+green_ci=32096331188
+green_job=95588309616
+green_tests=77/77 PASS
+lint=PASS
+typecheck=PASS
+build=PASS
+authenticated_routes_appshell=PASS
+public_auth_outside_appshell=PASS
+legacy_black_cta_remaining_routes=ABSENT
+migrations=UNCHANGED
+dependencies=UNCHANGED
+RLS=UNCHANGED
+RPC=UNCHANGED
+server_actions=UNCHANGED
+movement_action_blob=f9049a6763faa4e66205c0685a205c248dc26ce2
+admin_users_action_blob=fdb9c19dd772b2565c3ec87d972c46aaceba0864
+admin_adjustment_action_blob=fd9685f97cb1faf4179ba4df0153492cbaabcc1d
+codex_functional_head=PENDING

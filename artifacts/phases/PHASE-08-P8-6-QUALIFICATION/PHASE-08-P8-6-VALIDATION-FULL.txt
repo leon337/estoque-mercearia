@@ -1,0 +1,46 @@
+PHASE-08/P8.6 FULL VALIDATION
+
+BASE
+main=e83dd6a8efd514ddd5452e80b3b1c45698389a76
+
+TDD
+RED=be4efeb778bdd83ae3fe630debeae88f5806c683
+RED_CI=32096143760
+RESULT=70/77 PASS; 7 expected failures limited to new P8.3c/P8.4/P8.5/P8.6 presentation contracts; legacy functional contracts PASS
+
+GREEN_CODE=fbac665619aae4fc7efac637a02b8f051b38c033
+GREEN_CI=32096331188
+GREEN_JOB=95588309616
+RESULT=77/77 PASS; lint PASS; typecheck PASS; build PASS
+
+ROUTES
+/=AppShell
+/products=AppShell
+/products/new=AppShell
+/products/[id]/edit=AppShell
+/inventory=AppShell
+/movements/new=AppShell
+/history=AppShell
+/admin/users=AppShell
+/admin/adjustment=AppShell
+/login=public AuthCard, no AppShell
+/register=public AuthCard, no AppShell
+
+BOUNDARY
+changed_production_files=7 UI files
+migrations=unchanged
+dependencies=unchanged
+RLS=unchanged
+RPC=unchanged
+movement_action_base=f9049a6763faa4e66205c0685a205c248dc26ce2
+movement_action_branch=f9049a6763faa4e66205c0685a205c248dc26ce2
+admin_users_action_base=fdb9c19dd772b2565c3ec87d972c46aaceba0864
+admin_users_action_branch=fdb9c19dd772b2565c3ec87d972c46aaceba0864
+admin_adjustment_action_base=fd9685f97cb1faf4179ba4df0153492cbaabcc1d
+admin_adjustment_action_branch=fd9685f97cb1faf4179ba4df0153492cbaabcc1d
+
+FINAL
+codex=PENDING
+final_head_ci=PENDING_AFTER_PRF
+public_guard_smoke=PENDING_POST_MERGE
+authenticated_visual=PENDING_POST_DEPLOY

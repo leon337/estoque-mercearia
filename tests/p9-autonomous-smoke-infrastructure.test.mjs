@@ -158,3 +158,11 @@ test("P9 browser install avoids redundant apt dependency provisioning on hosted 
   assert.match(source, /npx playwright install chromium/);
   assert.doesNotMatch(source, /playwright install --with-deps chromium/);
 });
+
+test("P9 public functional status distinguishes inspected registration from credential-blocked login", async () => {
+  const source = await read(files.runner);
+  assert.match(source, /input\[name=["']name["']\]/);
+  assert.match(source, /input\[name=["']password_confirm["']\]/);
+  assert.match(source, /recordFunctional\(report, ["']\/register["'], ["']PASS["']/);
+  assert.match(source, /recordFunctional\(report, ["']\/login["'], ["']BLOCKED["']/);
+});

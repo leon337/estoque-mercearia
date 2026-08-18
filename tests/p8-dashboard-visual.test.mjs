@@ -11,7 +11,7 @@ test("P8.3a dashboard adopts Design System primitives and canonical panel hierar
     assert.match(source, new RegExp(primitive), primitive);
   }
 
-  assert.match(source, />Painel</);
+  assert.match(source, /title="Painel"/);
   assert.match(source, /Nova movimentação/);
   assert.match(source, /Atenção no estoque/);
   assert.match(source, /Ações rápidas/);
@@ -48,7 +48,7 @@ test("P8.3a dashboard stays mobile-first and does not invent unsupported analyti
   const source = await read("src/app/page.tsx");
 
   assert.match(source, /sm:grid-cols-3/);
-  assert.match(source, /lg:grid-cols-3/);
+  assert.match(source, /lg:grid-cols-\[minmax\(0,2fr\)_minmax\(18rem,1fr\)\]/);
   assert.match(source, /min-h-12/);
   assert.doesNotMatch(source, /<canvas|<svg[^>]*chart|recharts|chart\.js/i);
   assert.doesNotMatch(source, /Vendas do mês|Faturamento|Relatórios de vendas/i);

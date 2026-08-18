@@ -14,6 +14,7 @@ const requiredFiles = [
   'src/app/products/actions.ts',
   'src/app/products/new/page.tsx',
   'src/app/products/[id]/edit/page.tsx',
+  'src/components/products/ProductFormFields.tsx',
 ];
 
 test('M2 possui migration, listagem, cadastro, edição e actions de produtos', async () => {
@@ -96,7 +97,11 @@ test('interface explica categoria inativa e categoria em uso', async () => {
 test('formulários expõem os campos aprovados do produto', async () => {
   const createPage = await readFile(path.join(root, 'src/app/products/new/page.tsx'), 'utf8');
   const editPage = await readFile(path.join(root, 'src/app/products/[id]/edit/page.tsx'), 'utf8');
-  const combined = `${createPage}\n${editPage}`;
+  const sharedFields = await readFile(path.join(root, 'src/components/products/ProductFormFields.tsx'), 'utf8');
+  const combined = `${createPage}\n${editPage}\n${sharedFields}`;
+
+  assert.match(createPage, /ProductFormFields/);
+  assert.match(editPage, /ProductFormFields/);
 
   for (const field of ['internal_code', 'barcode', 'name', 'category_id', 'unit', 'minimum_stock']) {
     assert.match(combined, new RegExp(`name=["']${field}["']`));

@@ -1,0 +1,29 @@
+mission_id: PHASE-08
+phase_id: P8.3a
+slug: DASHBOARD-VISUAL
+risk_class: B
+state: MERGE_AUTHORIZED_PENDING_FINAL_REVIEW
+base_main: 6acf364c4fbf336e002fb1752b0dc8d2ef501191
+qualified_code_head: ab3b708a62d8014fef9b7f4cc10e9ce009e16ebe
+qualified_ci: 32093280676
+tests:
+  total: 64
+  passed: 64
+  failed: 0
+lint: PASS
+typecheck: PASS
+build: PASS
+codex:
+  initial_review: COMPLETE
+  finding_count: 1
+  blocking_findings_open: 0
+  finding_status: P2_FIXED
+  exact_final_head_review: PENDING_AFTER_PRF
+leo_gate: APROVAR_COM_RESSALVAS
+human_gate:
+  design_approved: true
+  continuous_phase08_authorization: true
+merge: AUTHORIZED_WHEN_FINAL_REVIEW_CLEAR
+manual_deploy: NOT_REQUIRED
+smoke:
+  authenticated_visual: PENDING_POST_MERGE_OR_P8.6

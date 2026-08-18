@@ -25,15 +25,18 @@ const adminPassword = process.env.E2E_ADMIN_PASSWORD || "";
 const outputDir = process.env.E2E_OUTPUT_DIR || "e2e-output";
 const authStatePath = path.resolve(".e2e-auth-state.json");
 const runId = String(process.env.GITHUB_RUN_ID || Date.now());
-const qaName = `QA-E2E-${runId}`;
+const runAttempt = String(process.env.GITHUB_RUN_ATTEMPT || "1");
+const qaIdentity = `${runId}-${runAttempt}`;
+const qaName = `QA-E2E-${qaIdentity}`;
 const qaEditedName = `${qaName}-EDIT`;
-const qaInternalCode = `QA${runId.slice(-10)}`;
-const qaBarcode = `${Date.now()}`.slice(-13).padStart(13, "9");
+const qaInternalCode = `QA${runId.slice(-8)}A${runAttempt.slice(-3)}`;
+const qaBarcode = `${runId.slice(-10)}${runAttempt.slice(-3)}`.slice(-13).padStart(13, "9");
 
 const report = createReport(baseURL);
 report.routes = SEED_ROUTES.map(seedRouteRecord);
 report.credentials.available = Boolean(adminEmail && adminPassword);
 report.runNotes.push(`run_id=${runId}`);
+report.runNotes.push(`run_attempt=${runAttempt}`);
 report.runNotes.push("No credential values are written to this report.");
 
 await rm(outputDir, { recursive: true, force: true });
@@ -390,7 +393,7 @@ async function functionalQaFlow() {
     const adjustmentButton = page.getByRole("button", { name: "Confirmar ajuste", exact: true });
     if (!(await adjustmentButton.isDisabled())) throw new Error("Adjustment submit should start disabled.");
     await page.locator('input[name="quantity"]').fill("0");
-    await page.locator('textarea[name="reason"]').fill(`QA E2E smoke ${runId} — validation only, not submitted`);
+    await page.locator('textarea[name="reason"]').fill(`QA E2E smoke ${qaIdentity} — validation only, not submitted`);
     if (await adjustmentButton.isDisabled()) throw new Error("Adjustment submit did not enable after valid QA fields.");
     await captureEvidence(page, outputDir, "desktop", "admin-adjustment", "qa-valid-not-submitted");
     recordFunctional(report, "/admin/adjustment", "PASS", "QA product selection and disabled→enabled validation states verified; adjustment was intentionally not submitted.");

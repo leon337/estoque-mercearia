@@ -46,3 +46,11 @@ test("P10 production smoke covers fractional UN rejection before valid movement 
   assert.match(source, /isDisabled\(\)/);
   assert.match(source, /unit-aware|precision|fractional/i);
 });
+
+test("P10 production smoke makes QA fixture identity unique across workflow reruns", async () => {
+  const source = await read("scripts/e2e/production-smoke.mjs");
+
+  assert.match(source, /GITHUB_RUN_ATTEMPT/);
+  assert.match(source, /runAttempt|runIdentity|qaIdentity/);
+  assert.match(source, /qaInternalCode[\s\S]*runAttempt|runAttempt[\s\S]*qaInternalCode/);
+});

@@ -9,13 +9,13 @@ export function MobileBottomNav({ role }: { role: Role }) {
   const items = getNavigation(role).filter((item) => !item.adminOnly);
 
   return (
-    <nav aria-label="Navegação móvel" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-1 py-1 shadow-lg md:hidden">
+    <nav aria-label="Navegação móvel" className="fixed inset-x-0 bottom-0 z-50 flex overflow-x-auto border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-1 py-1 shadow-lg md:hidden">
       {items.map((item) => {
         const active = isNavActive(pathname, item.href);
         return (
           <Link
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-12 items-center justify-center rounded-lg px-1 text-center text-[11px] font-semibold leading-tight ${active ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]" : "text-[var(--color-on-surface-variant)]"}`}
+            className={`flex min-h-12 min-w-24 flex-1 items-center justify-center rounded-lg px-2 text-center text-[11px] font-semibold leading-tight ${active ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]" : "text-[var(--color-on-surface-variant)]"}`}
             href={item.href}
             key={item.href}
           >

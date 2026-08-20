@@ -2,10 +2,11 @@ mission_id: ESTOQUE-MERCEARIA-PHASE-10
 phase_id: PHASE-10
 title: Stabilization and Domain Integrity
 risk_class: B
-state: CLOSEOUT_CANDIDATE_AWAITING_FINAL_EVIDENCE
-objective_met: false
-baseline_main: 326d1b2059e77253bac446ff111b297a3e428a71
+state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+objective_met: true
+application_baseline_main: 326d1b2059e77253bac446ff111b297a3e428a71
 issue: 21
+closeout_pr: 27
 pull_requests:
   p10_1: 22
   p10_2: [23, 24]
@@ -29,17 +30,31 @@ technical_validation:
   typecheck: PASS
   build: PASS
 final_production_smoke:
-  state: PENDING
-closeout_pr:
-  state: PENDING
-  required_check: verify
+  run_id: 32344160656
+  job_id: 96349225201
+  head_sha: 326d1b2059e77253bac446ff111b297a3e428a71
+  status: PASS
+  overall: PASS
+  artifact_id: 9397459502
+  artifact_digest: "sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf"
+  evidence_files: 51
+  qa_cleanup: inactive
+closeout_validation:
+  pr: 27
+  ci_run_id: 32344608801
+  verify_job_id: 96350580180
+  verify: PASS
+  mergeable: true
 audit:
-  state: PENDING_FINAL_SMOKE
+  state: PASS
 leo_gate:
-  decision: PENDING
-blockers:
-  - final Production Smoke E2E result not yet captured
-  - closeout PR verify result not yet captured
+  decision: APROVAR
+  justification: "Objetivo atendido, evidência final verde, PRF completo e HUMAN_GATE materializado."
+  next_state: ENTREGUE_APOS_MERGE_PR_27
+  next_action: "Integrar a PR #27 e registrar o fechamento na Issue #21."
+  responsible: MESTRE
+blockers: []
+unresolved_findings: []
 human_action_required: false
-next_action: "Capturar o smoke final, atualizar o PRF, validar verify e decidir o gate interno."
+next_action: "Integrar a PR #27 e fechar a Issue #21 como completed."
 checkpoint_recipient: MESTRE

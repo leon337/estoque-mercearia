@@ -1,9 +1,9 @@
 # Estoque Mercearia — Estado Atual e Mapa de Verdade
 
-**Classificação:** `CURRENT_IMPLEMENTED` + `STABILIZATION_IN_PROGRESS`  
-**Baseline live antes da PHASE-10:** `main@1082b8947c9ef5cc0ded3a21b01c01428ebb61ad`  
-**Data da reconciliação:** 2026-08-18  
-**Missão ativa:** Issue #21 — PHASE-10
+**Classificação:** `CURRENT_IMPLEMENTED` + `STABLE_BASELINE`  
+**Baseline funcional qualificada:** `main@326d1b2059e77253bac446ff111b297a3e428a71`  
+**Closeout documental:** PR #27  
+**Data da reconciliação:** 2026-08-20
 
 ## 1. Como ler este repositório
 
@@ -32,73 +32,116 @@ ADMINISTRAÇÃO  ✅ concluída
 PUBLICAÇÃO     ✅ concluída
 DESIGN SYSTEM  ✅ concluído
 E2E AUTÔNOMO   ✅ concluído
-ESTABILIZAÇÃO  🔄 PHASE-10 em andamento
+ESTABILIZAÇÃO  ✅ PHASE-10 qualificada
 ```
 
-O produto é um MVP publicado e operacional. A prioridade atual não é ampliar escopo funcional, e sim consolidar invariantes, documentação e governança do repositório antes de novos módulos.
+O produto é um MVP publicado e operacional. A PHASE-10 consolidou invariantes de domínio, documentação e governança do repositório antes de qualquer nova expansão funcional.
 
 ## 3. Marcos concluídos
 
 ### PHASE-06 — MVP funcional
-
-M0–M7 concluíram:
-
-- fundação Next.js/TypeScript/CI;
-- autenticação, perfis `ADMIN`/`OPERATOR` e RLS;
-- categorias e produtos;
-- núcleo transacional de estoque;
-- `INITIAL`, `ENTRY`, `EXIT` e `ADJUSTMENT`;
-- idempotência, serialização por produto e bloqueio de estoque negativo;
-- histórico e dashboard;
-- administração de usuários e last-admin guard;
-- hardening de RPCs;
-- qualificação técnica do MVP.
+M0–M7 materializaram fundação, autenticação/RLS, produtos, estoque, movimentações, histórico, dashboard e administração.
 
 ### PHASE-07 — Public Release
-
-- aplicação publicada no Render;
-- correções de segurança/dependências e roteamento encontradas no smoke real;
-- endpoint público qualificado;
-- rollback/runbook/evidência preservados.
+Aplicação publicada no Render, com runbook e qualificação de produção.
 
 ### PHASE-08 — Design System v1
-
-Issue #13 encerrado como concluído. PRs #14, #15, #16, #17 e #18 integraram:
-
-- fundação visual/AppShell;
-- login/cadastro;
-- dashboard;
-- produtos;
-- estoque;
-- movimentações/histórico;
-- administração;
-- qualificação visual cross-route.
-
-A referência Google Stitch foi usada como insumo visual, sem substituir regras de domínio, auth, RLS ou arquitetura validada.
+Redesign responsivo integrado sem alterar regras de domínio, auth ou RLS.
 
 ### PHASE-09 — Autonomous Production Smoke
+Playwright/Chromium passou a validar produção pública com evidências desktop/mobile, rotas públicas/protegidas/admin, lifecycle QA e critical review.
 
-Issue #19 encerrado como concluído. PR #20 integrada em `main`.
+### PHASE-10 — Stabilization & Domain Integrity
 
-Baseline de integração:
+#### P10.1 — Reconciliação documental
+PR #22 integrou README reconciliado e este mapa canônico, preservando PRFs históricos como snapshots.
 
-- merge commit: `1082b8947c9ef5cc0ded3a21b01c01428ebb61ad`;
-- HEAD pré-merge qualificado: `0e252c5a2e6ed237b7d9906ca1e6aad90e50fa86`;
-- CI final pré-merge: PASS;
-- Production Smoke E2E final: PASS;
-- 87/87 testes no HEAD de código qualificado;
-- 11/11 rotas mínimas PASS;
-- desktop/mobile PASS;
-- revisão crítica independente PASS;
-- fluxo ADMIN real e lifecycle de produto QA PASS;
-- credenciais mantidas fora de código/artefatos.
+#### P10.2 — Integridade de quantidades/unidades
+PRs #23 e #24:
+- `UN`, `CX`, `PCT`: somente inteiros;
+- `KG`, `L`, `M`: até 3 casas decimais;
+- unidades desconhecidas: até 3 casas por compatibilidade;
+- validação em UI, Server Action e banco;
+- formatação de quantidade em pt-BR;
+- migration `0008_quantity_precision.sql`;
+- harness E2E robusto a reruns por `GITHUB_RUN_ATTEMPT`.
 
-Esses números são evidência histórica do boundary PHASE-09. Qualquer mudança posterior precisa ser requalificada.
+Production Smoke qualificado: run `32193323462` — PASS.
 
-## 4. Superfícies atuais
+#### P10.3 — Hardening de repositório/CI
+PR #25:
+- CI também em push para `main`;
+- `/smoke-production` reutilizável;
+- trigger de `issue_comment` restrito a OWNER/MEMBER/COLLABORATOR;
+- enforcement `PRODUCTION_SMOKE`.
 
-Rotas principais materializadas:
+Production Smoke: run `32193964995` — PASS.
 
+#### P10.4 — Integridade de estoque mínimo
+PR #26:
+- correção humana aprovada de `minimum_stock=0.046 UN` para `1 UN`;
+- validação por unidade em Server Action e formulário;
+- migration `0009_product_minimum_stock_precision.sql`;
+- trigger autoritativo `products_minimum_stock_precision`;
+- rejeição live comprovada de `1.5 UN`;
+- CI `32197520954`: 97/97 + lint/typecheck/build PASS;
+- merge funcional `326d1b2059e77253bac446ff111b297a3e428a71`.
+
+## 4. HUMAN_GATE de governança concluído
+
+LEANDRO materializou no GitHub:
+
+```yaml
+default_branch: main
+ruleset: Protect main
+enforcement: Active
+target: default/main
+require_pull_request: true
+required_approvals: 0
+required_status_check: verify
+bypass_list: empty
+block_force_push: true
+restrict_deletions: true
+```
+
+Leitura live posterior confirmou `main protected=true`.
+
+A API de branch protection tradicional pode continuar mostrando seu bloco legado como desabilitado; a proteção efetiva é fornecida pelo Ruleset.
+
+## 5. Qualificação final pós-HUMAN_GATE
+
+Production Smoke E2E final:
+
+```yaml
+run_id: 32344160656
+job_id: 96349225201
+event: issue_comment
+branch: main
+head_sha: 326d1b2059e77253bac446ff111b297a3e428a71
+workflow_conclusion: success
+normal_smoke: PASS
+critical_review: PASS
+overall: PASS
+artifact_id: 9397459502
+artifact_digest: sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf
+evidence_files: 51
+qa_cleanup: inactive
+```
+
+O log registrou explicitamente `PRODUCTION_SMOKE overall=PASS`.
+
+O PRF de closeout está em:
+`artifacts/phases/PHASE-10-STABILIZATION-DOMAIN-INTEGRITY/`.
+
+A PR #27 validou o próprio gate novo:
+- CI run `32344608801`;
+- job `verify` `96350580180`;
+- install, lint, testes, typecheck e build PASS;
+- PR reportada mergeable.
+
+## 6. Superfícies atuais
+
+Rotas principais:
 - `/login`
 - `/register`
 - `/`
@@ -111,7 +154,7 @@ Rotas principais materializadas:
 - `/admin/users`
 - `/admin/adjustment`
 
-## 5. Arquitetura operacional resumida
+## 7. Arquitetura operacional resumida
 
 ```text
 Navegador / Next.js UI
@@ -128,102 +171,42 @@ PostgreSQL / inventory + stock_movements
 ```
 
 Princípios preservados:
-
 - cliente envia intenção, não saldo autoritativo;
 - ator deriva da sessão autenticada;
 - histórico é append-only para a aplicação;
-- operação de estoque usa chave de idempotência;
+- operação de estoque usa idempotência;
 - estoque negativo é bloqueado;
+- precisão de quantidade depende da unidade;
+- estoque mínimo respeita a mesma política;
 - usuários inativos não possuem acesso operacional;
 - operações administrativas exigem `ADMIN`.
 
-## 6. Automação e evidência
+## 8. Automação e evidência
 
 ### CI
-
-O workflow `CI` executa instalação reprodutível, lint, testes, typecheck e build nos gatilhos configurados.
+O workflow `CI` executa instalação reprodutível, lint, testes, typecheck e build. O job canônico requerido no ruleset é `verify`.
 
 ### Production Smoke E2E
+O workflow usa Chromium/Playwright contra produção pública. Credenciais QA ficam apenas em repository secrets. O runner gera screenshots, inventário de rotas, relatórios e artifact de evidência.
 
-O workflow `Production Smoke E2E` usa Chromium/Playwright contra produção pública. As credenciais de QA ficam apenas em repository secrets:
+## 9. Limitações e observações
 
-- `E2E_ADMIN_EMAIL`
-- `E2E_ADMIN_PASSWORD`
-
-O runner produz screenshots, inventário de rotas, relatórios e artifact de evidência.
-
-## 7. Divergências e achados atuais
-
-### 7.1 Quantidade/unidade — achado funcional aberto
-
-Foi reproduzido manualmente que a tela de nova movimentação aceita quantidade como `11,000001` para produto com unidade `UN`, e o saldo projetado pode ser exibido como `11.000001 UN`.
-
-Causa já localizada no código atual:
-
-- UI usa `step="any"` na quantidade;
-- Server Action aceita qualquer `number` finito positivo;
-- RPC/banco usa `numeric` sem regra de precisão vinculada à unidade;
-- exibição não normaliza a quantidade para `pt-BR`.
-
-Estado: **OPEN / PHASE-10 P10.2**.
-
-Política inicial aprovada para implementação:
-
-- unidades inteiras: `UN`, `CX`, `PCT` → somente inteiros;
-- unidades fracionáveis: `KG`, `L`, `M` → precisão controlada;
-- validação precisa existir no boundary autoritativo, não só no HTML;
-- interface deve exibir quantidades em pt-BR.
-
-### 7.2 Default branch do GitHub — divergência de governança
-
-No início da PHASE-10, o GitHub reporta `default_branch = feature/bootstrap`, embora o desenvolvimento integrado esteja em `main`.
-
-Consequência: quem abre o repositório pela branch padrão pode receber documentação histórica de bootstrap como se fosse atual.
-
-Estado: **OPEN / PHASE-10 P10.3**.
-
-A correção pretendida é tornar `main` a branch padrão. Se o conector disponível não oferecer mutação dessa configuração, a ação será tratada como dependência externa explícita e não será simulada.
-
-### 7.3 Proteção de `main`
-
-No início da PHASE-10, `main` aparece sem proteção e sem required status checks configurados na branch protection tradicional.
-
-Estado: **OPEN / PHASE-10 P10.3**.
-
-## 8. Como interpretar documentos históricos
-
-PRFs e checkpoints registram a verdade do momento em que foram gerados.
-
-Exemplo: o checkpoint da PHASE-09 contém `QUALIFIED_AWAITING_HUMAN_MERGE_GATE`. Isso não significa que o projeto atual ainda aguarda merge; significa que aquele arquivo foi criado **antes** da autorização/integração final. O estado live posterior é a fonte de verdade.
-
-A mesma regra vale para checklists antigos com `[ ]`, estados `BLOCKED`, `NOT_PUBLISHED`, ressalvas pré-deploy e SHAs de branches antigas.
-
-## 9. PHASE-10 — ordem de execução
-
-### P10.1 — Reconciliação documental
-
-- README atualizado;
-- este `docs/CURRENT-STATE.md` criado;
-- documentos históricos preservados como snapshots;
-- divergências atuais registradas explicitamente.
-
-### P10.2 — Integridade de quantidades/unidades
-
-- RED reproduzindo quantidade fracionária indevida para `UN`;
-- GREEN com regra compartilhada e enforcement autoritativo;
-- formatação pt-BR;
-- regressões e smoke E2E.
-
-### P10.3 — Hardening de repositório/CI
-
-- default branch `main`;
-- proteção/checks de integração conforme capacidade do repositório;
-- revisão dos gatilhos de CI para o fluxo real;
-- qualificação final da PHASE-10.
+- O Playwright é instalado efemeramente no smoke e pode exibir resumo de dependências temporárias; isso não equivale automaticamente a vulnerabilidade nas dependências versionadas da aplicação.
+- Branch heads, Issue state, workflow runs e commit reportado pelo Render continuam voláteis.
+- Um closeout somente documental pode avançar `main`/deploy sem mudar a árvore de aplicação.
+- PRFs antigos podem conter estados `BLOCKED`, `AWAITING_GATE` ou checklists incompletos que eram verdadeiros naquele boundary e são históricos hoje.
 
 ## 10. Próxima expansão de produto
 
-Somente depois da PHASE-10 devem ser priorizados novos módulos como fornecedores, compras, custos/preços, vendas/PDV, alertas ou multi-loja. Eles ainda **não** são capacidades atuais do MVP.
+A PHASE-10 encerra a estabilização. Novos módulos podem ser planejados em missão separada, por exemplo:
+- fornecedores;
+- compras;
+- custos e preços;
+- vendas/PDV;
+- alertas;
+- multi-loja.
+
+Nenhum desses módulos é capacidade atual até existir implementação e evidência verificável.
 
 ## 11. Regra de continuidade
 
@@ -231,6 +214,6 @@ Ao retomar o projeto:
 
 1. consulte `main`, PRs, Issues e workflows live;
 2. leia este arquivo;
-3. leia o Issue #21 enquanto PHASE-10 estiver aberta;
-4. use PRFs somente como evidência do boundary correspondente;
-5. não declare regressão resolvida sem validação fresca.
+3. use o PRF da PHASE-10 como evidência da baseline estabilizada;
+4. confirme produção e banco quando a pergunta depender de estado live;
+5. trate novas expansões como nova missão, sem reabrir implicitamente a PHASE-10.

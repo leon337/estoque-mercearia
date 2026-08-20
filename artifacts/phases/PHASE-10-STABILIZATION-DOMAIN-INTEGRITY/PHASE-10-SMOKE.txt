@@ -4,17 +4,26 @@ Historical qualified evidence:
 - P10.2 final Production Smoke: run 32193323462 — PASS
 - P10.3 Production Smoke: run 32193964995 — PASS
 
-Final closeout smoke:
-- trigger: Issue #21 comment `/smoke-production`
-- trigger timing: after default branch was changed to main and ruleset Protect main became active
-- state: PENDING_RESULT
+FINAL CLOSEOUT SMOKE AFTER HUMAN_GATE
+run: 32344160656
+job: 96349225201
+event: issue_comment
+branch: main
+head_sha: 326d1b2059e77253bac446ff111b297a3e428a71
+workflow_status: completed
+workflow_conclusion: success
+normal_smoke: PASS
+critical_review: PASS
+enforcement: PASS
+overall: PASS
+artifact_id: 9397459502
+artifact_digest: sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf
+artifact_files: 51
+artifact_size_bytes: 2765254
+qa_fixture: QA-E2E-32344160656-1-EDIT
+qa_cleanup: inactive
 
-Acceptance:
-- workflow must execute from current default branch/main
-- normal smoke PASS
-- critical review PASS
-- overall PASS
-- evidence artifact uploaded
-- no uncleaned active QA fixture
+The workflow log explicitly emitted:
+PRODUCTION_SMOKE overall=PASS
 
-Current verdict: PENDING_FINAL_SMOKE
+VERDICT: PASS

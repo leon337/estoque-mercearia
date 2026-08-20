@@ -14,7 +14,13 @@ Pacote de rastreabilidade Classe B para a estabilização pós-PHASE-09.
 9. `PHASE-10-CHECKPOINT.yaml`
 10. `PHASE-10-ARTIFACT-MANIFEST.sha256`
 
-## Estado
-`CLOSEOUT_CANDIDATE_AWAITING_FINAL_EVIDENCE`
+## Resultado
+`GATE_APPROVED_AWAITING_CLOSEOUT_MERGE`
 
-Este pacote não declara a fase entregue enquanto o Production Smoke final e o check `verify` do PR documental não estiverem comprovadamente verdes.
+- auditoria: PASS;
+- Production Smoke final: PASS;
+- required check `verify`: PASS;
+- LÉO: APROVAR;
+- HUMAN_GATE adicional: não requerido.
+
+A fase torna-se `ENTREGUE` quando este closeout for integrado em `main` e o encerramento for registrado na Issue #21.

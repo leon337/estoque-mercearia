@@ -2,15 +2,15 @@
 
 MVP web de controle de estoque para uma pequena mercearia, desenvolvido com Next.js, TypeScript, PostgreSQL/Supabase e governança MCF.
 
-> **Estado atual:** MVP funcional publicado e em estabilização pós-PHASE-09. O mapa canônico do estado do projeto está em [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md). Para branch, SHA, PR, Issue, workflow e produção, o estado live do GitHub/Render prevalece sobre snapshots documentais.
+> **Estado atual:** MVP funcional publicado. PHASE-10 — Stabilization & Domain Integrity — qualificada e encerrada tecnicamente; o estado live de branch, SHA, Issue, workflow e produção deve ser confirmado no GitHub/Render. O mapa canônico está em [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md).
 
 ## Estado do produto
 
 - **M0–M7 / PHASE-06:** MVP funcional qualificado — concluído.
 - **PHASE-07 — Public Release:** produção pública no Render — concluída.
-- **PHASE-08 — Design System v1:** redesign visual baseado no Google Stitch, preservando regras e arquitetura — concluído.
-- **PHASE-09 — Autonomous Production Smoke:** Playwright/Chromium, desktop/mobile, rotas públicas/protegidas/admin, fluxo QA e revisão crítica — concluído e integrado pela PR #20.
-- **PHASE-10 — Stabilization & Domain Integrity:** reconciliação documental, hardening do repositório e correção de invariantes de quantidade/unidade — em andamento no Issue #21.
+- **PHASE-08 — Design System v1:** redesign visual responsivo — concluído.
+- **PHASE-09 — Autonomous Production Smoke:** Playwright/Chromium com evidência desktop/mobile e fluxo QA — concluído.
+- **PHASE-10 — Stabilization & Domain Integrity:** reconciliação, precisão por unidade, hardening de CI/repositório e estoque mínimo — concluída tecnicamente; closeout em PR #27.
 
 ## Escopo funcional atual
 
@@ -20,6 +20,8 @@ MVP web de controle de estoque para uma pequena mercearia, desenvolvido com Next
 - estoque materializado por produto;
 - `INITIAL`, `ENTRY`, `EXIT` e `ADJUSTMENT`;
 - idempotência e bloqueio de estoque negativo;
+- precisão de quantidade vinculada à unidade (`UN/CX/PCT` inteiros; unidades fracionáveis com precisão controlada);
+- estoque mínimo com a mesma integridade de unidade;
 - histórico auditável;
 - dashboard operacional;
 - administração de usuários e ajustes;
@@ -92,22 +94,33 @@ Fluxo inicial: criar o primeiro usuário em `/register`, executar o bootstrap ow
 
 ## Segurança
 
-O navegador envia intenção, nunca o saldo autoritativo nem o ator da movimentação. Alterações de estoque passam pelos RPCs controlados; APIs públicas privilegiadas são wrappers `SECURITY INVOKER` e as implementações privilegiadas ficam em schema privado. Usuários inativos não possuem acesso operacional.
+O navegador envia intenção, nunca o saldo autoritativo nem o ator da movimentação. Alterações de estoque passam pelos RPCs controlados; APIs públicas privilegiadas são wrappers `SECURITY INVOKER` e implementações privilegiadas ficam em schema privado. Usuários inativos não possuem acesso operacional.
 
-Nunca versionar credenciais reais, dumps de produção ou chaves privilegiadas.
+Precisão de quantidade e de estoque mínimo também é validada no boundary autoritativo do banco, impedindo bypass da UI.
+
+Nunca versione credenciais reais, dumps de produção ou chaves privilegiadas.
 
 ## Testes de produção
 
-O workflow `Production Smoke E2E` executa Chromium real contra a aplicação publicada e preserva evidências. As credenciais de QA/E2E ficam exclusivamente nos GitHub Actions repository secrets `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD`.
+O workflow `Production Smoke E2E` executa Chromium real contra a aplicação publicada e preserva evidências. As credenciais QA/E2E ficam somente nos GitHub Actions repository secrets `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD`.
 
-A PHASE-09 foi qualificada antes do merge com 87/87 testes no CI, 11/11 rotas no smoke final e revisão crítica independente sem achado bloqueante. Esses números são evidência histórica do HEAD qualificado; novas mudanças exigem nova validação.
+A qualificação final da PHASE-10 após o HUMAN_GATE executou o run `32344160656` em `main@326d1b2059e77253bac446ff111b297a3e428a71` com `PRODUCTION_SMOKE overall=PASS`, 51 evidências no artifact `9397459502` e cleanup QA confirmado.
 
-## Backup e recuperação
+## Governança do repositório
 
-O `MVP-RUNBOOK.md` define backup lógico periódico com Supabase CLI (`supabase db dump`) e armazenamento fora do ambiente principal, além do procedimento de restauração e validação pós-restore.
+- default branch: `main`;
+- ruleset: `Protect main` ativo;
+- pull request obrigatório;
+- required status check: `verify`;
+- force push/deleção protegidos;
+- bypass list vazia no HUMAN_GATE materializado.
 
 ## Produção
 
 Produção pública: https://estoque-mercearia.onrender.com
 
-A documentação de cada fase preserva o estado verdadeiro do momento em que foi produzida. Para saber **onde o projeto está agora**, comece por `docs/CURRENT-STATE.md` e confirme os itens voláteis no GitHub/Render live.
+A identidade funcional qualificada antes do closeout documental é `main@326d1b2059e77253bac446ff111b297a3e428a71`. Um merge somente documental pode avançar `main` e o commit reportado pelo provider sem alterar a árvore de aplicação. Para qualquer estado volátil, consulte GitHub/Render live.
+
+## Próxima expansão
+
+Novos módulos — fornecedores, compras, custos/preços, vendas/PDV, alertas ou multi-loja — não fazem parte das capacidades atuais e devem ser priorizados em nova missão, sobre a baseline estabilizada da PHASE-10.

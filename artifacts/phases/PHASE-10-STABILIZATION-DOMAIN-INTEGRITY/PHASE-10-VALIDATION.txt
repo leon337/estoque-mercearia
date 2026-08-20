@@ -1,22 +1,39 @@
 PHASE-10 VALIDATION SUMMARY
-STATE: CLOSEOUT_CANDIDATE
+STATE: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
 
 P10.1 documentation reconciliation: PASS
 P10.2 quantity/unit integrity: PASS
 P10.3 repository/CI code hardening: PASS
 P10.4 minimum-stock integrity: PASS
-default_branch=main: PASS (live verified)
-main protected by active ruleset: PASS (live + HUMAN_GATE evidence)
-required PR / verify check configured: PASS (HUMAN_GATE evidence)
+default_branch=main: PASS
+main protected by active ruleset: PASS
+required PR / verify configured: PASS
 
-Historical final GREEN for P10.4:
+P10.4 technical GREEN:
 CI run 32197520954 / job 95904440177
 lint PASS
 tests 97/97 PASS
 typecheck PASS
 build PASS
 
-CLOSEOUT PRODUCTION SMOKE: PENDING
-CLOSEOUT PR verify: PENDING
+FINAL PRODUCTION SMOKE:
+run 32344160656 / job 96349225201
+head main@326d1b2059e77253bac446ff111b297a3e428a71
+workflow success
+normal smoke PASS
+critical review PASS
+PRODUCTION_SMOKE overall=PASS
+artifact 9397459502
+digest sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf
+evidence files 51
+QA cleanup: inactive
 
-VERDICT: NOT_YET_ENTREGUE
+CLOSEOUT PR #27:
+CI run 32344608801 / job 96350580180
+required check verify PASS
+install/lint/tests/typecheck/build PASS
+mergeable=true
+
+AUDIT: PASS
+LEO_GATE: APROVAR
+FINAL DELIVERY: EFFECTIVE_AFTER_PR_27_MERGE

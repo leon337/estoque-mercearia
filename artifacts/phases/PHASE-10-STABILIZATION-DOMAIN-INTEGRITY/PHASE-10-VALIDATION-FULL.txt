@@ -1,6 +1,6 @@
 PHASE-10 VALIDATION — EXPANDED EVIDENCE
 
-BASELINE
+APPLICATION BASELINE
 main=326d1b2059e77253bac446ff111b297a3e428a71
 
 P10.1
@@ -26,13 +26,13 @@ P10.3
 
 P10.4
 - PR #26 merged at 326d1b2059e77253bac446ff111b297a3e428a71
-- RED 32197349571: 94/97; only three new P10.4 contracts failed
+- RED 32197349571: 94/97; somente os três novos contratos P10.4 falharam
 - GREEN 32197520954 / job 95904440177: 97/97 + lint/typecheck/build PASS
 - hosted DB rejects incompatible minimum_stock precision
-- Render deployment evidence in Issue #21: dep-da2enhcs728c73ariio0 LIVE on 326d1b2059e77253bac446ff111b297a3e428a71
+- Render deploy evidence: dep-da2enhcs728c73ariio0 LIVE on 326d1b2059e77253bac446ff111b297a3e428a71
 
 GITHUB REPOSITORY HUMAN_GATE
-- default branch changed to main
+- default branch = main
 - ruleset Protect main ACTIVE
 - main protected=true live
 - require PR before merging
@@ -42,8 +42,40 @@ GITHUB REPOSITORY HUMAN_GATE
 - force push blocked
 - deletion restricted
 
-FINAL BOUNDARY
-- Production Smoke E2E triggered after HUMAN_GATE: PENDING_RESULT
-- closeout PR CI/verify: PENDING_RESULT
+FINAL PRODUCTION SMOKE AFTER HUMAN_GATE
+- run 32344160656
+- job 96349225201
+- event issue_comment
+- branch main
+- head 326d1b2059e77253bac446ff111b297a3e428a71
+- workflow conclusion success
+- all workflow steps success
+- normal production smoke success
+- independent critical review success
+- evidence enforcement success
+- PRODUCTION_SMOKE overall=PASS
+- artifact 9397459502
+- digest sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf
+- uploaded files: 51
+- artifact bytes: 2765254
+- QA product observed in Supabase: QA-E2E-32344160656-1-EDIT
+- QA product active=false
 
-No final delivery claim is authorized while either pending item remains.
+CLOSEOUT PR #27
+- candidate head f1bf6d8b23446c9aba16a00b8db121839b8b6222
+- CI run 32344608801
+- verify job 96350580180
+- conclusion success
+- install PASS
+- lint PASS
+- tests PASS
+- typecheck PASS
+- build PASS
+- GitHub PR metadata: mergeable=true
+
+AUDIT / GATE
+- audit verdict PASS
+- LÉO decision APROVAR
+- blockers: none
+- human action required: false
+- closeout merge remains the final integration action

@@ -33,13 +33,32 @@ LEANDRO → MESTRE (2026-08-20):
 - branch live confirmada como protegida.
 
 MESTRE → Renato:
-- comentário `/smoke-production` enviado à Issue #21 após materialização do HUMAN_GATE;
-- resultado ainda precisa ser capturado.
+- comentário `/smoke-production` enviado à Issue #21;
+- fixture Supabase `QA-E2E-32344160656-1-EDIT` permitiu recuperar o `run_id` exato;
+- run `32344160656` confirmado em `main@326d1b2059e77253bac446ff111b297a3e428a71`;
+- job `96349225201` PASS;
+- log: `PRODUCTION_SMOKE overall=PASS`;
+- artifact `9397459502` / 51 evidências;
+- fixture QA confirmada `active=false`.
 
-MESTRE → Carmem:
-- branch `phase10/closeout-prf` criada de `326d1b2059e77253bac446ff111b297a3e428a71`;
-- PRF de fechamento em preparação.
+Renato → Carmem:
+- branch `phase10/closeout-prf` e PR #27 materializadas;
+- required `verify` executado no run `32344608801`, job `96350580180`;
+- install/lint/test/typecheck/build PASS.
+
+Carmem → Emily:
+- PRF Classe B consolidado;
+- manifest recalculado;
+- nenhuma evidência inventada.
+
+Emily → LÉO:
+- auditoria PASS;
+- sem blocker remanescente;
+- closeout PR somente documental.
+
+LÉO → MESTRE:
+- decisão `APROVAR`;
+- próxima ação: integrar PR #27 e fechar Issue #21.
 
 ## Estado do loop
-Ação segura restante: obter evidência final do smoke e do `verify`.
-Sem essas evidências, não há declaração de sucesso final.
+Objetivo atendido. A única ação restante é a integração documental já aprovada; após o merge, MESTRE registra `ENTREGUE`.

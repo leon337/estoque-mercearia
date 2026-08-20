@@ -1,0 +1,60 @@
+mission_id: ESTOQUE-MERCEARIA-PHASE-10
+phase_id: PHASE-10
+title: Stabilization and Domain Integrity
+risk_class: B
+state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+objective_met: true
+application_baseline_main: 326d1b2059e77253bac446ff111b297a3e428a71
+issue: 21
+closeout_pr: 27
+pull_requests:
+  p10_1: 22
+  p10_2: [23, 24]
+  p10_3: 25
+  p10_4: 26
+repository_gate:
+  default_branch: main
+  main_protected: true
+  ruleset: Protect main
+  ruleset_active: true
+  required_pull_request: true
+  required_status_check: verify
+  required_approvals: 0
+  bypass_empty: true
+  force_push_blocked: true
+  deletion_restricted: true
+technical_validation:
+  p10_4_ci_run: 32197520954
+  p10_4_tests: "97/97"
+  lint: PASS
+  typecheck: PASS
+  build: PASS
+final_production_smoke:
+  run_id: 32344160656
+  job_id: 96349225201
+  head_sha: 326d1b2059e77253bac446ff111b297a3e428a71
+  status: PASS
+  overall: PASS
+  artifact_id: 9397459502
+  artifact_digest: "sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf"
+  evidence_files: 51
+  qa_cleanup: inactive
+closeout_validation:
+  pr: 27
+  ci_run_id: 32344608801
+  verify_job_id: 96350580180
+  verify: PASS
+  mergeable: true
+audit:
+  state: PASS
+leo_gate:
+  decision: APROVAR
+  justification: "Objetivo atendido, evidência final verde, PRF completo e HUMAN_GATE materializado."
+  next_state: ENTREGUE_APOS_MERGE_PR_27
+  next_action: "Integrar a PR #27 e registrar o fechamento na Issue #21."
+  responsible: MESTRE
+blockers: []
+unresolved_findings: []
+human_action_required: false
+next_action: "Integrar a PR #27 e fechar a Issue #21 como completed."
+checkpoint_recipient: MESTRE

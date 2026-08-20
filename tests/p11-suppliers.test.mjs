@@ -92,3 +92,15 @@ test('Production Smoke inclui rotas de fornecedores', async () => {
   assert.match(smoke, /template:\s*["']\/suppliers\/new["']/);
   assert.match(smoke, /template:\s*["']\/suppliers\/\[id\]\/edit["']/);
 });
+
+test('Production Smoke materializa e limpa o ciclo QA de fornecedor', async () => {
+  const runner = await readFile(path.join(root, 'scripts/e2e/production-smoke.mjs'), 'utf8');
+
+  assert.match(runner, /async function supplierQaFlow/);
+  assert.match(runner, /QA-SUPPLIER-/);
+  assert.match(runner, /Cadastrar fornecedor/);
+  assert.match(runner, /Salvar alterações/);
+  assert.match(runner, /Inativar fornecedor/);
+  assert.match(runner, /template:\s*["']\/suppliers\/\[id\]\/edit["']/);
+  assert.match(runner, /supplierQaFlow\(\)/);
+});

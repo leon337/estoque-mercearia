@@ -1,0 +1,49 @@
+PHASE-10 VALIDATION — EXPANDED EVIDENCE
+
+BASELINE
+main=326d1b2059e77253bac446ff111b297a3e428a71
+
+P10.1
+- PR #22 merged
+- merge fb7657d5c87189a7ac1d26734c0be609e07a9117
+- CI 32191365545 PASS
+
+P10.2
+- PR #23 merged: unit-aware stock quantity policy
+- migration 0008_quantity_precision.sql
+- PR #24 merged: rerun-safe QA identity
+- TDD recovery GREEN CI 32193323407: 92/92 + lint/typecheck/build PASS
+- Production Smoke 32193323462 / job 95892155188 PASS
+- artifact 9345026608
+- digest sha256:ed331b7ccc02700bc9cc671132622bb1532698dbed12056ea28c50444a80fc6f
+
+P10.3
+- PR #25 merged at 038cad785078e5c2842e1cffbef1e6c12aba679c
+- GREEN CI 32193965086: 94/94 + lint/typecheck/build PASS
+- Production Smoke 32193964995 / job 95894065058 PASS
+- artifact 9345239717
+- digest sha256:d6d156c8a51ec89712638d5623974c2b1ee8be987e7d9a5e58aa4c4e1253e30e
+
+P10.4
+- PR #26 merged at 326d1b2059e77253bac446ff111b297a3e428a71
+- RED 32197349571: 94/97; only three new P10.4 contracts failed
+- GREEN 32197520954 / job 95904440177: 97/97 + lint/typecheck/build PASS
+- hosted DB rejects incompatible minimum_stock precision
+- Render deployment evidence in Issue #21: dep-da2enhcs728c73ariio0 LIVE on 326d1b2059e77253bac446ff111b297a3e428a71
+
+GITHUB REPOSITORY HUMAN_GATE
+- default branch changed to main
+- ruleset Protect main ACTIVE
+- main protected=true live
+- require PR before merging
+- required check verify
+- required approvals 0
+- bypass list empty
+- force push blocked
+- deletion restricted
+
+FINAL BOUNDARY
+- Production Smoke E2E triggered after HUMAN_GATE: PENDING_RESULT
+- closeout PR CI/verify: PENDING_RESULT
+
+No final delivery claim is authorized while either pending item remains.

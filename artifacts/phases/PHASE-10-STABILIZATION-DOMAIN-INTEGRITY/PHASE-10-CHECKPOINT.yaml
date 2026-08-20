@@ -1,0 +1,45 @@
+mission_id: ESTOQUE-MERCEARIA-PHASE-10
+phase_id: PHASE-10
+title: Stabilization and Domain Integrity
+risk_class: B
+state: CLOSEOUT_CANDIDATE_AWAITING_FINAL_EVIDENCE
+objective_met: false
+baseline_main: 326d1b2059e77253bac446ff111b297a3e428a71
+issue: 21
+pull_requests:
+  p10_1: 22
+  p10_2: [23, 24]
+  p10_3: 25
+  p10_4: 26
+repository_gate:
+  default_branch: main
+  main_protected: true
+  ruleset: Protect main
+  ruleset_active: true
+  required_pull_request: true
+  required_status_check: verify
+  required_approvals: 0
+  bypass_empty: true
+  force_push_blocked: true
+  deletion_restricted: true
+technical_validation:
+  p10_4_ci_run: 32197520954
+  p10_4_tests: "97/97"
+  lint: PASS
+  typecheck: PASS
+  build: PASS
+final_production_smoke:
+  state: PENDING
+closeout_pr:
+  state: PENDING
+  required_check: verify
+audit:
+  state: PENDING_FINAL_SMOKE
+leo_gate:
+  decision: PENDING
+blockers:
+  - final Production Smoke E2E result not yet captured
+  - closeout PR verify result not yet captured
+human_action_required: false
+next_action: "Capturar o smoke final, atualizar o PRF, validar verify e decidir o gate interno."
+checkpoint_recipient: MESTRE

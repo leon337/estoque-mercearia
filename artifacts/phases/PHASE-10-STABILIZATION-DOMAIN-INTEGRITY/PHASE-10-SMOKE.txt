@@ -1,0 +1,20 @@
+PHASE-10 SMOKE
+
+Historical qualified evidence:
+- P10.2 final Production Smoke: run 32193323462 — PASS
+- P10.3 Production Smoke: run 32193964995 — PASS
+
+Final closeout smoke:
+- trigger: Issue #21 comment `/smoke-production`
+- trigger timing: after default branch was changed to main and ruleset Protect main became active
+- state: PENDING_RESULT
+
+Acceptance:
+- workflow must execute from current default branch/main
+- normal smoke PASS
+- critical review PASS
+- overall PASS
+- evidence artifact uploaded
+- no uncleaned active QA fixture
+
+Current verdict: PENDING_FINAL_SMOKE

@@ -31,6 +31,9 @@ const qaName = `QA-E2E-${qaIdentity}`;
 const qaEditedName = `${qaName}-EDIT`;
 const qaInternalCode = `QA${runId.slice(-8)}A${runAttempt.slice(-3)}`;
 const qaBarcode = `${runId.slice(-10)}${runAttempt.slice(-3)}`.slice(-13).padStart(13, "9");
+const qaSupplierName = `QA-SUPPLIER-${qaIdentity}`;
+const qaSupplierEditedName = `${qaSupplierName}-EDIT`;
+const qaSupplierTaxId = `E2E-${runId.slice(-12)}-${runAttempt.slice(-3)}`;
 
 const report = createReport(baseURL);
 report.routes = SEED_ROUTES.map(seedRouteRecord);
@@ -428,6 +431,96 @@ async function functionalQaFlow() {
   }
 }
 
+async function supplierQaFlow() {
+  const context = await browser.newContext({ viewport: PRIMARY_VIEWPORTS.desktop, storageState: authStatePath });
+  const page = await context.newPage();
+  let editPath = null;
+  const qaRecord = {
+    kind: "supplier",
+    initialName: qaSupplierName,
+    finalName: qaSupplierEditedName,
+    taxId: qaSupplierTaxId,
+    id: null,
+    cleanup: "pending",
+  };
+  report.qaData.push(qaRecord);
+
+  try {
+    await gotoWithRetry(page, "/suppliers/new");
+    await page.locator('input[name="name"]').fill(qaSupplierName);
+    await page.locator('input[name="tax_id"]').fill(qaSupplierTaxId);
+    await page.locator('input[name="email"]').fill(`qa-${runId.slice(-8)}-${runAttempt}@example.invalid`);
+    await captureEvidence(page, outputDir, "desktop", "supplier-new", "qa-filled");
+    await page.getByRole("button", { name: "Cadastrar fornecedor", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/suppliers", { timeout: 60_000 });
+    await page.getByRole("status").filter({ hasText: "Fornecedor cadastrado." }).waitFor({ timeout: 30_000 });
+    recordFunctional(report, "/suppliers/new", "PASS", `Created isolated QA supplier ${qaSupplierName}.`);
+
+    await gotoWithRetry(page, `/suppliers?q=${encodeURIComponent(qaSupplierName)}&status=all`);
+    await page.getByRole("heading", { name: qaSupplierName, exact: true }).waitFor({ timeout: 30_000 });
+    const editLink = page.getByRole("link", { name: "Editar", exact: true }).first();
+    editPath = await editLink.getAttribute("href");
+    if (!editPath || !/^\/suppliers\/[^/]+\/edit$/.test(editPath)) {
+      throw new Error(`Supplier edit link was not materialized: ${editPath}`);
+    }
+    qaRecord.id = editPath.split("/")[2];
+
+    await gotoWithRetry(page, editPath);
+    await page.getByRole("heading", { name: "Editar fornecedor", exact: true }).waitFor({ timeout: 30_000 });
+    if ((await page.locator('input[name="name"]').inputValue()) !== qaSupplierName) throw new Error("Persisted QA supplier name mismatch.");
+    const inspection = await inspectPage(page, "/suppliers/[id]/edit", "desktop", []);
+    const evidence = await captureEvidence(page, outputDir, "desktop", "supplier-edit", "persisted");
+    recordRoute(report, {
+      template: "/suppliers/[id]/edit",
+      path: editPath,
+      name: "supplier-edit",
+      type: "administrative",
+      viewport: "desktop",
+      status: inspection.status,
+      evidence,
+      findings: inspection.findings,
+      url: page.url(),
+    });
+    addDiscoveredRoutes(report, [editPath]);
+
+    await page.locator('input[name="name"]').fill(qaSupplierEditedName);
+    await page.getByRole("button", { name: "Salvar alterações", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/suppliers", { timeout: 60_000 });
+    await page.getByRole("status").filter({ hasText: "Fornecedor atualizado." }).waitFor({ timeout: 30_000 });
+    await gotoWithRetry(page, `/suppliers?q=${encodeURIComponent(qaSupplierEditedName)}&status=all`);
+    await page.getByRole("heading", { name: qaSupplierEditedName, exact: true }).waitFor({ timeout: 30_000 });
+    recordFunctional(report, "/suppliers", "PASS", "QA supplier was located before and after edit.");
+    recordFunctional(report, "/suppliers/[id]/edit", "PASS", "Persisted supplier values loaded and edit persisted.");
+
+    const mobileContext = await browser.newContext({ viewport: PRIMARY_VIEWPORTS.mobile, storageState: authStatePath });
+    try {
+      const dynamicRoute = SEED_ROUTES.find((route) => route.template === "/suppliers/[id]/edit");
+      await auditRoute(mobileContext, dynamicRoute, "mobile", editPath, "persisted");
+    } finally {
+      await mobileContext.close();
+    }
+
+    await gotoWithRetry(page, editPath);
+    await page.getByRole("button", { name: "Inativar fornecedor", exact: true }).click();
+    await page.waitForURL((url) => url.pathname === "/suppliers", { timeout: 60_000 });
+    await page.getByRole("status").filter({ hasText: "Fornecedor inativado." }).waitFor({ timeout: 30_000 });
+    await gotoWithRetry(page, `/suppliers?q=${encodeURIComponent(qaSupplierEditedName)}&status=inactive`);
+    await page.getByRole("heading", { name: qaSupplierEditedName, exact: true }).waitFor({ timeout: 30_000 });
+    await page.getByText("Inativo", { exact: true }).first().waitFor({ timeout: 30_000 });
+    qaRecord.cleanup = "inactivated";
+    recordFunctional(report, "/suppliers/[id]/edit", "PASS", "QA supplier edit/persistence passed and supplier was inactivated at cleanup.");
+    return { editPath };
+  } catch (error) {
+    report.runNotes.push(`Supplier QA flow FAIL: ${String(error?.message ?? error)}`);
+    const evidence = await captureEvidence(page, outputDir, "desktop", "supplier-flow", "failure").catch(() => null);
+    recordFunctional(report, "/suppliers/new", "FAIL", `Supplier QA flow failed: ${String(error?.message ?? error)}${evidence ? `; evidence=${evidence}` : ""}`);
+    qaRecord.cleanup = qaRecord.id ? "unknown_after_failure" : "not_created_or_unknown";
+    return { editPath, error };
+  } finally {
+    await context.close();
+  }
+}
+
 async function main() {
   try {
     await publicSmoke();
@@ -461,6 +554,19 @@ async function main() {
         viewport: "mobile",
         status: "BLOCKED",
         findings: [{ code: "dynamic_route_not_materialized", severity: "error", detail: "QA product edit path was not available." }],
+      });
+    }
+
+    const supplier = await supplierQaFlow();
+    if (!supplier.editPath) {
+      recordRoute(report, {
+        template: "/suppliers/[id]/edit",
+        path: null,
+        name: "supplier-edit",
+        type: "administrative",
+        viewport: "mobile",
+        status: "BLOCKED",
+        findings: [{ code: "dynamic_route_not_materialized", severity: "error", detail: "QA supplier edit path was not available." }],
       });
     }
 

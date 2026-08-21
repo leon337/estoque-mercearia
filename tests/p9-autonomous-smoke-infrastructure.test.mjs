@@ -7,6 +7,7 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 const files = {
   workflow: ".github/workflows/production-smoke.yml",
   runner: "scripts/e2e/production-smoke.mjs",
+  core: "scripts/e2e/production-smoke-core.mjs",
   criticalReview: "scripts/e2e/critical-review.mjs",
   lib: "scripts/e2e/smoke-lib.mjs",
 };
@@ -19,6 +20,11 @@ async function assertExists(path) {
     exists = false;
   }
   assert.equal(exists, true, `${path} must exist`);
+}
+
+async function readComposedRunner() {
+  const [runner, core] = await Promise.all([read(files.runner), read(files.core)]);
+  return `${runner}\n${core}`;
 }
 
 test("P9 autonomous smoke provides workflow runner helpers and independent RC", async () => {
@@ -46,8 +52,9 @@ test("P9 workflow is MCF-triggerable, evidence-preserving and credential-safe", 
 
 test("P9 runner covers public authenticated admin dynamic routes and QA lifecycle", async () => {
   await assertExists(files.runner);
+  await assertExists(files.core);
   await assertExists(files.lib);
-  const runner = await read(files.runner);
+  const runner = await readComposedRunner();
   const lib = await read(files.lib);
   const combined = `${runner}\n${lib}`;
 
@@ -161,7 +168,7 @@ test("P9 browser install avoids redundant apt dependency provisioning on hosted 
 });
 
 test("P9 public functional status distinguishes inspected registration from credential-blocked login", async () => {
-  const source = await read(files.runner);
+  const source = await readComposedRunner();
   assert.match(source, /input\[name=["']name["']\]/);
   assert.match(source, /input\[name=["']password_confirm["']\]/);
   assert.match(source, /recordFunctional\(report, ["']\/register["'], ["']PASS["']/);

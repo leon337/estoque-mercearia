@@ -129,7 +129,7 @@ export default async function EditSupplierPage({ params, searchParams }: { param
                   <input className={controlClass} maxLength={80} name="supplier_code" />
                 </label>
                 <label className="flex min-h-12 items-center gap-2 text-sm font-medium">
-                  <input className="size-5" name="preferred" type="checkbox" /> Preferencial
+                  <input className="size-12" name="preferred" type="checkbox" /> Preferencial
                 </label>
                 <Button type="submit">Vincular produto</Button>
               </form>
@@ -156,7 +156,7 @@ export default async function EditSupplierPage({ params, searchParams }: { param
                     <input className={controlClass} defaultValue={link.supplier_code ?? ""} disabled={!link.active || !supplier.active} maxLength={80} name="supplier_code" />
                   </label>
                   <label className="flex min-h-12 items-center gap-2 text-sm font-medium">
-                    <input className="size-5" defaultChecked={link.preferred} disabled={!link.active || !supplier.active} name="preferred" type="checkbox" /> Preferencial
+                    <input className="size-12" defaultChecked={link.preferred} disabled={!link.active || !supplier.active} name="preferred" type="checkbox" /> Preferencial
                   </label>
                   {link.active && supplier.active ? <Button type="submit" variant="secondary">Salvar vínculo</Button> : <span />}
                 </form>

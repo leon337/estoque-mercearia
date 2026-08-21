@@ -85,6 +85,15 @@ test('navegação inclui fornecedores e mobile suporta crescimento', async () =>
   assert.doesNotMatch(mobile, /grid-cols-5/);
 });
 
+test('navegação móvel PHASE-11 cabe em 320px sem escapar horizontalmente', async () => {
+  const mobile = await readFile(path.join(root, 'src/components/shell/MobileBottomNav.tsx'), 'utf8');
+  const edit = await readFile(path.join(root, 'src/app/suppliers/[id]/edit/page.tsx'), 'utf8');
+
+  assert.doesNotMatch(mobile, /min-w-24/);
+  assert.match(mobile, /min-w-\[52px\]/);
+  assert.match(edit, /name="preferred"[^>]+size-12|size-12[^>]+name="preferred"/);
+});
+
 test('Production Smoke inclui rotas de fornecedores', async () => {
   const smoke = await readFile(path.join(root, 'scripts/e2e/smoke-lib.mjs'), 'utf8');
 

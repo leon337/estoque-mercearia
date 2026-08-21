@@ -15,7 +15,7 @@ export function MobileBottomNav({ role }: { role: Role }) {
         return (
           <Link
             aria-current={active ? "page" : undefined}
-            className={`flex min-h-12 min-w-24 flex-1 items-center justify-center rounded-lg px-2 text-center text-[11px] font-semibold leading-tight ${active ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]" : "text-[var(--color-on-surface-variant)]"}`}
+            className={`flex min-h-12 min-w-[52px] flex-1 items-center justify-center rounded-lg px-2 text-center text-[11px] font-semibold leading-tight ${active ? "bg-[var(--color-primary-container)] text-[var(--color-on-surface)]" : "text-[var(--color-on-surface-variant)]"}`}
             href={item.href}
             key={item.href}
           >

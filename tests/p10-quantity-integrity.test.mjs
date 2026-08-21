@@ -4,6 +4,14 @@ import { readFile, readdir } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
+async function readProductionSmoke() {
+  const [runner, core] = await Promise.all([
+    read("scripts/e2e/production-smoke.mjs"),
+    read("scripts/e2e/production-smoke-core.mjs"),
+  ]);
+  return `${runner}\n${core}`;
+}
+
 test("P10 movement form applies unit-aware quantity precision and pt-BR formatting", async () => {
   const source = await read("src/app/movements/new/movement-form.tsx");
 
@@ -39,7 +47,7 @@ test("P10 database migration enforces quantity precision at the authoritative bo
 });
 
 test("P10 production smoke covers fractional UN rejection before valid movement input", async () => {
-  const source = await read("scripts/e2e/production-smoke.mjs");
+  const source = await readProductionSmoke();
 
   assert.match(source, /11\.000001/);
   assert.match(source, /quantity-precision-error|quantidades inteiras|precision/i);
@@ -48,7 +56,7 @@ test("P10 production smoke covers fractional UN rejection before valid movement 
 });
 
 test("P10 production smoke makes QA fixture identity unique across workflow reruns", async () => {
-  const source = await read("scripts/e2e/production-smoke.mjs");
+  const source = await readProductionSmoke();
 
   assert.match(source, /GITHUB_RUN_ATTEMPT/);
   assert.match(source, /runAttempt|runIdentity|qaIdentity/);

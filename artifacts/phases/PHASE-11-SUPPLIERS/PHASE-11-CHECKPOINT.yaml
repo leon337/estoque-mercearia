@@ -1,0 +1,49 @@
+mission_id: ESTOQUE-MERCEARIA-PHASE-11
+phase_id: PHASE-11
+title: Suppliers and Product-Supplier Links
+risk_class: B
+state: QUALIFIED_AWAITING_CLOSEOUT_MERGE
+objective_met: true
+issue: 28
+feature_pr: 29
+recovery_pr: 30
+qualified_application_baseline_main: f08c7600a808a3a22701ff4a2b6e6ee1c722a190
+technical_validation:
+  feature_ci_run: 32354767814
+  feature_verify_job: 96381473935
+  feature_tests: "104/104"
+  recovery_ci_run: 32483680138
+  recovery_verify_job: 96775347265
+  recovery_tests: "105/105"
+  lint: PASS
+  typecheck: PASS
+  build: PASS
+database_validation:
+  migration: 0010_suppliers.sql
+  project_id: exwtngpwqgkrkoszpgib
+  suppliers_rls: true
+  product_suppliers_rls: true
+  supplier_policies: 3
+  product_supplier_policies: 3
+  preferred_unique_index: true
+  anon_supplier_select: false
+  authenticated_delete: false
+final_production_smoke:
+  run_id: 32483860330
+  job_id: 96775902904
+  head_sha: f08c7600a808a3a22701ff4a2b6e6ee1c722a190
+  status: PASS
+  overall: PASS
+  artifact_id: 9447149075
+  artifact_digest: "sha256:b77c97cc4d40170f1e0de4df05fb4dff4b9e90bf354eee97e23ea2735836d5ca"
+  qa_cleanup: inactive
+audit:
+  state: PASS
+blockers: []
+unresolved_findings: []
+human_action_required: false
+leo_gate:
+  decision: APROVAR
+  next_state: ENTREGUE_APOS_MERGE_DO_CLOSEOUT
+next_action: "Integrar o PRF documental e fechar a Issue #28 como completed."
+checkpoint_recipient: MESTRE

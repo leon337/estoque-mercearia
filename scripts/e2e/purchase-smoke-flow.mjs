@@ -1,6 +1,5 @@
 import {
   PRIMARY_VIEWPORTS,
-  SEED_ROUTES,
   addDiscoveredRoutes,
   captureEvidence,
   inspectPage,
@@ -18,6 +17,11 @@ async function gotoWithRetry(page, baseURL, pathname) {
     }
   });
   await page.waitForTimeout(250);
+}
+
+function isPurchaseDetailPath(pathname) {
+  const segments = pathname.split("/").filter(Boolean);
+  return pathname.startsWith("/purchases/") && pathname !== "/purchases/new" && segments.length === 2;
 }
 
 async function chooseOptionContaining(select, text) {
@@ -141,7 +145,7 @@ export async function runPurchaseQaFlow({
     await page.locator('textarea[name="notes"]').fill(qaPurchaseTag);
     await captureEvidence(page, outputDir, "desktop", "purchase-new", "qa-filled");
     await page.getByRole("button", { name: "Criar pedido", exact: true }).click();
-    await page.waitForURL((url) => /^\/purchases\/[^/]+$/.test(url.pathname), { timeout: 60_000 });
+    await page.waitForURL((url) => isPurchaseDetailPath(url.pathname), { timeout: 60_000 });
     purchasePath = new URL(page.url()).pathname;
     purchaseId = purchasePath.split("/")[2];
     qaRecord.purchaseId = purchaseId;

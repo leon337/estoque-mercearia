@@ -15,8 +15,17 @@ test('P12 item save does not use upsert that requires immutable-column UPDATE pr
     /from\(["']purchase_order_items["']\)[\s\S]{0,120}\.upsert\(/,
     'purchase_order_items must not use PostgREST upsert with restricted immutable-column UPDATE grants',
   );
-  assert.match(actions, /\.insert\(\{\s*purchase_order_id:\s*orderId,\s*product_id:\s*productId,\s*ordered_quantity:\s*quantity,\s*active:\s*true\s*\}\)/s);
-  assert.match(actions, /error\?\.code\s*===\s*["']23505["'][\s\S]+\.update\(\{\s*ordered_quantity:\s*quantity,\s*active:\s*true\s*\}\)/s);
+  assert.match(actions, /from\(["']purchase_order_items["']\)\.insert\(\{/);
+  for (const property of [
+    /purchase_order_id:\s*orderId/,
+    /product_id:\s*productId/,
+    /ordered_quantity:\s*quantity/,
+    /active:\s*true/,
+  ]) {
+    assert.match(actions, property);
+  }
+  assert.match(actions, /insertError\?\.code\s*===\s*["']23505["']/);
+  assert.match(actions, /from\(["']purchase_order_items["']\)[\s\S]+\.update\(\{\s*ordered_quantity:\s*quantity,\s*active:\s*true\s*\}\)/s);
 });
 
 test('P12 mobile navigation still fits the 320px critical-review viewport after adding Compras', async () => {

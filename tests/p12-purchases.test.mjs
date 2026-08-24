@@ -17,18 +17,13 @@ const requiredFiles = [
 ];
 
 test('P12 possui migration, actions e superfícies de compras', async () => {
-  for (const relativePath of requiredFiles) {
-    await access(path.join(root, relativePath), constants.R_OK);
-  }
+  for (const relativePath of requiredFiles) await access(path.join(root, relativePath), constants.R_OK);
 });
 
-test('migration modela pedidos e recebimentos sem dimensão monetária', async () => {
+test('migration modela pedidos e recebimentos sem dimensão monetária na baseline P12', async () => {
   const sql = await readFile(path.join(root, 'supabase/migrations/0011_purchases.sql'), 'utf8');
-
   assert.match(sql, /create type public\.purchase_order_status/i);
-  for (const state of ['DRAFT', 'ORDERED', 'PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED']) {
-    assert.match(sql, new RegExp(`'${state}'`));
-  }
+  for (const state of ['DRAFT', 'ORDERED', 'PARTIALLY_RECEIVED', 'RECEIVED', 'CANCELLED']) assert.match(sql, new RegExp(`'${state}'`));
   assert.match(sql, /create table public\.purchase_orders/i);
   assert.match(sql, /create table public\.purchase_order_items/i);
   assert.match(sql, /create table public\.purchase_receipts/i);
@@ -40,7 +35,6 @@ test('migration modela pedidos e recebimentos sem dimensão monetária', async (
 
 test('migration protege compras com RLS e escrita ADMIN sem DELETE de histórico', async () => {
   const sql = await readFile(path.join(root, 'supabase/migrations/0011_purchases.sql'), 'utf8');
-
   for (const table of ['purchase_orders', 'purchase_order_items', 'purchase_receipts', 'purchase_receipt_items']) {
     assert.match(sql, new RegExp(`alter table public\\.${table} enable row level security`, 'i'));
     assert.match(sql, new RegExp(`revoke all on public\\.${table} from anon`, 'i'));
@@ -52,7 +46,6 @@ test('migration protege compras com RLS e escrita ADMIN sem DELETE de histórico
 
 test('recebimento é transacional, idempotente e reutiliza o domínio autoritativo de estoque', async () => {
   const sql = await readFile(path.join(root, 'supabase/migrations/0011_purchases.sql'), 'utf8');
-
   assert.match(sql, /private\.receive_purchase_order/i);
   assert.match(sql, /security definer/i);
   assert.match(sql, /private\.register_stock_movement/i);
@@ -67,35 +60,30 @@ test('recebimento é transacional, idempotente e reutiliza o domínio autoritati
 
 test('actions de compras exigem ADMIN e expõem o lifecycle aprovado', async () => {
   const actions = await readFile(path.join(root, 'src/app/purchases/actions.ts'), 'utf8');
-
   assert.match(actions, /requireAdminUser/);
-  for (const action of ['createPurchaseOrder', 'addPurchaseOrderItem', 'removePurchaseOrderItem', 'markPurchaseOrderOrdered', 'cancelPurchaseOrder', 'receivePurchaseOrder']) {
-    assert.match(actions, new RegExp(`export async function ${action}`));
-  }
+  for (const action of ['createPurchaseOrder', 'addPurchaseOrderItem', 'removePurchaseOrderItem', 'markPurchaseOrderOrdered', 'cancelPurchaseOrder', 'receivePurchaseOrder']) assert.match(actions, new RegExp(`export async function ${action}`));
   assert.match(actions, /receive_purchase_order/);
   assert.match(actions, /isQuantityTextValidForUnit/);
 });
 
-test('UI e navegação expõem compras sem preço ou custo', async () => {
+test('UI e navegação preservam o lifecycle de compras após extensões posteriores', async () => {
   const navigation = await readFile(path.join(root, 'src/components/shell/navigation.ts'), 'utf8');
   const list = await readFile(path.join(root, 'src/app/purchases/page.tsx'), 'utf8');
   const create = await readFile(path.join(root, 'src/app/purchases/new/page.tsx'), 'utf8');
   const detail = await readFile(path.join(root, 'src/app/purchases/[id]/page.tsx'), 'utf8');
   const combined = `${list}\n${create}\n${detail}`;
-
   assert.match(navigation, /["']\/purchases["']/);
   assert.match(navigation, /Compras/);
   assert.match(create, /name=["']supplier_id["']/);
   assert.match(detail, /name=["']product_id["']/);
   assert.match(detail, /name=["']quantity["']/);
   assert.match(combined, /Pedido|Compras/);
-  assert.doesNotMatch(combined, /Preço|Custo|R\$|unit_price|cost_price/i);
+  assert.doesNotMatch(combined, /imposto|tribut|frete|pagamento|NF-e/i);
 });
 
 test('Production Smoke cobre rotas e lifecycle de compra/recebimento', async () => {
   const smoke = await readFile(path.join(root, 'scripts/e2e/smoke-lib.mjs'), 'utf8');
   const runner = await readFile(path.join(root, 'scripts/e2e/production-smoke.mjs'), 'utf8');
-
   assert.match(smoke, /template:\s*["']\/purchases["']/);
   assert.match(smoke, /template:\s*["']\/purchases\/new["']/);
   assert.match(smoke, /template:\s*["']\/purchases\/\[id\]["']/);

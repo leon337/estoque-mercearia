@@ -92,6 +92,9 @@ export async function runPurchaseQaFlow({
     purchaseId: null,
     orderedQuantity: 2,
     receivedQuantity: 0,
+    initialCostPrice: 2.5,
+    salePrice: 4.99,
+    unitCost: 3.4567,
     cleanup: "pending",
   };
   report.qaData.push(qaRecord);
@@ -104,6 +107,8 @@ export async function runPurchaseQaFlow({
     await page.locator('select[name="category_id"]').selectOption("");
     await page.locator('input[name="unit"]').fill("UN");
     await page.locator('input[name="minimum_stock"]').fill("0");
+    await page.locator('input[name="cost_price"]').fill("2.5000");
+    await page.locator('input[name="sale_price"]').fill("4.99");
     await page.getByRole("button", { name: "Cadastrar produto", exact: true }).click();
     await page.waitForURL((url) => url.pathname === "/products", { timeout: 60_000 });
     await page.getByRole("status").filter({ hasText: "Produto cadastrado." }).waitFor({ timeout: 30_000 });
@@ -169,6 +174,7 @@ export async function runPurchaseQaFlow({
 
     await chooseOptionContaining(page.locator('select[name="product_id"]'), productName);
     await page.locator('input[name="quantity"]').fill("2");
+    await page.locator('input[name="unit_cost"]').fill("3.4567");
     await page.getByRole("button", { name: "Adicionar item", exact: true }).click();
     await page.waitForURL((url) => url.pathname === purchasePath, { timeout: 60_000 });
     await page.getByRole("status").filter({ hasText: "Item adicionado ao pedido." }).waitFor({ timeout: 30_000 });
@@ -201,6 +207,12 @@ export async function runPurchaseQaFlow({
     await inventoryCard.getByText("2 UN", { exact: true }).waitFor({ timeout: 30_000 });
     recordFunctional(report, "/inventory", "PASS", `${qaPurchaseTag} receipt produced the expected isolated balance of 2 UN.`);
 
+    await gotoWithRetry(page, baseURL, productEditPath);
+    await page.locator('input[name="cost_price"]').toHaveValue("3.4567");
+    await page.locator('input[name="sale_price"]').toHaveValue("4.99");
+    recordFunctional(report, "/products/[id]/edit", "PASS", `${qaPurchaseTag} last received cost updated to 3.4567 while sale price remained 4.99.`);
+    await captureEvidence(page, outputDir, "desktop", "product-edit", "last-cost");
+
     const mobileContext = await browser.newContext({ viewport: PRIMARY_VIEWPORTS.mobile, storageState: authStatePath });
     const mobilePage = await mobileContext.newPage();
     try {
@@ -225,7 +237,7 @@ export async function runPurchaseQaFlow({
     await gotoWithRetry(page, baseURL, "/purchases");
     await page.getByRole("link", { name: "Abrir pedido", exact: true }).filter({ has: page.locator(`xpath=..`) }).first().count().catch(() => 0);
     recordFunctional(report, "/purchases", "PASS", `${qaPurchaseTag} reached the purchases lifecycle and remains as immutable QA history.`);
-    recordFunctional(report, "/purchases/[id]", "PASS", "Purchase moved DRAFT → ORDERED → PARTIALLY_RECEIVED → RECEIVED and stock balance reached 2 UN.");
+    recordFunctional(report, "/purchases/[id]", "PASS", "Purchase moved DRAFT → ORDERED → PARTIALLY_RECEIVED → RECEIVED, stock reached 2 UN, and PHASE-13 monetary snapshots were preserved.");
 
     return { purchasePath, purchaseId, productId, supplierId };
   } catch (error) {

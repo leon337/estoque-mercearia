@@ -15,9 +15,10 @@ function first(value: QueryValue) { return Array.isArray(value) ? value[0] ?? ""
 type SupplierRelation = { name: string } | { name: string }[] | null;
 type ProductRelation = { id: string; internal_code: string; name: string; unit: string; active: boolean } | { id: string; internal_code: string; name: string; unit: string; active: boolean }[] | null;
 type OrderRow = { id: string; supplier_id: string; status: string; notes: string | null; created_at: string; suppliers: SupplierRelation };
-type ItemRow = { id: string; product_id: string; ordered_quantity: number; received_quantity: number; active: boolean; products: ProductRelation };
+type ItemRow = { id: string; product_id: string; ordered_quantity: number; received_quantity: number; unit_cost: number; active: boolean; products: ProductRelation };
 type LinkRow = { product_id: string; products: ProductRelation };
 function one<T>(value: T | T[] | null): T | null { return Array.isArray(value) ? value[0] ?? null : value; }
+function formatBRL(value: number | string) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value) || 0); }
 const labels: Record<string, string> = { DRAFT: "Rascunho", ORDERED: "Enviado", PARTIALLY_RECEIVED: "Recebido parcialmente", RECEIVED: "Recebido", CANCELLED: "Cancelado" };
 function tone(status: string): "success" | "warning" | "neutral" | "critical" { if (status === "RECEIVED") return "success"; if (status === "ORDERED" || status === "PARTIALLY_RECEIVED") return "warning"; if (status === "CANCELLED") return "critical"; return "neutral"; }
 function stepForUnit(unit: string) { return ["UN", "CX", "PCT"].includes(unit.trim().toUpperCase()) ? "1" : "0.001"; }
@@ -30,7 +31,7 @@ export default async function PurchaseDetailPage({ params, searchParams }: { par
   const { data: orderData, error: orderError } = await supabase.from("purchase_orders").select("id, supplier_id, status, notes, created_at, suppliers(name)").eq("id", id).single();
   if (orderError || !orderData) notFound();
   const order = orderData as unknown as OrderRow;
-  const { data: itemData, error: itemError } = await supabase.from("purchase_order_items").select("id, product_id, ordered_quantity, received_quantity, active, products(id, internal_code, name, unit, active)").eq("purchase_order_id", id).eq("active", true).order("created_at");
+  const { data: itemData, error: itemError } = await supabase.from("purchase_order_items").select("id, product_id, ordered_quantity, received_quantity, unit_cost, active, products(id, internal_code, name, unit, active)").eq("purchase_order_id", id).eq("active", true).order("created_at");
   if (itemError) throw new Error("Não foi possível consultar os itens do pedido.");
   const items = (itemData ?? []) as unknown as ItemRow[];
   const isAdmin = profile.role === "ADMIN";
@@ -48,6 +49,7 @@ export default async function PurchaseDetailPage({ params, searchParams }: { par
   const errors: Record<string, string> = { validation: "Revise os dados informados.", not_draft: "O pedido não está mais em rascunho.", empty: "Adicione ao menos um item antes de enviar.", not_receivable: "O pedido não está disponível para recebimento.", cannot_cancel: "Este pedido não pode mais ser cancelado.", supplier_inactive: "O fornecedor está inativo.", product_inactive: "O produto está inativo.", not_linked: "O produto não possui vínculo ativo com o fornecedor.", exceeds_ordered: "A quantidade recebida excede o restante do item.", operation_conflict: "A operação de recebimento conflita com uma tentativa anterior.", database: "Não foi possível concluir a operação." };
   const successMessages: Record<string, string> = { created: "Pedido criado.", item_saved: "Item adicionado ao pedido.", item_removed: "Item removido do pedido.", ordered: "Pedido marcado como enviado.", cancelled: "Pedido cancelado.", received: "Recebimento registrado no estoque." };
   const supplier = one(order.suppliers);
+  const orderTotal = items.reduce((sum, item) => sum + Number(item.ordered_quantity) * Number(item.unit_cost), 0);
 
   return (
     <AppShell role={profile.role}>
@@ -60,16 +62,17 @@ export default async function PurchaseDetailPage({ params, searchParams }: { par
         {isAdmin && order.status === "DRAFT" ? (
           <DataCard className="mt-6">
             <h2 className="text-lg font-semibold">Adicionar produto</h2>
-            <form action={addPurchaseOrderItem} className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
+            <form action={addPurchaseOrderItem} className="mt-4 grid gap-4 md:grid-cols-[minmax(0,1fr)_10rem_10rem_auto] md:items-end">
               <input name="purchase_order_id" type="hidden" value={order.id} />
-              <label className="grid gap-2 text-sm font-medium">Produto
-                <select className={controlClass} name="product_id" required><option value="">Selecione</option>{availableProducts.map((link) => { const product = one(link.products); return product ? <option key={product.id} value={product.id}>{product.internal_code} · {product.name} ({product.unit})</option> : null; })}</select>
-              </label>
+              <label className="grid gap-2 text-sm font-medium">Produto<select className={controlClass} name="product_id" required><option value="">Selecione</option>{availableProducts.map((link) => { const product = one(link.products); return product ? <option key={product.id} value={product.id}>{product.internal_code} · {product.name} ({product.unit})</option> : null; })}</select></label>
               <label className="grid gap-2 text-sm font-medium">Quantidade<input className={controlClass} min="0.001" name="quantity" required step="0.001" type="number" /></label>
+              <label className="grid gap-2 text-sm font-medium">Custo unitário<input className={`${controlClass} font-data`} defaultValue="0" min="0" name="unit_cost" required step="0.0001" type="number" /></label>
               <Button disabled={availableProducts.length === 0} type="submit">Adicionar item</Button>
             </form>
           </DataCard>
         ) : null}
+
+        <DataCard className="mt-6"><div className="flex items-center justify-between gap-4"><span className="text-sm text-[var(--color-on-surface-variant)]">Total estimado do pedido</span><strong className="font-data text-xl">{formatBRL(orderTotal)}</strong></div></DataCard>
 
         <section className="mt-8" aria-labelledby="purchase-items-title">
           <h2 className="text-2xl font-bold" id="purchase-items-title">Itens do pedido</h2>
@@ -77,18 +80,16 @@ export default async function PurchaseDetailPage({ params, searchParams }: { par
             {items.length === 0 ? <DataCard className="border-dashed"><p className="text-sm text-[var(--color-on-surface-variant)]">Nenhum item adicionado.</p></DataCard> : items.map((item) => {
               const product = one(item.products);
               const remaining = Number(item.ordered_quantity) - Number(item.received_quantity);
+              const itemTotal = Number(item.ordered_quantity) * Number(item.unit_cost);
               return (
                 <DataCard key={item.id}>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div><h3 className="font-semibold">{product ? `${product.internal_code} · ${product.name}` : "Produto"}</h3><p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Pedido: {item.ordered_quantity} {product?.unit ?? ""} · Recebido: {item.received_quantity} · Restante: {remaining}</p></div>
+                    <div><h3 className="font-semibold">{product ? `${product.internal_code} · ${product.name}` : "Produto"}</h3><p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Pedido: {item.ordered_quantity} {product?.unit ?? ""} · Recebido: {item.received_quantity} · Restante: {remaining}</p><p className="mt-1 text-sm">Custo unitário: <span className="font-data">{formatBRL(item.unit_cost)}</span> · Total: <span className="font-data font-semibold">{formatBRL(itemTotal)}</span></p></div>
                     {isAdmin && order.status === "DRAFT" ? <form action={removePurchaseOrderItem}><input name="purchase_order_id" type="hidden" value={order.id} /><input name="item_id" type="hidden" value={item.id} /><Button type="submit" variant="danger">Remover</Button></form> : null}
                   </div>
                   {isAdmin && ["ORDERED", "PARTIALLY_RECEIVED"].includes(order.status) && remaining > 0 && product ? (
                     <form action={receivePurchaseOrder} className="mt-4 grid gap-3 border-t border-[var(--color-border-subtle)] pt-4 sm:grid-cols-[12rem_auto] sm:items-end">
-                      <input name="purchase_order_id" type="hidden" value={order.id} />
-                      <input name="purchase_order_item_id" type="hidden" value={item.id} />
-                      <input name="operation_id" type="hidden" value={randomUUID()} />
-                      <input name="stock_operation_id" type="hidden" value={randomUUID()} />
+                      <input name="purchase_order_id" type="hidden" value={order.id} /><input name="purchase_order_item_id" type="hidden" value={item.id} /><input name="operation_id" type="hidden" value={randomUUID()} /><input name="stock_operation_id" type="hidden" value={randomUUID()} />
                       <label className="grid gap-2 text-sm font-medium">Quantidade a receber<input className={controlClass} max={remaining} min={stepForUnit(product.unit)} name="quantity" required step={stepForUnit(product.unit)} type="number" /></label>
                       <Button type="submit">Registrar recebimento</Button>
                     </form>

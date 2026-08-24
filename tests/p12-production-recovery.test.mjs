@@ -38,3 +38,13 @@ test('P12 mobile navigation still fits the 320px critical-review viewport after 
   assert.doesNotMatch(mobile, /min-w-\[52px\]/);
   assert.ok(nonAdminItems * 44 + 8 <= 320, 'mobile nav minimum widths plus horizontal padding must fit 320px');
 });
+
+test('P12 production smoke waits for a real purchase detail route instead of matching /purchases/new', async () => {
+  const flow = await readFile(path.join(root, 'scripts/e2e/purchase-smoke-flow.mjs'), 'utf8');
+
+  assert.match(flow, /function isPurchaseDetailPath\(pathname\)/);
+  assert.match(flow, /pathname\.startsWith\(["']\/purchases\/["']\)/);
+  assert.match(flow, /pathname !== ["']\/purchases\/new["']/);
+  assert.match(flow, /page\.waitForURL\(\(url\) => isPurchaseDetailPath\(url\.pathname\)/);
+  assert.match(flow, /purchasePath = new URL\(page\.url\(\)\)\.pathname/);
+});

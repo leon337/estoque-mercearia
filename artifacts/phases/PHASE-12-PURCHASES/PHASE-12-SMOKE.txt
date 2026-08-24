@@ -1,0 +1,12 @@
+PHASE-12 FINAL PRODUCTION SMOKE
+run_id=32788784924
+job_id=97626059502
+head_sha=826ea2b798e19761acf55cedbe54032f0bf927ce
+normal_smoke=PASS
+critical_review=PASS
+enforcement=PASS
+overall=PASS
+artifact_id=9542459270
+artifact_digest=sha256:2e59a630a0555a865952cec3a3c0e467e2f39ecca6bbf80c49d76ba082dc6e59
+render_deploy=dep-da6ct7rm8hqs73ch78a0
+render_status=live

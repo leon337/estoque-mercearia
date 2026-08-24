@@ -7,7 +7,8 @@ const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 test("M4 exposes an operational inventory read page", async () => {
   const source = await read("src/app/inventory/page.tsx");
   assert.match(source, /from\("products"\)/);
-  assert.match(source, /inventory\s*\(\s*quantity\s*\)/);
+  assert.match(source, /from\("inventory"\)/);
+  assert.match(source, /product_id, quantity/);
   assert.match(source, /minimum_stock/);
   assert.match(source, /Estoque baixo|ZERADO|Baixo|Sem estoque/);
   assert.match(source, /\/movements\/new/);

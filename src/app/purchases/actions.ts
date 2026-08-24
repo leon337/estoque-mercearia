@@ -73,10 +73,23 @@ export async function addPurchaseOrderItem(formData: FormData) {
   if (productError || !product?.active) redirect(`/purchases/${orderId}?error=product_inactive`);
   if (!isQuantityTextValidForUnit(quantityText, product.unit)) redirect(`/purchases/${orderId}?error=validation`);
 
-  const { error } = await supabase.from("purchase_order_items").upsert(
-    { purchase_order_id: orderId, product_id: productId, ordered_quantity: quantity, active: true },
-    { onConflict: "purchase_order_id,product_id" },
-  );
+  const { error: insertError } = await supabase.from("purchase_order_items").insert({
+    purchase_order_id: orderId,
+    product_id: productId,
+    ordered_quantity: quantity,
+    active: true,
+  });
+
+  let error = insertError;
+  if (insertError?.code === "23505") {
+    const { error: updateError } = await supabase
+      .from("purchase_order_items")
+      .update({ ordered_quantity: quantity, active: true })
+      .eq("purchase_order_id", orderId)
+      .eq("product_id", productId);
+    error = updateError;
+  }
+
   if (error) redirect(`/purchases/${orderId}?error=${errorCode(error)}`);
 
   revalidatePath(`/purchases/${orderId}`);

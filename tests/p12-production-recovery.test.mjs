@@ -48,3 +48,14 @@ test('P12 production smoke waits for a real purchase detail route instead of mat
   assert.match(flow, /page\.waitForURL\(\(url\) => isPurchaseDetailPath\(url\.pathname\)/);
   assert.match(flow, /purchasePath = new URL\(page\.url\(\)\)\.pathname/);
 });
+
+test('P12 production smoke retries the inventory balance read after a committed receipt', async () => {
+  const flow = await readFile(path.join(root, 'scripts/e2e/purchase-smoke-flow.mjs'), 'utf8');
+
+  assert.match(flow, /retryWithBackoff/);
+  assert.match(flow, /async function waitForInventoryBalance\(/);
+  assert.match(flow, /gotoWithRetry\(page, baseURL, ["']\/inventory["']\)/);
+  assert.match(flow, /retryable\s*=\s*true/);
+  assert.match(flow, /maxAttempts:\s*3/);
+  assert.match(flow, /waitForInventoryBalance\(page, baseURL, productName, ["']2 UN["']\)/);
+});

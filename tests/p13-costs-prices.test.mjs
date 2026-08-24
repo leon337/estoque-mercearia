@@ -71,3 +71,14 @@ test('P13 permanece separado do domínio quantitativo de estoque', async () => {
   const stockWrapper = await readFile(path.join(root, 'src/modules/inventory/register-stock-movement.ts'), 'utf8');
   assert.doesNotMatch(stockWrapper, /cost_price|sale_price|unit_cost|price|cost/i);
 });
+
+test('P13 Production Smoke prova preço, custo unitário e atualização de último custo recebido', async () => {
+  const flow = await readFile(path.join(root, 'scripts/e2e/purchase-smoke-flow.mjs'), 'utf8');
+
+  assert.match(flow, /input\[name=["']cost_price["']\][^\n]*fill\(["']2\.5000["']\)/);
+  assert.match(flow, /input\[name=["']sale_price["']\][^\n]*fill\(["']4\.99["']\)/);
+  assert.match(flow, /input\[name=["']unit_cost["']\][^\n]*fill\(["']3\.4567["']\)/);
+  assert.match(flow, /input\[name=["']cost_price["']\][^\n]*toHaveValue\(["']3\.4567["']\)/);
+  assert.match(flow, /input\[name=["']sale_price["']\][^\n]*toHaveValue\(["']4\.99["']\)/);
+  assert.match(flow, /last received cost|último custo recebido|last-cost/i);
+});

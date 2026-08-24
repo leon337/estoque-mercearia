@@ -1,0 +1,24 @@
+phase: PHASE-12
+name: Pedidos de compra e recebimento
+state: ENTREGUE
+issue: 31
+final_main_sha: 826ea2b798e19761acf55cedbe54032f0bf927ce
+verify:
+  run_id: 32787782198
+  job_id: 97623094929
+  conclusion: success
+supabase:
+  project_id: exwtngpwqgkrkoszpgib
+  migration: 0011_purchases.sql
+render:
+  service_id: srv-da1et8pt0dsc73bn9pgg
+  deploy_id: dep-da6ct7rm8hqs73ch78a0
+  status: live
+production_smoke:
+  run_id: 32788784924
+  job_id: 97626059502
+  conclusion: success
+  artifact_id: 9542459270
+  artifact_digest: sha256:2e59a630a0555a865952cec3a3c0e467e2f39ecca6bbf80c49d76ba082dc6e59
+audit: PASS
+next_phase: PHASE-13

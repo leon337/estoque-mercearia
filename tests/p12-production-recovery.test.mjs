@@ -48,3 +48,10 @@ test('P12 production smoke waits for a real purchase detail route instead of mat
   assert.match(flow, /page\.waitForURL\(\(url\) => isPurchaseDetailPath\(url\.pathname\)/);
   assert.match(flow, /purchasePath = new URL\(page\.url\(\)\)\.pathname/);
 });
+
+test('P12 server-side Supabase reads bypass framework fetch caching after transactional mutations', async () => {
+  const server = await readFile(path.join(root, 'src/lib/supabase/server.ts'), 'utf8');
+
+  assert.match(server, /global:\s*\{/);
+  assert.match(server, /cache:\s*["']no-store["']/);
+});

@@ -97,6 +97,7 @@ Production Smoke final PHASE-14:
 
 - mapa de verdade: `docs/CURRENT-STATE.md`;
 - runbook: `docs/operations/MVP-RUNBOOK.md`;
+- bootstrap histórico do primeiro ADMIN: `docs/operations/FIRST-ADMIN-BOOTSTRAP.md`;
 - PRFs: `artifacts/phases/`;
 - CI canônico: job `verify`;
 - branch padrão: `main`;

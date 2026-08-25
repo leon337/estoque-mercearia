@@ -31,6 +31,11 @@ async function salesQaFlow() {
   await run("scripts/e2e/sales-smoke-runner.mjs");
 }
 
+async function alertsQaFlow() {
+  await run("scripts/e2e/alerts-smoke-runner.mjs");
+}
+
 await run("scripts/e2e/production-smoke-core.mjs");
 await purchaseQaFlow();
 await salesQaFlow();
+await alertsQaFlow();

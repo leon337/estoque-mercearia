@@ -1,0 +1,46 @@
+PHASE-13 FULL VALIDATION
+
+TDD:
+RED 5889a110f71e8117c67916a66f80067cc35870b2 / CI 32787370605
+GREEN 6971ce00a68272ab10078522d03cb34909100043 / CI 32789675405 / job 97628628955
+E2E RED e701367aa65975709273a4b50e3c296a8f2c5baa / CI 32789913645
+GREEN 95f2847ebf49654b87654a17edbc49f084ac3895 / CI 32790007012 / job 97629520762
+
+SUPABASE:
+project=exwtngpwqgkrkoszpgib
+migration_version=20260824233202
+migration_name=costs_prices
+products.cost_price=numeric(14,4) not null
+products.sale_price=numeric(14,2) not null
+purchase_order_items.unit_cost=numeric(14,4) not null
+triggers=purchase_order_items_unit_cost_guard,purchase_receipt_items_update_cost
+private_direct_execute=denied for authenticated/anon/service_role
+
+RECOVERY:
+failed_smoke=32790465653
+root_cause=invalid raw Locator.toHaveValue use in E2E harness
+domain_failure=false
+recovery_pr=43
+recovery_head=096e0bb1312a63bef4ea0af00a39fe0a6dc3856c
+recovery_ci=32799047601
+recovery_ci_job=97656185941
+recovery_ci_result=PASS
+main_after_recovery=8a7ed1942c7d67558ac9dc2c97e123f8fedb16b5
+
+FINAL PRODUCTION:
+run=32799202870
+job=97656620884
+event=issue_comment
+head=8a7ed1942c7d67558ac9dc2c97e123f8fedb16b5
+workflow=success
+desktop_visual=PASS
+mobile_visual=PASS
+functional_smoke=PASS
+responsive_consistency=PASS_COM_RESSALVA
+critical_review=PASS_COM_RESSALVA
+overall=PASS_COM_RESSALVA
+artifact=9545965832
+digest=sha256:0bce5ee47bf51d93a922d0b845a1a267143964145d47e94658584459e349ec37
+evidence_files=80
+qa_cleanup=inactive
+reservation=small_touch_target only, narrow mobile; transferred to PHASE-14

@@ -1,0 +1,17 @@
+PHASE-13 PRODUCTION SMOKE
+run_id=32799202870
+job_id=97656620884
+head_sha=8a7ed1942c7d67558ac9dc2c97e123f8fedb16b5
+event=issue_comment
+workflow_conclusion=success
+normal_smoke=PASS
+functional_smoke=PASS
+desktop_visual=PASS
+mobile_visual=PASS
+responsive_consistency=PASS_COM_RESSALVA
+critical_review=PASS_COM_RESSALVA
+overall=PASS_COM_RESSALVA
+artifact_id=9545965832
+artifact_digest=sha256:0bce5ee47bf51d93a922d0b845a1a267143964145d47e94658584459e349ec37
+evidence_files=80
+reservation=small_touch_target on 320px bottom nav; no functional/domain failure

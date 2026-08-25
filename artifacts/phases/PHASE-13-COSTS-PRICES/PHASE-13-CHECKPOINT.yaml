@@ -1,0 +1,30 @@
+phase: PHASE-13
+slug: COSTS-PRICES
+risk_class: B
+issue: 37
+state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+objective_met: true
+feature_merge: 9f2c5e5ba274b68fcf6c78aa0110acb0e62a32a1
+recovery_merge: 8a7ed1942c7d67558ac9dc2c97e123f8fedb16b5
+supabase:
+  project: exwtngpwqgkrkoszpgib
+  migration_version: "20260824233202"
+  migration_name: costs_prices
+validation:
+  ci_run: 32799047601
+  ci_job: 97656185941
+  ci: PASS
+production_smoke:
+  run: 32799202870
+  job: 97656620884
+  workflow: success
+  overall: PASS_COM_RESSALVA
+  artifact: 9545965832
+  digest: sha256:0bce5ee47bf51d93a922d0b845a1a267143964145d47e94658584459e349ec37
+audit: PASS_WITH_RESERVATION
+leo_gate: APROVAR_COM_RESSALVAS
+reservation:
+  code: small_touch_target
+  boundary: narrow_mobile_bottom_nav
+  owner: PHASE-14
+blockers: []

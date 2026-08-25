@@ -60,6 +60,6 @@ test("P8.3a alert card removes base padding through the DataCard API", async () 
 
   assert.match(dataCard, /padding\??:/);
   assert.match(dataCard, /none/);
-  assert.match(dashboard, /<DataCard padding="none">/);
+  assert.match(dashboard, /<DataCard[^>]*padding="none"[^>]*>/);
   assert.doesNotMatch(dashboard, /<DataCard className="p-0">/);
 });

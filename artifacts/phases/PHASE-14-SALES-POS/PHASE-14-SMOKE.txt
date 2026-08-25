@@ -1,0 +1,32 @@
+PHASE-14 PRODUCTION SMOKE — FINAL
+
+run_id=32808403066
+job_id=97682929264
+workflow=Production Smoke E2E
+event=issue_comment
+branch=main
+head_sha=1011194369b16b33d108c100e8c49e12d15a4f17
+workflow_conclusion=success
+normal_smoke=PASS
+critical_review=PASS
+enforcement=PASS
+overall=PASS
+artifact_id=9548993617
+artifact_digest=sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df
+evidence_files=90
+
+DATABASE_ACCEPTANCE
+sale_status=COMPLETED
+sold_quantity=3
+unit_sale_price=4.99
+movement_type=EXIT
+quantity_delta=-3
+previous_quantity=5
+resulting_quantity=2
+qa_product_cleanup=inactive
+
+RENDER
+service_id=srv-da1et8pt0dsc73bn9pgg
+deploy_id=dep-da6heh49v7es739qa22g
+commit=1011194369b16b33d108c100e8c49e12d15a4f17
+status=live

@@ -1,0 +1,64 @@
+PHASE-14 FULL VALIDATION
+
+Mission: Issue #41 — Vendas / PDV mínimo
+Risk class: B
+
+1. DESIGN / PLAN
+PASS — canonical design and implementation plan are versioned.
+
+2. TDD / CI
+PASS — implementation and recoveries used RED→GREEN.
+Final recovery GREEN:
+run 32807140246
+job 97679344873
+lint PASS
+tests 135/135 PASS
+typecheck PASS
+build PASS
+
+3. DATABASE
+PASS — migrations 0013 through 0016 are applied.
+PASS — authoritative price snapshot remains server/database controlled.
+PASS — sale completion reuses the authoritative stock movement domain.
+PASS — no application DELETE path for completed history.
+PASS — final `complete_sale()` ambiguity recovery is live.
+
+4. PRODUCTION PROVIDER
+PASS — Render service estoque-mercearia.
+service srv-da1et8pt0dsc73bn9pgg
+deploy dep-da6heh49v7es739qa22g
+branch main
+commit 1011194369b16b33d108c100e8c49e12d15a4f17
+status live
+finished_at 2026-08-25T04:18:28.803817Z
+
+5. PRODUCTION SMOKE
+PASS — run 32808403066 / job 97682929264.
+head_sha 1011194369b16b33d108c100e8c49e12d15a4f17
+normal smoke PASS
+critical review PASS
+enforcement PASS
+overall PASS
+artifact 9548993617
+digest sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df
+90 evidence files
+
+6. AUTHORITATIVE DATABASE ACCEPTANCE
+PASS:
+sale_status COMPLETED
+sold_quantity 3
+unit_sale_price 4.99
+stock movement EXIT
+quantity_delta -3
+previous_quantity 5
+resulting_quantity 2
+QA product cleanup inactive
+
+7. AUDIT
+PASS — no Critical/Important finding remains open.
+
+8. GATE
+LÉO: APROVAR.
+
+FINAL=PASS
+NEXT=merge closeout PR, close Issue #41 as completed/ENTREGUE.

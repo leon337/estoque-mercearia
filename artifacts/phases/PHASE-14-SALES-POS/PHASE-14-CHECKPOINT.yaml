@@ -1,0 +1,46 @@
+phase: PHASE-14
+slug: SALES-POS
+issue: 41
+risk_class: B
+state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+objective_met: true
+terminal_entregue_asserted: false
+functional_main_sha: 1011194369b16b33d108c100e8c49e12d15a4f17
+implementation:
+  pr: 42
+  merge_sha: ee2d16eeac4b787096313443ce0fbfa2388116a6
+recovery:
+  pr: 45
+  merge_sha: 1011194369b16b33d108c100e8c49e12d15a4f17
+  migration: 0016_complete_sale_qualified_item_id.sql
+verification:
+  primary_ci_run: 32806378496
+  primary_ci_job: 97677178335
+  recovery_green_run: 32807140246
+  recovery_green_job: 97679344873
+  recovery_green_tests: 135/135
+  final_smoke_run: 32808403066
+  final_smoke_job: 97682929264
+  final_smoke_overall: PASS
+  artifact_id: 9548993617
+  artifact_digest: sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df
+  evidence_files: 90
+render:
+  workspace_id: tea-d2u2msje5dus73eb6ehg
+  service_id: srv-da1et8pt0dsc73bn9pgg
+  deploy_id: dep-da6heh49v7es739qa22g
+  commit: 1011194369b16b33d108c100e8c49e12d15a4f17
+  status: live
+  finished_at: 2026-08-25T04:18:28.803817Z
+database_acceptance:
+  sale_status: COMPLETED
+  sold_quantity: 3
+  unit_sale_price: 4.99
+  movement_type: EXIT
+  quantity_delta: -3
+  previous_quantity: 5
+  resulting_quantity: 2
+audit: PASS
+leo_gate: APROVAR
+pending: []
+next_action: merge_closeout_pr_and_close_issue_41

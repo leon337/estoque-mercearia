@@ -39,6 +39,17 @@ test('P14 banco deriva preço do produto e congela estrutura fora de DRAFT', asy
   assert.match(sql, /before insert or update on public\.sale_items/i);
 });
 
+test('P14 reativação de item recaptura o preço atual sem permitir preço autoritativo do cliente', async () => {
+  await access(path.join(root, 'supabase/migrations/0014_sales_item_price_reactivation.sql'), constants.R_OK);
+  const [base, recovery] = await Promise.all([
+    readFile(path.join(root, 'supabase/migrations/0013_sales.sql'), 'utf8'),
+    readFile(path.join(root, 'supabase/migrations/0014_sales_item_price_reactivation.sql'), 'utf8'),
+  ]);
+  for (const sql of [base, recovery]) {
+    assert.match(sql, /tg_op\s*=\s*'INSERT'[\s\S]*old\.active\s*=\s*false[\s\S]*new\.active\s*=\s*true[\s\S]*new\.unit_sale_price\s*:=\s*v_sale_price/i);
+  }
+});
+
 test('P14 conclusão é transacional, idempotente e baixa estoque via domínio autoritativo', async () => {
   const sql = await readFile(path.join(root, 'supabase/migrations/0013_sales.sql'), 'utf8');
   assert.match(sql, /private\.complete_sale/i);

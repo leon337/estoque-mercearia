@@ -75,13 +75,15 @@ test('UI de fornecedores contém campos e gestão de vínculos', async () => {
   assert.match(edit, /preferred/);
 });
 
-test('navegação inclui fornecedores e mobile suporta crescimento', async () => {
+test('navegação inclui fornecedores e mobile suporta crescimento com overflow ou conjunto prioritário limitado', async () => {
   const navigation = await readFile(path.join(root, 'src/components/shell/navigation.ts'), 'utf8');
   const mobile = await readFile(path.join(root, 'src/components/shell/MobileBottomNav.tsx'), 'utf8');
 
   assert.match(navigation, /["']\/suppliers["']/);
   assert.match(navigation, /Fornecedores/);
-  assert.match(mobile, /overflow-x-auto/);
+  const scrollStrategy = /overflow-x-auto/.test(mobile);
+  const boundedStrategy = /MOBILE_NAV_ROUTES/.test(mobile) && /slice\(0,\s*5\)/.test(mobile);
+  assert.ok(scrollStrategy || boundedStrategy, 'mobile navigation must either scroll safely or explicitly bound priority destinations');
   assert.doesNotMatch(mobile, /grid-cols-5/);
 });
 

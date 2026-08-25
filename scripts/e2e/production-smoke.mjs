@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const QA_PURCHASE_MARKER = "QA-PURCHASE-";
+const QA_SALE_MARKER = "QA-SALE-";
 
 function run(script) {
   return new Promise((resolve, reject) => {
@@ -25,5 +26,11 @@ async function purchaseQaFlow() {
   await run("scripts/e2e/purchase-smoke-runner.mjs");
 }
 
+async function salesQaFlow() {
+  void QA_SALE_MARKER;
+  await run("scripts/e2e/sales-smoke-runner.mjs");
+}
+
 await run("scripts/e2e/production-smoke-core.mjs");
 await purchaseQaFlow();
+await salesQaFlow();

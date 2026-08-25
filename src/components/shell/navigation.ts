@@ -1,9 +1,10 @@
 export type Role = "ADMIN" | "OPERATOR";
-export type AppRoute = "/" | "/products" | "/suppliers" | "/purchases" | "/inventory" | "/movements/new" | "/history" | "/admin/users";
+export type AppRoute = "/" | "/sales" | "/products" | "/suppliers" | "/purchases" | "/inventory" | "/movements/new" | "/history" | "/admin/users";
 export type NavItem = { href: AppRoute; label: string; adminOnly?: boolean };
 
 const navigation: NavItem[] = [
   { href: "/", label: "Painel" },
+  { href: "/sales", label: "Vendas" },
   { href: "/products", label: "Produtos" },
   { href: "/suppliers", label: "Fornecedores" },
   { href: "/purchases", label: "Compras" },

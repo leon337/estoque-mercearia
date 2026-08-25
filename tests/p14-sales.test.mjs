@@ -48,6 +48,14 @@ test('P14 reativação de item recaptura o preço atual por migration forward-on
   assert.doesNotMatch(recovery, /grant\s+update\s*\([^)]*unit_sale_price/i);
 });
 
+test('P14 permite remover de DRAFT um item cujo produto foi inativado', async () => {
+  const recoveryPath = path.join(root, 'supabase/migrations/0015_sales_item_inactive_product_removal.sql');
+  await access(recoveryPath, constants.R_OK);
+  const recovery = await readFile(recoveryPath, 'utf8');
+  assert.match(recovery, /old\.active\s*=\s*true[\s\S]*new\.active\s*=\s*false[\s\S]*new\.quantity\s+is\s+not\s+distinct\s+from\s+old\.quantity[\s\S]*return\s+new;[\s\S]*select\s+p\.unit,\s*p\.active,\s*p\.sale_price/i);
+  assert.match(recovery, /SALE_NOT_DRAFT/i);
+});
+
 test('P14 conclusão é transacional, idempotente e baixa estoque via domínio autoritativo', async () => {
   const sql = await readFile(path.join(root, 'supabase/migrations/0013_sales.sql'), 'utf8');
   assert.match(sql, /private\.complete_sale/i);

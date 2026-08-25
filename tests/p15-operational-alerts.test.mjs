@@ -46,6 +46,13 @@ test("P15 dashboard attention block points operators to the alerts center", asyn
   assert.match(page, /Atenção no estoque[\s\S]*href="\/alerts"[\s\S]*Ver todos os alertas/);
 });
 
+test("P15 dashboard constrains the mobile grid against long operational content", async () => {
+  const page = await read("src/app/page.tsx");
+  assert.match(page, /grid-cols-\[minmax\(0,1fr\)\]/);
+  assert.match(page, /<DataCard className="min-w-0" padding="none">/);
+  assert.match(page, /<aside className="grid min-w-0 content-start gap-6">/);
+});
+
 test("P15 Production Smoke covers the alerts route in both primary viewports", async () => {
   const [runner, orchestrator] = await Promise.all([
     read("scripts/e2e/alerts-smoke-runner.mjs"),

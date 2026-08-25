@@ -16,7 +16,7 @@ test("P15 exposes a derived operational alerts center", async () => {
   assert.match(helper, /CRITICAL/);
   assert.match(helper, /WARNING/);
   assert.match(helper, /quantity\s*<=\s*0/);
-  assert.match(helper, /quantity\s*>\s*0[\s\S]*quantity\s*<=\s*minimumStock/);
+  assert.match(helper, /quantity\s*>\s*0\s*&&\s*quantity\s*<=\s*minimumStock/);
 });
 
 test("P15 alerts support search/filter and preserve session boundary", async () => {
@@ -41,7 +41,14 @@ test("P15 navigation exposes alerts without expanding the qualified mobile botto
   assert.doesNotMatch(mobileRoutes, /"\/alerts"/);
 });
 
-test("P15 Production Smoke covers the alerts route", async () => {
-  const smoke = await read("scripts/e2e/smoke-lib.mjs");
-  assert.match(smoke, /template:\s*"\/alerts"[\s\S]*path:\s*"\/alerts"[\s\S]*name:\s*"alerts"/);
+test("P15 Production Smoke covers the alerts route in both primary viewports", async () => {
+  const [runner, orchestrator] = await Promise.all([
+    read("scripts/e2e/alerts-smoke-runner.mjs"),
+    read("scripts/e2e/production-smoke.mjs"),
+  ]);
+  assert.match(runner, /PRIMARY_VIEWPORTS/);
+  assert.match(runner, /\/alerts/);
+  assert.match(runner, /Alertas operacionais/);
+  assert.match(runner, /recordFunctional/);
+  assert.match(orchestrator, /alerts-smoke-runner\.mjs/);
 });

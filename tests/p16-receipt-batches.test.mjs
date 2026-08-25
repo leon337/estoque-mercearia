@@ -47,6 +47,15 @@ test("P16 exposes ADMIN batch registration and active-user batch listing", async
   assert.match(helper, /NO_EXPIRY/);
 });
 
+test("P16 feeds expiring and expired batches into the operational alerts center", async () => {
+  const alerts = await read("src/app/alerts/page.tsx");
+  assert.match(alerts, /\.from\("receipt_batches"\)/);
+  assert.match(alerts, /batchExpiryStatus/);
+  assert.match(alerts, /Validade de lotes/);
+  assert.match(alerts, /EXPIRED/);
+  assert.match(alerts, /EXPIRING/);
+});
+
 test("P16 integrates batches into desktop navigation and production smoke without growing mobile nav", async () => {
   const [navigation, mobile, orchestrator] = await Promise.all([
     read("src/components/shell/navigation.ts"),

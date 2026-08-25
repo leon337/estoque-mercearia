@@ -1,0 +1,12 @@
+PHASE-13 VALIDATION
+result=PASS_WITH_RESERVATION
+feature_merge=9f2c5e5ba274b68fcf6c78aa0110acb0e62a32a1
+recovery_merge=8a7ed1942c7d67558ac9dc2c97e123f8fedb16b5
+migration=20260824233202 costs_prices
+ci_green=32799047601 job=97656185941
+production_smoke=32799202870 job=97656620884
+workflow_conclusion=success
+functional_smoke=PASS
+overall=PASS_COM_RESSALVA
+reservation=small_touch_target narrow_mobile bottom navigation
+carryover=PHASE-14 mobile navigation <=5 routes

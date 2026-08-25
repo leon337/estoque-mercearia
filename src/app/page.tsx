@@ -85,8 +85,8 @@ export default async function Home() {
           <MetricCard hint="No mínimo ou abaixo dele" label="Estoque baixo" tone="warning" value={<span className="font-data">{lowStock.length}</span>} />
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
-          <DataCard padding="none">
+        <div className="mt-6 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
+          <DataCard className="min-w-0" padding="none">
             <div className="flex flex-col gap-3 border-b border-[var(--color-border-subtle)] p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold">Atenção no estoque</h2>
@@ -124,7 +124,7 @@ export default async function Home() {
             )}
           </DataCard>
 
-          <aside className="grid content-start gap-6">
+          <aside className="grid min-w-0 content-start gap-6">
             <DataCard>
               <h2 className="text-lg font-semibold">Ações rápidas</h2>
               <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Acesse os fluxos mais usados da operação.</p>

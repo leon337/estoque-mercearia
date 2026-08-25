@@ -208,8 +208,11 @@ export async function runPurchaseQaFlow({
     recordFunctional(report, "/inventory", "PASS", `${qaPurchaseTag} receipt produced the expected isolated balance of 2 UN.`);
 
     await gotoWithRetry(page, baseURL, productEditPath);
-    await page.locator('input[name="cost_price"]').toHaveValue("3.4567");
-    await page.locator('input[name="sale_price"]').toHaveValue("4.99");
+    const receivedCostPrice = await page.locator('input[name="cost_price"]').inputValue();
+    const persistedSalePrice = await page.locator('input[name="sale_price"]').inputValue();
+    if (receivedCostPrice !== "3.4567" || persistedSalePrice !== "4.99") {
+      throw new Error(`PHASE-13 monetary persistence mismatch: cost=${receivedCostPrice};sale=${persistedSalePrice}`);
+    }
     recordFunctional(report, "/products/[id]/edit", "PASS", `${qaPurchaseTag} last received cost updated to 3.4567 while sale price remained 4.99.`);
     await captureEvidence(page, outputDir, "desktop", "product-edit", "last-cost");
 

@@ -80,23 +80,9 @@ export default async function Home() {
         />
 
         <section className="mt-6 grid gap-3 sm:grid-cols-3" aria-label="Resumo do estoque">
-          <MetricCard
-            hint="Itens disponíveis para operação"
-            label="Produtos ativos"
-            value={<span className="font-data">{rows.length}</span>}
-          />
-          <MetricCard
-            hint="Reposição prioritária"
-            label="Estoque zerado"
-            tone="critical"
-            value={<span className="font-data">{zeroStock.length}</span>}
-          />
-          <MetricCard
-            hint="No mínimo ou abaixo dele"
-            label="Estoque baixo"
-            tone="warning"
-            value={<span className="font-data">{lowStock.length}</span>}
-          />
+          <MetricCard hint="Itens disponíveis para operação" label="Produtos ativos" value={<span className="font-data">{rows.length}</span>} />
+          <MetricCard hint="Reposição prioritária" label="Estoque zerado" tone="critical" value={<span className="font-data">{zeroStock.length}</span>} />
+          <MetricCard hint="No mínimo ou abaixo dele" label="Estoque baixo" tone="warning" value={<span className="font-data">{lowStock.length}</span>} />
         </section>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
@@ -104,21 +90,17 @@ export default async function Home() {
             <div className="flex flex-col gap-3 border-b border-[var(--color-border-subtle)] p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold">Atenção no estoque</h2>
-                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
-                  Produtos zerados ou que já atingiram o estoque mínimo.
-                </p>
+                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Produtos zerados ou que já atingiram o estoque mínimo.</p>
               </div>
-              <Link className="text-sm font-semibold text-[var(--color-primary)] underline underline-offset-4" href="/inventory">
-                Ver estoque completo
+              <Link className="text-sm font-semibold text-[var(--color-primary)] underline underline-offset-4" href="/alerts">
+                Ver todos os alertas
               </Link>
             </div>
 
             {!urgent.length ? (
               <div className="p-5">
                 <p className="font-semibold">Nenhum produto exige reposição neste momento.</p>
-                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
-                  Os produtos ativos estão acima do limite de atenção.
-                </p>
+                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Os produtos ativos estão acima do limite de atenção.</p>
               </div>
             ) : (
               <ul className="divide-y divide-[var(--color-border-subtle)]">
@@ -130,19 +112,11 @@ export default async function Home() {
                         <span aria-hidden="true"> · </span>
                         {p.name}
                       </p>
-                      <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
-                        Mínimo: <span className="font-data">{p.minimumStock}</span> {p.unit}
-                      </p>
+                      <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Mínimo: <span className="font-data">{p.minimumStock}</span> {p.unit}</p>
                     </div>
                     <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
-                      {p.quantity <= 0 ? (
-                        <StatusBadge tone="critical">ZERADO</StatusBadge>
-                      ) : (
-                        <StatusBadge tone="warning">BAIXO</StatusBadge>
-                      )}
-                      <strong className="font-data text-sm">
-                        {p.quantity} {p.unit}
-                      </strong>
+                      {p.quantity <= 0 ? <StatusBadge tone="critical">ZERADO</StatusBadge> : <StatusBadge tone="warning">BAIXO</StatusBadge>}
+                      <strong className="font-data text-sm">{p.quantity} {p.unit}</strong>
                     </div>
                   </li>
                 ))}
@@ -153,44 +127,22 @@ export default async function Home() {
           <aside className="grid content-start gap-6">
             <DataCard>
               <h2 className="text-lg font-semibold">Ações rápidas</h2>
-              <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
-                Acesse os fluxos mais usados da operação.
-              </p>
+              <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Acesse os fluxos mais usados da operação.</p>
               <nav className="mt-4 grid gap-2" aria-label="Ações rápidas">
-                <Link className={quickLinkClass} href="/inventory">
-                  <span>Estoque</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <Link className={quickLinkClass} href="/products">
-                  <span>Produtos</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <Link className={quickLinkClass} href="/history">
-                  <span>Histórico</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <Link className={quickLinkClass} href="/movements/new">
-                  <span>Nova movimentação</span>
-                  <span aria-hidden="true">→</span>
-                </Link>
+                <Link className={quickLinkClass} href="/inventory"><span>Estoque</span><span aria-hidden="true">→</span></Link>
+                <Link className={quickLinkClass} href="/products"><span>Produtos</span><span aria-hidden="true">→</span></Link>
+                <Link className={quickLinkClass} href="/history"><span>Histórico</span><span aria-hidden="true">→</span></Link>
+                <Link className={quickLinkClass} href="/movements/new"><span>Nova movimentação</span><span aria-hidden="true">→</span></Link>
               </nav>
             </DataCard>
 
             {profile.role === "ADMIN" ? (
               <DataCard>
                 <h2 className="text-lg font-semibold">Administração</h2>
-                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">
-                  Controles disponíveis somente para administradores.
-                </p>
+                <p className="mt-1 text-sm text-[var(--color-on-surface-variant)]">Controles disponíveis somente para administradores.</p>
                 <div className="mt-4 grid gap-2">
-                  <Link className={quickLinkClass} href="/admin/users">
-                    <span>Usuários e permissões</span>
-                    <span aria-hidden="true">→</span>
-                  </Link>
-                  <Link className={quickLinkClass} href="/admin/adjustment">
-                    <span>Ajuste de estoque</span>
-                    <span aria-hidden="true">→</span>
-                  </Link>
+                  <Link className={quickLinkClass} href="/admin/users"><span>Usuários e permissões</span><span aria-hidden="true">→</span></Link>
+                  <Link className={quickLinkClass} href="/admin/adjustment"><span>Ajuste de estoque</span><span aria-hidden="true">→</span></Link>
                 </div>
               </DataCard>
             ) : null}

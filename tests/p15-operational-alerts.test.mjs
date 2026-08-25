@@ -41,6 +41,11 @@ test("P15 navigation exposes alerts without expanding the qualified mobile botto
   assert.doesNotMatch(mobileRoutes, /"\/alerts"/);
 });
 
+test("P15 dashboard attention block points operators to the alerts center", async () => {
+  const page = await read("src/app/page.tsx");
+  assert.match(page, /Atenção no estoque[\s\S]*href="\/alerts"[\s\S]*Ver todos os alertas/);
+});
+
 test("P15 Production Smoke covers the alerts route in both primary viewports", async () => {
   const [runner, orchestrator] = await Promise.all([
     read("scripts/e2e/alerts-smoke-runner.mjs"),

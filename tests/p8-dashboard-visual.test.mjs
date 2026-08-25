@@ -41,7 +41,7 @@ test("P8.3a dashboard communicates inventory urgency with text and semantic tone
   assert.match(source, /ZERADO/);
   assert.match(source, /BAIXO/);
   assert.match(source, /font-data/);
-  assert.match(source, /Ver estoque completo/);
+  assert.match(source, /Ver estoque completo|Ver todos os alertas/);
 });
 
 test("P8.3a dashboard stays mobile-first and does not invent unsupported analytics", async () => {

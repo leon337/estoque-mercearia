@@ -78,7 +78,9 @@ test('P13 Production Smoke prova preço, custo unitário e atualização de últ
   assert.match(flow, /input\[name=["']cost_price["']\][^\n]*fill\(["']2\.5000["']\)/);
   assert.match(flow, /input\[name=["']sale_price["']\][^\n]*fill\(["']4\.99["']\)/);
   assert.match(flow, /input\[name=["']unit_cost["']\][^\n]*fill\(["']3\.4567["']\)/);
-  assert.match(flow, /input\[name=["']cost_price["']\][^\n]*toHaveValue\(["']3\.4567["']\)/);
-  assert.match(flow, /input\[name=["']sale_price["']\][^\n]*toHaveValue\(["']4\.99["']\)/);
+  assert.match(flow, /input\[name=["']cost_price["']\][^\n]*inputValue\(\)/);
+  assert.match(flow, /input\[name=["']sale_price["']\][^\n]*inputValue\(\)/);
+  assert.match(flow, /PHASE-13 monetary persistence mismatch/);
+  assert.doesNotMatch(flow, /\.toHaveValue\(/);
   assert.match(flow, /last received cost|último custo recebido|last-cost/i);
 });

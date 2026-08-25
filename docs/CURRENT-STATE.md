@@ -1,219 +1,200 @@
 # Estoque Mercearia — Estado Atual e Mapa de Verdade
 
 **Classificação:** `CURRENT_IMPLEMENTED` + `STABLE_BASELINE`  
-**Baseline funcional qualificada:** `main@326d1b2059e77253bac446ff111b297a3e428a71`  
-**Closeout documental:** PR #27  
-**Data da reconciliação:** 2026-08-20
+**Baseline funcional qualificada:** `main@1011194369b16b33d108c100e8c49e12d15a4f17`  
+**Fase mais recente:** PHASE-14 — Vendas / PDV mínimo  
+**Data da reconciliação:** 2026-08-25
 
-## 1. Como ler este repositório
-
-Este arquivo é o ponto de entrada para responder **“qual é o estado atual do Estoque Mercearia?”**.
-
-Ordem de precedência:
+## 1. Precedência de verdade
 
 1. instrução explícita atual de LEANDRO;
-2. GitHub/Render/Supabase live;
+2. GitHub / Render / Supabase live;
 3. código, testes e workflows do SHA aplicável;
 4. este mapa de estado;
 5. PRFs, Issues e documentos históricos.
 
-Branch heads, estados de PR/Issue, runs de CI, deploys e saúde de produção são voláteis e devem ser confirmados live.
+Estados de deploy, branch, PR, Issue e workflow são voláteis e devem ser confirmados live quando relevantes.
 
 ## 2. Estado executivo
 
 ```text
-FUNDAÇÃO       ✅ concluída
-AUTH / RLS     ✅ concluído
-PRODUTOS       ✅ concluído
-ESTOQUE        ✅ concluído
-MOVIMENTAÇÕES  ✅ concluídas
-HISTÓRICO      ✅ concluído
-ADMINISTRAÇÃO  ✅ concluída
-PUBLICAÇÃO     ✅ concluída
-DESIGN SYSTEM  ✅ concluído
-E2E AUTÔNOMO   ✅ concluído
-ESTABILIZAÇÃO  ✅ PHASE-10 qualificada
+PHASE-06  MVP funcional                 ✅
+PHASE-07  Public Release                ✅
+PHASE-08  Design System v1              ✅
+PHASE-09  Production Smoke autônomo     ✅
+PHASE-10  Estabilização e integridade   ✅
+PHASE-11  Fornecedores                  ✅
+PHASE-12  Compras e Reposição           ✅
+PHASE-13  Custos e Preços               ✅
+PHASE-14  Vendas / PDV mínimo           ✅ qualificada
 ```
 
-O produto é um MVP publicado e operacional. A PHASE-10 consolidou invariantes de domínio, documentação e governança do repositório antes de qualquer nova expansão funcional.
+## 3. Capacidades atuais
 
-## 3. Marcos concluídos
+### Fundação operacional
+- autenticação e perfis `ADMIN` / `OPERATOR`;
+- categorias/produtos;
+- estoque materializado;
+- movimentos `INITIAL`, `ENTRY`, `EXIT`, `ADJUSTMENT`;
+- histórico auditável;
+- idempotência;
+- bloqueio de estoque negativo;
+- precisão por unidade;
+- estoque mínimo coerente;
+- dashboard e administração.
 
-### PHASE-06 — MVP funcional
-M0–M7 materializaram fundação, autenticação/RLS, produtos, estoque, movimentações, histórico, dashboard e administração.
+### PHASE-11 — Fornecedores
+- `suppliers`;
+- `product_suppliers`;
+- cadastro, edição, ativação/inativação;
+- vínculo produto-fornecedor;
+- fornecedor preferencial;
+- RLS e operações administrativas.
 
-### PHASE-07 — Public Release
-Aplicação publicada no Render, com runbook e qualificação de produção.
+### PHASE-12 — Compras
+- pedidos e itens;
+- lifecycle de compra/recebimento;
+- recebimentos transacionais;
+- entrada autoritativa de estoque;
+- idempotência;
+- RLS;
+- UI `/purchases`.
 
-### PHASE-08 — Design System v1
-Redesign responsivo integrado sem alterar regras de domínio, auth ou RLS.
+### PHASE-13 — Custos e preços
+- `cost_price`;
+- `sale_price`;
+- custo unitário de compra;
+- atualização de último custo recebido;
+- total monetário derivado, não agregado persistido;
+- boundaries monetários no banco.
 
-### PHASE-09 — Autonomous Production Smoke
-Playwright/Chromium passou a validar produção pública com evidências desktop/mobile, rotas públicas/protegidas/admin, lifecycle QA e critical review.
+### PHASE-14 — Vendas / PDV mínimo
+- `sales` e `sale_items`;
+- `DRAFT`, `COMPLETED`, `CANCELLED`;
+- snapshot de `products.sale_price`;
+- quantidade com política de unidade;
+- conclusão atômica;
+- `EXIT` via domínio autoritativo de estoque;
+- idempotência;
+- histórico sem DELETE pela aplicação;
+- UI `/sales`, `/sales/new`, `/sales/[id]`;
+- navegação móvel priorizada.
 
-### PHASE-10 — Stabilization & Domain Integrity
+## 4. PHASE-14 — evidência final
 
-#### P10.1 — Reconciliação documental
-PR #22 integrou README reconciliado e este mapa canônico, preservando PRFs históricos como snapshots.
+### CI / TDD
+Recovery final:
+- run `32807140246`;
+- job `97679344873`;
+- lint PASS;
+- 135/135 testes PASS;
+- typecheck PASS;
+- build PASS.
 
-#### P10.2 — Integridade de quantidades/unidades
-PRs #23 e #24:
-- `UN`, `CX`, `PCT`: somente inteiros;
-- `KG`, `L`, `M`: até 3 casas decimais;
-- unidades desconhecidas: até 3 casas por compatibilidade;
-- validação em UI, Server Action e banco;
-- formatação de quantidade em pt-BR;
-- migration `0008_quantity_precision.sql`;
-- harness E2E robusto a reruns por `GITHUB_RUN_ATTEMPT`.
+### Supabase
+Migrations:
+- `0013_sales.sql`;
+- `0014_sales_item_price_reactivation.sql`;
+- `0015_sales_item_inactive_product_removal.sql`;
+- `0016_complete_sale_qualified_item_id.sql`.
 
-Production Smoke qualificado: run `32193323462` — PASS.
+Achados de lifecycle e conclusão descobertos durante a fase foram corrigidos por migrations forward-only.
 
-#### P10.3 — Hardening de repositório/CI
-PR #25:
-- CI também em push para `main`;
-- `/smoke-production` reutilizável;
-- trigger de `issue_comment` restrito a OWNER/MEMBER/COLLABORATOR;
-- enforcement `PRODUCTION_SMOKE`.
+### Render
+- workspace `tea-d2u2msje5dus73eb6ehg`;
+- service `srv-da1et8pt0dsc73bn9pgg`;
+- deploy `dep-da6heh49v7es739qa22g`;
+- commit `1011194369b16b33d108c100e8c49e12d15a4f17`;
+- status `live`.
 
-Production Smoke: run `32193964995` — PASS.
+### Production Smoke
+- run `32808403066`;
+- job `97682929264`;
+- head SHA `1011194369b16b33d108c100e8c49e12d15a4f17`;
+- workflow `success`;
+- `PRODUCTION_SMOKE overall=PASS`;
+- artifact `9548993617`;
+- digest `sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df`;
+- 90 evidências.
 
-#### P10.4 — Integridade de estoque mínimo
-PR #26:
-- correção humana aprovada de `minimum_stock=0.046 UN` para `1 UN`;
-- validação por unidade em Server Action e formulário;
-- migration `0009_product_minimum_stock_precision.sql`;
-- trigger autoritativo `products_minimum_stock_precision`;
-- rejeição live comprovada de `1.5 UN`;
-- CI `32197520954`: 97/97 + lint/typecheck/build PASS;
-- merge funcional `326d1b2059e77253bac446ff111b297a3e428a71`.
+### Banco — cenário final
+- venda `COMPLETED`;
+- 3 unidades vendidas;
+- snapshot `4.99`;
+- movimento `EXIT -3`;
+- saldo `5 → 2`;
+- produto QA inativado.
 
-## 4. HUMAN_GATE de governança concluído
-
-LEANDRO materializou no GitHub:
-
-```yaml
-default_branch: main
-ruleset: Protect main
-enforcement: Active
-target: default/main
-require_pull_request: true
-required_approvals: 0
-required_status_check: verify
-bypass_list: empty
-block_force_push: true
-restrict_deletions: true
-```
-
-Leitura live posterior confirmou `main protected=true`.
-
-A API de branch protection tradicional pode continuar mostrando seu bloco legado como desabilitado; a proteção efetiva é fornecida pelo Ruleset.
-
-## 5. Qualificação final pós-HUMAN_GATE
-
-Production Smoke E2E final:
-
-```yaml
-run_id: 32344160656
-job_id: 96349225201
-event: issue_comment
-branch: main
-head_sha: 326d1b2059e77253bac446ff111b297a3e428a71
-workflow_conclusion: success
-normal_smoke: PASS
-critical_review: PASS
-overall: PASS
-artifact_id: 9397459502
-artifact_digest: sha256:0e2d48949e5ac6725f15658bb11a8c27ed1b7664aa8b139b42128419126294bf
-evidence_files: 51
-qa_cleanup: inactive
-```
-
-O log registrou explicitamente `PRODUCTION_SMOKE overall=PASS`.
-
-O PRF de closeout está em:
-`artifacts/phases/PHASE-10-STABILIZATION-DOMAIN-INTEGRITY/`.
-
-A PR #27 validou o próprio gate novo:
-- CI run `32344608801`;
-- job `verify` `96350580180`;
-- install, lint, testes, typecheck e build PASS;
-- PR reportada mergeable.
-
-## 6. Superfícies atuais
-
-Rotas principais:
-- `/login`
-- `/register`
-- `/`
-- `/products`
-- `/products/new`
-- `/products/[id]/edit`
-- `/inventory`
-- `/movements/new`
-- `/history`
-- `/admin/users`
-- `/admin/adjustment`
-
-## 7. Arquitetura operacional resumida
+## 5. Arquitetura operacional
 
 ```text
-Navegador / Next.js UI
+Browser / Next.js UI
         ↓
 Server Actions / SSR
         ↓
 Supabase Auth + RLS
         ↓
-RPCs públicos SECURITY INVOKER
+public SECURITY INVOKER RPCs
         ↓
-implementações privadas controladas
+private controlled implementations
         ↓
-PostgreSQL / inventory + stock_movements
+PostgreSQL domains
+  ├─ products / suppliers
+  ├─ purchases / receipts
+  ├─ inventory / stock_movements
+  └─ sales / sale_items
 ```
 
-Princípios preservados:
-- cliente envia intenção, não saldo autoritativo;
-- ator deriva da sessão autenticada;
-- histórico é append-only para a aplicação;
-- operação de estoque usa idempotência;
-- estoque negativo é bloqueado;
-- precisão de quantidade depende da unidade;
-- estoque mínimo respeita a mesma política;
-- usuários inativos não possuem acesso operacional;
-- operações administrativas exigem `ADMIN`.
+Princípios:
+- cliente envia intenção;
+- ator deriva da sessão;
+- saldo e movimentos são autoritativos no banco;
+- preço de venda do item é snapshot controlado no boundary;
+- operações transacionais são idempotentes;
+- histórico não é reescrito para “corrigir” operações concluídas.
 
-## 8. Automação e evidência
+## 6. Governança
 
-### CI
-O workflow `CI` executa instalação reprodutível, lint, testes, typecheck e build. O job canônico requerido no ruleset é `verify`.
+```yaml
+default_branch: main
+ruleset: Protect main
+require_pull_request: true
+required_status_check: verify
+required_approvals: 0
+bypass_list: empty
+block_force_push: true
+restrict_deletions: true
+```
 
-### Production Smoke E2E
-O workflow usa Chromium/Playwright contra produção pública. Credenciais QA ficam apenas em repository secrets. O runner gera screenshots, inventário de rotas, relatórios e artifact de evidência.
+A API de branch protection tradicional pode continuar mostrando proteção legada desativada; o ruleset é a proteção efetiva.
 
-## 9. Limitações e observações
+## 7. Produção
 
-- O Playwright é instalado efemeramente no smoke e pode exibir resumo de dependências temporárias; isso não equivale automaticamente a vulnerabilidade nas dependências versionadas da aplicação.
-- Branch heads, Issue state, workflow runs e commit reportado pelo Render continuam voláteis.
-- Um closeout somente documental pode avançar `main`/deploy sem mudar a árvore de aplicação.
-- PRFs antigos podem conter estados `BLOCKED`, `AWAITING_GATE` ou checklists incompletos que eram verdadeiros naquele boundary e são históricos hoje.
+URL: `https://estoque-mercearia.onrender.com`
 
-## 10. Próxima expansão de produto
+Baseline funcional PHASE-14:
+`1011194369b16b33d108c100e8c49e12d15a4f17`
 
-A PHASE-10 encerra a estabilização. Novos módulos podem ser planejados em missão separada, por exemplo:
-- fornecedores;
-- compras;
-- custos e preços;
-- vendas/PDV;
-- alertas;
-- multi-loja.
+Merges somente documentais após essa baseline podem avançar `main` e o SHA reportado pelo Render sem alterar a árvore funcional.
 
-Nenhum desses módulos é capacidade atual até existir implementação e evidência verificável.
+## 8. Fora do escopo atual
 
-## 11. Regra de continuidade
+- pagamento Pix/cartão integrado;
+- caixa financeiro;
+- clientes/fiado;
+- fiscal/NF-e/NFC-e;
+- devoluções/trocas;
+- promoções/comissões;
+- lotes/validade;
+- multi-loja;
+- automação/IA de demanda.
 
-Ao retomar o projeto:
+Essas capacidades exigem novas missões.
 
-1. consulte `main`, PRs, Issues e workflows live;
-2. leia este arquivo;
-3. use o PRF da PHASE-10 como evidência da baseline estabilizada;
-4. confirme produção e banco quando a pergunta depender de estado live;
-5. trate novas expansões como nova missão, sem reabrir implicitamente a PHASE-10.
+## 9. Regra de continuidade
+
+Ao retomar:
+1. verificar GitHub/Render/Supabase live;
+2. usar este arquivo como mapa canônico;
+3. consultar o PRF da PHASE-14 para evidência de closeout;
+4. abrir novas expansões como fases separadas.

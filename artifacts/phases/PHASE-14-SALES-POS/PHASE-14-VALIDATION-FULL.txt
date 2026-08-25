@@ -1,95 +1,64 @@
 PHASE-14 FULL VALIDATION
 
-MISSION
-Issue #41: PHASE-14 — Vendas / PDV mínimo.
-Risk class B: novo domínio persistente com saída transacional de estoque; sem integração financeira/fiscal externa.
+Mission: Issue #41 — Vendas / PDV mínimo
+Risk class: B
 
-DESIGN/PLAN
-PASS — docs/superpowers/specs/2026-08-24-phase14-sales-design.md
-PASS — docs/superpowers/plans/2026-08-24-phase14-sales.md
+1. DESIGN / PLAN
+PASS — canonical design and implementation plan are versioned.
 
-IMPLEMENTATION
-PASS — sales/sale_items
-PASS — DRAFT/COMPLETED/CANCELLED
-PASS — authoritative unit_sale_price snapshot
-PASS — quantity precision by product unit
-PASS — transactional completion
-PASS — idempotent completion operation
-PASS — EXIT through private.register_stock_movement
-PASS — no persisted monetary total
-PASS — no application DELETE for completed history
-PASS — /sales, /sales/new, /sales/[id]
-PASS — mobile navigation bounded to operational priorities
+2. TDD / CI
+PASS — implementation and recoveries used RED→GREEN.
+Final recovery GREEN:
+run 32807140246
+job 97679344873
+lint PASS
+tests 135/135 PASS
+typecheck PASS
+build PASS
 
-PRE-MERGE AUDIT RECOVERIES
-PASS — 0014 recaptures price on item reactivation.
-PASS — 0015 allows pure DRAFT item removal even if product became inactive.
+3. DATABASE
+PASS — migrations 0013 through 0016 are applied.
+PASS — authoritative price snapshot remains server/database controlled.
+PASS — sale completion reuses the authoritative stock movement domain.
+PASS — no application DELETE path for completed history.
+PASS — final `complete_sale()` ambiguity recovery is live.
 
-PRIMARY CI
-run=32806378496
-job=97677178335
-tests=134/134 PASS
-lint=PASS
-typecheck=PASS
-build=PASS
+4. PRODUCTION PROVIDER
+PASS — Render service estoque-mercearia.
+service srv-da1et8pt0dsc73bn9pgg
+deploy dep-da6heh49v7es739qa22g
+branch main
+commit 1011194369b16b33d108c100e8c49e12d15a4f17
+status live
+finished_at 2026-08-25T04:18:28.803817Z
 
-POST-MERGE FAILURE
-run=32806536045
-job=97677639816
-overall=FAIL
-failure=PostgreSQL 42702 ambiguous id in private.complete_sale()
-atomicity_preserved=true
-partial_stock_movement=false
-inventory_remained=5
-sale_remained=DRAFT
+5. PRODUCTION SMOKE
+PASS — run 32808403066 / job 97682929264.
+head_sha 1011194369b16b33d108c100e8c49e12d15a4f17
+normal smoke PASS
+critical review PASS
+enforcement PASS
+overall PASS
+artifact 9548993617
+digest sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df
+90 evidence files
 
-RECOVERY
-PR=45
-RED run=32807016706 job=97678998323 tests=134/135 expected
-GREEN run=32807140246 job=97679344873 tests=135/135
-GREEN lint=PASS
-GREEN typecheck=PASS
-GREEN build=PASS
-migration=0016_complete_sale_qualified_item_id.sql
-merged_main=1011194369b16b33d108c100e8c49e12d15a4f17
+6. AUTHORITATIVE DATABASE ACCEPTANCE
+PASS:
+sale_status COMPLETED
+sold_quantity 3
+unit_sale_price 4.99
+stock movement EXIT
+quantity_delta -3
+previous_quantity 5
+resulting_quantity 2
+QA product cleanup inactive
 
-HOSTED DATABASE
-0013=APPLIED
-0014=APPLIED
-0015=APPLIED
-0016=APPLIED
-post_fix_reproduction=QA_COMPLETE_OK status=COMPLETED replayed=f
-rollback_after_reproduction=CONFIRMED
-failed_smoke_residual_sale=CANCELLED through domain
+7. AUDIT
+PASS — no Critical/Important finding remains open.
 
-FINAL PRODUCTION SMOKE
-run=32808403066
-job=97682929264
-head_sha=1011194369b16b33d108c100e8c49e12d15a4f17
-event=issue_comment
-base_url=https://estoque-mercearia.onrender.com
-job_conclusion=SUCCESS
-normal_smoke=PASS
-critical_review=PASS
-artifact_upload=PASS
-enforcement=PASS
-overall=PASS
-artifact_id=9548993617
-artifact_digest=sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df
-evidence_files=90
+8. GATE
+LÉO: APROVAR.
 
-FINAL AUTHORITATIVE QA CHECK
-sale=QA-SALE-32808403066-1
-status=COMPLETED
-quantity=3
-unit_sale_price=4.99
-stock_movement_type=EXIT
-quantity_delta=-3
-previous_quantity=5
-resulting_quantity=2
-product_cleanup=inactive
-
-OPEN CONTRACT CHECK
-Render public endpoint behavior is PASS.
-Direct provider evidence for Render LIVE commit identity is not yet attached.
-Therefore terminal ENTREGUE is not asserted in this candidate.
+FINAL=PASS
+NEXT=merge closeout PR, close Issue #41 as completed/ENTREGUE.

@@ -1,0 +1,17 @@
+PHASE-14 RENDER LIVE EVIDENCE
+
+workspace_name=Leandro's workspace
+workspace_id=tea-d2u2msje5dus73eb6ehg
+service_name=estoque-mercearia
+service_id=srv-da1et8pt0dsc73bn9pgg
+branch=main
+auto_deploy=yes
+deploy_id=dep-da6heh49v7es739qa22g
+commit=1011194369b16b33d108c100e8c49e12d15a4f17
+status=live
+created_at=2026-08-25T04:17:08.35439Z
+finished_at=2026-08-25T04:18:28.803817Z
+production_url=https://estoque-mercearia.onrender.com
+
+Cross-check:
+Production Smoke 32808403066 used the same head SHA and concluded PRODUCTION_SMOKE overall=PASS.

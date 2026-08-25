@@ -25,7 +25,7 @@ Sistema web de controle operacional para pequena mercearia, desenvolvido com Nex
 
 ## Fases
 
-- **PHASE-06** — MVP funcional — concluída.
+- **M0–M7 / PHASE-06** — MVP funcional — concluída.
 - **PHASE-07** — Public Release — concluída.
 - **PHASE-08** — Design System v1 — concluída.
 - **PHASE-09** — Autonomous Production Smoke — concluída.

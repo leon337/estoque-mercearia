@@ -2,14 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getNavigation, isNavActive, type Role } from "./navigation";
+import { getNavigation, isNavActive, type AppRoute, type Role } from "./navigation";
+
+const MOBILE_NAV_ROUTES: AppRoute[] = ["/", "/sales", "/purchases", "/inventory", "/products"];
 
 export function MobileBottomNav({ role }: { role: Role }) {
   const pathname = usePathname();
-  const items = getNavigation(role).filter((item) => !item.adminOnly);
+  const items = getNavigation(role)
+    .filter((item) => MOBILE_NAV_ROUTES.includes(item.href))
+    .slice(0, 5);
 
   return (
-    <nav aria-label="Navegação móvel" className="fixed inset-x-0 bottom-0 z-50 flex overflow-x-auto border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-1 py-1 shadow-lg md:hidden">
+    <nav aria-label="Navegação móvel" className="fixed inset-x-0 bottom-0 z-50 flex border-t border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-1 py-1 shadow-lg md:hidden">
       {items.map((item) => {
         const active = isNavActive(pathname, item.href);
         return (

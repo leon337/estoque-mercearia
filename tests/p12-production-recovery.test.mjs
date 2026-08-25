@@ -19,11 +19,18 @@ test('P12 item save does not use upsert that requires immutable-column UPDATE pr
 test('P12 mobile navigation still fits the 320px critical-review viewport after adding Compras', async () => {
   const mobile = await readFile(path.join(root, 'src/components/shell/MobileBottomNav.tsx'), 'utf8');
   const navigation = await readFile(path.join(root, 'src/components/shell/navigation.ts'), 'utf8');
-  const nonAdminItems = [...navigation.matchAll(/\{ href: ["'][^"']+["'], label: ["'][^"']+["'] \}/g)].length;
-  assert.equal(nonAdminItems, 7);
+
+  assert.match(navigation, /\{ href: ["']\/purchases["'], label: ["']Compras["'] \}/);
+  assert.match(mobile, /MOBILE_NAV_ROUTES[\s\S]*["']\/purchases["']/);
+  assert.match(mobile, /slice\(0,\s*5\)/);
   assert.match(mobile, /min-w-\[44px\]/);
   assert.doesNotMatch(mobile, /min-w-\[52px\]/);
-  assert.ok(nonAdminItems * 44 + 8 <= 320);
+
+  const mobileRouteBlock = mobile.match(/MOBILE_NAV_ROUTES[^=]*=\s*\[([^\]]+)\]/);
+  assert.ok(mobileRouteBlock, 'mobile priority routes must be explicit');
+  const mobileItems = [...mobileRouteBlock[1].matchAll(/["']\/(?:[^"']*)["']/g)].length;
+  assert.ok(mobileItems <= 5, 'mobile bottom navigation must remain bounded to five destinations');
+  assert.ok(mobileItems * 44 + 8 <= 320);
 });
 
 test('P12 production smoke waits for a real purchase detail route instead of matching /purchases/new', async () => {

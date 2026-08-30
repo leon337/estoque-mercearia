@@ -1,0 +1,30 @@
+mission_id: ESTOQUE-MERCEARIA
+phase_id: PHASE-15
+title: Alertas operacionais de estoque
+risk_class: A
+issue: 47
+baseline_sha: 8d43e46aac11120ac786e6e1e343b9175050a11a
+objective_met: true
+acceptance:
+  design_plan: PASS
+  tdd_red_green: PASS
+  verify: PASS
+  merge_main: PASS
+  render_live_exact_sha: PASS
+  production_smoke: PASS
+  prf: CANDIDATE_AWAITING_MERGE
+authorizations:
+  continuous_leandro_phase_15_to_18: true
+human_gate_required: false
+leo_gate: APROVAR
+current_state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+unresolved_findings: []
+blockers: []
+closeout_action: Merge closeout PR and close Issue #47
+next_phase:
+  phase_id: PHASE-16
+  issue: 49
+  pr: 50
+  state: DRAFT_OPEN_AWAITING_PHASE15_CLOSEOUT_AND_RESYNC
+  next_action: Sincronizar PR #50 com o main pós-closeout, requalificar CI e prosseguir pelo gate já autorizado.
+checkpoint_recipient: MESTRE

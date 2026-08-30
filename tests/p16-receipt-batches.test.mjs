@@ -68,3 +68,10 @@ test("P16 integrates batches into desktop navigation and production smoke withou
   assert.doesNotMatch(mobile.match(/MOBILE_NAV_ROUTES:[\s\S]*?\];/)?.[0] ?? "", /"\/batches"/);
   assert.match(orchestrator, /batches-smoke-runner\.mjs/);
 });
+
+test("P16 batch registration constrains every form control on narrow viewports", async () => {
+  const newPage = await read("src/app/batches/new/page.tsx");
+  assert.match(newPage, /const controlClass = "[^"]*min-w-0[^"]*w-full[^"]*"/);
+  assert.equal(newPage.match(/className=\{controlClass\}/g)?.length, 4);
+  assert.equal(newPage.match(/<label className="grid min-w-0/g)?.length, 4);
+});

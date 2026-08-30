@@ -1,9 +1,9 @@
 # Estoque Mercearia — Estado Atual e Mapa de Verdade
 
 **Classificação:** `CURRENT_IMPLEMENTED` + `STABLE_BASELINE`  
-**Baseline funcional qualificada:** `main@1011194369b16b33d108c100e8c49e12d15a4f17`  
-**Fase mais recente:** PHASE-14 — Vendas / PDV mínimo  
-**Data da reconciliação:** 2026-08-25
+**Baseline funcional qualificada:** `main@8d43e46aac11120ac786e6e1e343b9175050a11a`  
+**Fase mais recente:** PHASE-15 — Alertas operacionais de estoque  
+**Data da reconciliação:** 2026-08-30
 
 ## 1. Precedência de verdade
 
@@ -26,7 +26,9 @@ PHASE-10  Estabilização e integridade   ✅
 PHASE-11  Fornecedores                  ✅
 PHASE-12  Compras e Reposição           ✅
 PHASE-13  Custos e Preços               ✅
-PHASE-14  Vendas / PDV mínimo           ✅ qualificada
+PHASE-14  Vendas / PDV mínimo           ✅
+PHASE-15  Alertas operacionais          ✅ qualificada
+PHASE-16  Lotes e validade              🟡 missão aberta / PR candidata
 ```
 
 ## 3. Capacidades atuais
@@ -77,53 +79,53 @@ PHASE-14  Vendas / PDV mínimo           ✅ qualificada
 - `EXIT` via domínio autoritativo de estoque;
 - idempotência;
 - histórico sem DELETE pela aplicação;
-- UI `/sales`, `/sales/new`, `/sales/[id]`;
-- navegação móvel priorizada.
+- UI `/sales`, `/sales/new`, `/sales/[id]`.
 
-## 4. PHASE-14 — evidência final
+### PHASE-15 — Alertas operacionais
+- rota `/alerts`;
+- alertas derivados de produtos ativos + `inventory`;
+- `CRITICAL` para `quantity <= 0`;
+- `WARNING` para `quantity > 0 && quantity <= minimum_stock`;
+- busca, filtro, contadores e ordenação;
+- handoff do dashboard para o centro de alertas;
+- navegação desktop sem exceder o limite qualificado do bottom-nav mobile;
+- nenhum saldo ou severidade autoritativa duplicada.
 
-### CI / TDD
-Recovery final:
-- run `32807140246`;
-- job `97679344873`;
+## 4. PHASE-15 — evidência final
+
+### Implementação e recovery
+- PR #48 merge `2bdb666fc3ecceb5718fc76c2444187064676744`;
+- PR #51 merge `1014dcd87f98a3f892b7b0e99be704b8d64d14fa`;
+- smoke intermediário `32823449233` detectou overflow real em 320 px;
+- PR #52 recovery por TDD;
+- merge funcional final `8d43e46aac11120ac786e6e1e343b9175050a11a`.
+
+### CI fresco
+Requalificação em 2026-08-30:
+- run `32824603560`;
+- attempt `2`;
+- job `99336733237`;
 - lint PASS;
-- 135/135 testes PASS;
+- testes PASS;
 - typecheck PASS;
 - build PASS.
-
-### Supabase
-Migrations:
-- `0013_sales.sql`;
-- `0014_sales_item_price_reactivation.sql`;
-- `0015_sales_item_inactive_product_removal.sql`;
-- `0016_complete_sale_qualified_item_id.sql`.
-
-Achados de lifecycle e conclusão descobertos durante a fase foram corrigidos por migrations forward-only.
 
 ### Render
 - workspace `tea-d2u2msje5dus73eb6ehg`;
 - service `srv-da1et8pt0dsc73bn9pgg`;
-- deploy `dep-da6heh49v7es739qa22g`;
-- commit `1011194369b16b33d108c100e8c49e12d15a4f17`;
+- deploy `dep-da6kob5bedkc73fr83ig`;
+- commit `8d43e46aac11120ac786e6e1e343b9175050a11a`;
 - status `live`.
 
 ### Production Smoke
-- run `32808403066`;
-- job `97682929264`;
-- head SHA `1011194369b16b33d108c100e8c49e12d15a4f17`;
+- run `32824720287`;
+- job `97730119241`;
+- head SHA `8d43e46aac11120ac786e6e1e343b9175050a11a`;
 - workflow `success`;
-- `PRODUCTION_SMOKE overall=PASS`;
-- artifact `9548993617`;
-- digest `sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df`;
-- 90 evidências.
-
-### Banco — cenário final
-- venda `COMPLETED`;
-- 3 unidades vendidas;
-- snapshot `4.99`;
-- movimento `EXIT -3`;
-- saldo `5 → 2`;
-- produto QA inativado.
+- normal smoke PASS;
+- independent critical review PASS;
+- artifact `9554526907`;
+- digest `sha256:d4a978161419a8b5bdc0c303022517cac76d8930e56f0d335e418fbbd35fdd70`.
 
 ## 5. Arquitetura operacional
 
@@ -134,7 +136,7 @@ Server Actions / SSR
         ↓
 Supabase Auth + RLS
         ↓
-public SECURITY INVOKER RPCs
+public SECURITY INVOKER RPCs + leituras sujeitas a RLS
         ↓
 private controlled implementations
         ↓
@@ -143,12 +145,16 @@ PostgreSQL domains
   ├─ purchases / receipts
   ├─ inventory / stock_movements
   └─ sales / sale_items
+
+/alerts
+  └─ derivação em leitura de products + inventory
 ```
 
 Princípios:
 - cliente envia intenção;
 - ator deriva da sessão;
 - saldo e movimentos são autoritativos no banco;
+- alerta é estado derivado, não novo saldo;
 - preço de venda do item é snapshot controlado no boundary;
 - operações transacionais são idempotentes;
 - histórico não é reescrito para “corrigir” operações concluídas.
@@ -172,12 +178,23 @@ A API de branch protection tradicional pode continuar mostrando proteção legad
 
 URL: `https://estoque-mercearia.onrender.com`
 
-Baseline funcional PHASE-14:
-`1011194369b16b33d108c100e8c49e12d15a4f17`
+Baseline funcional PHASE-15:
+`8d43e46aac11120ac786e6e1e343b9175050a11a`
 
-Merges somente documentais após essa baseline podem avançar `main` e o SHA reportado pelo Render sem alterar a árvore funcional.
+Render LIVE:
+`dep-da6kob5bedkc73fr83ig` → `8d43e46aac11120ac786e6e1e343b9175050a11a`.
 
-## 8. Fora do escopo atual
+## 8. Continuidade ativa
+
+### PHASE-16 — Lotes e validade
+- Issue #49: aberta;
+- PR #50: draft aberta e mergeable no snapshot de retomada;
+- migration candidata `0017_receipt_batches.sql` já reportada como aplicada/validada no Supabase;
+- próximo gate: sincronizar a PR #50 com o `main` pós-closeout da PHASE-15, requalificar CI, integrar, confirmar Render LIVE no novo SHA, executar Production Smoke pós-deploy e gerar PRF Classe B.
+
+Nenhum HUMAN_GATE novo é necessário enquanto a execução permanecer dentro da autorização contínua registrada para PHASE-15 → PHASE-18 e não ocorrer gatilho reservado do MCF.
+
+## 9. Fora do escopo atual
 
 - pagamento Pix/cartão integrado;
 - caixa financeiro;
@@ -185,16 +202,16 @@ Merges somente documentais após essa baseline podem avançar `main` e o SHA rep
 - fiscal/NF-e/NFC-e;
 - devoluções/trocas;
 - promoções/comissões;
-- lotes/validade;
+- FEFO automático e saldo autoritativo por lote;
+- serialização/recall/cadeia fria;
 - multi-loja;
 - automação/IA de demanda.
 
-Essas capacidades exigem novas missões.
-
-## 9. Regra de continuidade
+## 10. Regra de continuidade
 
 Ao retomar:
 1. verificar GitHub/Render/Supabase live;
-2. usar este arquivo como mapa canônico;
-3. consultar o PRF da PHASE-14 para evidência de closeout;
-4. abrir novas expansões como fases separadas.
+2. usar este arquivo como mapa canônico depois da leitura live;
+3. consultar o PRF da PHASE-15 para evidência de closeout;
+4. retomar PHASE-16 pela Issue #49 / PR #50;
+5. escalar a LEANDRO somente nos gates reservados pelo MCF.

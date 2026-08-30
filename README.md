@@ -2,7 +2,7 @@
 
 Sistema web de controle operacional para pequena mercearia, desenvolvido com Next.js, TypeScript, PostgreSQL/Supabase e governança MCF.
 
-> **Estado atual:** PHASE-06 a PHASE-14 concluídas tecnicamente. O mapa canônico está em [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md). Estados voláteis de branch, deploy, CI e produção devem ser confirmados live.
+> **Estado atual:** PHASE-06 a PHASE-15 concluídas e qualificadas. O mapa canônico está em [`docs/CURRENT-STATE.md`](docs/CURRENT-STATE.md). Estados voláteis de branch, deploy, CI e produção devem ser confirmados live.
 
 ## Capacidades atuais
 
@@ -19,9 +19,10 @@ Sistema web de controle operacional para pequena mercearia, desenvolvido com Nex
 - vendas / PDV mínimo com `DRAFT`, `COMPLETED`, `CANCELLED`;
 - snapshot autoritativo de preço por item de venda;
 - conclusão transacional de venda com `EXIT` no estoque;
+- centro `/alerts` derivado de estoque zerado/baixo, sem estado duplicado;
 - dashboard, administração de usuários e ajustes;
 - Design System responsivo;
-- Production Smoke E2E autônomo com Playwright/Chromium.
+- Production Smoke E2E autônomo com Playwright/Chromium e revisão crítica.
 
 ## Fases
 
@@ -33,7 +34,9 @@ Sistema web de controle operacional para pequena mercearia, desenvolvido com Nex
 - **PHASE-11** — Fornecedores — concluída.
 - **PHASE-12** — Compras e Reposição — concluída.
 - **PHASE-13** — Custos e Preços — concluída.
-- **PHASE-14** — Vendas / PDV mínimo — qualificada; closeout em PRF.
+- **PHASE-14** — Vendas / PDV mínimo — concluída.
+- **PHASE-15** — Alertas operacionais de estoque — concluída e qualificada.
+- **PHASE-16** — Lotes e validade de recebimentos — missão aberta em #49 / PR #50.
 
 ## Stack
 
@@ -66,32 +69,38 @@ Sistema web de controle operacional para pequena mercearia, desenvolvido com Nex
 - `/sales`
 - `/sales/new`
 - `/sales/[id]`
+- `/alerts`
 - `/admin/users`
 - `/admin/adjustment`
 
 ## Segurança e domínio
 
-O navegador envia intenção; ator, saldo, snapshot monetário e movimentos resultantes são derivados ou validados no boundary autoritativo do servidor/banco. Operações de estoque reutilizam RPCs controlados. Histórico concluído não possui DELETE pela aplicação.
+O navegador envia intenção; ator, saldo, snapshot monetário e movimentos resultantes são derivados ou validados no boundary autoritativo do servidor/banco. Alertas são derivados em leitura e não substituem `inventory.quantity`. Operações de estoque reutilizam RPCs controlados. Histórico concluído não possui DELETE pela aplicação.
 
 ## Produção
 
 Produção pública: `https://estoque-mercearia.onrender.com`
 
-Baseline funcional PHASE-14 qualificada:
-`main@1011194369b16b33d108c100e8c49e12d15a4f17`
+Baseline funcional PHASE-15 qualificada:
+`main@8d43e46aac11120ac786e6e1e343b9175050a11a`
 
 Render:
 - serviço `estoque-mercearia`;
-- deploy `dep-da6heh49v7es739qa22g`;
+- deploy `dep-da6kob5bedkc73fr83ig`;
 - status `live`;
-- commit `1011194369b16b33d108c100e8c49e12d15a4f17`.
+- commit `8d43e46aac11120ac786e6e1e343b9175050a11a`.
 
-Production Smoke final PHASE-14:
-- run `32808403066`;
-- job `97682929264`;
-- `PRODUCTION_SMOKE overall=PASS`;
-- artifact `9548993617`;
-- digest `sha256:2b4741d6da0f93a8606f7658d5d5e1acd3506c7aef355058e87bacfab0d535df`.
+Production Smoke final PHASE-15:
+- run `32824720287`;
+- job `97730119241`;
+- `success`;
+- artifact `9554526907`;
+- digest `sha256:d4a978161419a8b5bdc0c303022517cac76d8930e56f0d335e418fbbd35fdd70`.
+
+Requalificação fresca em 2026-08-30:
+- CI run `32824603560`, attempt 2;
+- job `99336733237`;
+- lint, testes, typecheck e build `PASS`.
 
 ## Operação e evidências
 
@@ -103,6 +112,6 @@ Production Smoke final PHASE-14:
 - branch padrão: `main`;
 - ruleset `Protect main` ativo.
 
-## Próximas expansões
+## Próxima expansão ativa
 
-Capacidades como alertas inteligentes, lotes/validade, multi-loja, integrações fiscais/financeiras e automação avançada permanecem fora do escopo atual e devem ser abertas como novas missões.
+A PHASE-16 adiciona rastreabilidade de lotes e validade sem substituir o saldo quantitativo autoritativo. O contrato está na Issue #49 e a implementação candidata na PR #50. Capacidades posteriores como FEFO automático, multi-loja, integrações fiscais/financeiras e automação avançada permanecem fora do escopo atual.

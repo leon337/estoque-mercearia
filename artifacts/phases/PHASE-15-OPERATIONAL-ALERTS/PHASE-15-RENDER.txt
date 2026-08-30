@@ -1,0 +1,11 @@
+PHASE-15 RENDER EVIDENCE
+workspace=tea-d2u2msje5dus73eb6ehg
+service=srv-da1et8pt0dsc73bn9pgg
+deploy=dep-da6kob5bedkc73fr83ig
+commit=8d43e46aac11120ac786e6e1e343b9175050a11a
+status=live
+trigger=new_commit
+created_at=2026-08-25T08:02:52.163959Z
+finished_at=2026-08-25T08:04:13.206112Z
+live_rechecked_at=2026-08-30
+result=PASS

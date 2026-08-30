@@ -1,0 +1,17 @@
+PHASE-15 PRODUCTION SMOKE — FINAL
+target=main@8d43e46aac11120ac786e6e1e343b9175050a11a
+run=32824720287
+job=97730119241
+workflow=Production Smoke E2E
+status=completed
+conclusion=success
+normal_production_smoke=PASS
+independent_critical_review=PASS
+evidence_enforcement=PASS
+artifact_id=9554526907
+artifact_name=production-smoke-32824720287
+artifact_digest=sha256:d4a978161419a8b5bdc0c303022517cac76d8930e56f0d335e418fbbd35fdd70
+render_deploy=dep-da6kob5bedkc73fr83ig
+render_status=live
+render_commit=8d43e46aac11120ac786e6e1e343b9175050a11a
+overall=PASS

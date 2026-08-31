@@ -1,0 +1,80 @@
+PHASE-16 — VALIDATION FULL
+
+Acceptance checklist
+[PASS] Design versionado:
+  docs/superpowers/specs/2026-08-25-phase16-receipt-batches-design.md
+[PASS] Plano versionado:
+  docs/superpowers/plans/2026-08-25-phase16-receipt-batches.md
+[PASS] TDD RED inicial:
+  984411bc39160169f11f10993236ca643d8a4379
+[PASS] Implementação GREEN inicial:
+  21752599aaa62d27425dc26a9011a018f0c5f460
+[PASS] Sincronização pós-PHASE-15:
+  32873e132d4aa2c3dc879623a43a51cd287a6a55
+[PASS] Persistência Classe B:
+  receipt_batches ligado a purchase_receipt_items
+  inventory.quantity preservado como saldo autoritativo
+[PASS] Supabase live:
+  project exwtngpwqgkrkoszpgib
+  RLS enabled
+  SELECT active-user
+  INSERT ADMIN
+  UPDATE ADMIN
+  no DELETE path
+  actor/integrity/updated_at triggers present
+  anon sem grants
+  private functions sem EXECUTE para authenticated/anon
+[PASS] Merge funcional inicial:
+  PR #54 / 73942ff9bc06e9f6f2ab4d804590d30a8dc8bf71
+[PASS] Falha de produção capturada:
+  run 33341812298 / job 99338682061 / artifact 9740814353
+  finding: /batches/new overflow em 375 px e 320 px
+[PASS] Recovery RED:
+  9a37012197e90e3fcb144b883ec8fb6b421872b7
+  run 33344417918 / job 99345727910
+  146 PASS / 1 FAIL esperado
+[PASS] Recovery GREEN:
+  cb569a42d92f7ae17e8c0f5c5672a2ffcdeb2408
+  run 33344483822 / job 99345913013
+  lint PASS
+  147 tests PASS
+  typecheck PASS
+  build PASS
+[PASS] PR integrável de recovery:
+  PR #56
+  run 33344549700 / job 99346098723
+  PASS
+[PASS] Merge funcional final:
+  8e508e3421528a6da60c8a9b571097a11f651c69
+[PASS] CI fresco de main:
+  run 33344608583 / job 99346251908
+  lint PASS
+  tests PASS
+  typecheck PASS
+  build PASS
+[PASS] Render LIVE no SHA final:
+  dep-daackkc9v7es73e9ifdg / live / 8e508e3421528a6da60c8a9b571097a11f651c69
+[PASS] Production Smoke final pós-deploy:
+  run 33344692905 / job 99346483166 / success
+[PASS] Revisão crítica independente:
+  step "Run independent critical review" = success
+[PASS] Enforcement consolidado:
+  step "Enforce evidence-backed result" = success
+[PASS] Artifact final:
+  9741654703
+  sha256:b1df8994cae45a5bd6c252535627d113d72b8aead8b3d448833fe0cb084abba3
+[PASS] Responsividade do finding:
+  /batches/new desktop PASS
+  /batches/new mobile PASS
+  narrow mobile PASS
+  intermediate PASS
+  critical review findings = []
+
+CAF
+- mark-ready falhou por incompatibilidade GraphQL Repository.fullDatabaseId;
+- nenhuma mutação parcial foi aceita como sucesso;
+- ação idêntica não foi repetida;
+- fallback preservou o mesmo SHA em PR não-draft;
+- todos os gates foram reexecutados no artefato integrável.
+
+Final technical result: PASS.

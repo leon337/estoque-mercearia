@@ -1,0 +1,32 @@
+mission_id: ESTOQUE-MERCEARIA
+phase_id: PHASE-16
+title: Lotes e validade de recebimentos
+risk_class: B
+issue: 49
+baseline_sha: 8e508e3421528a6da60c8a9b571097a11f651c69
+objective_met: true
+acceptance:
+  design_plan: PASS
+  tdd_red_green: PASS
+  persistence_live: PASS
+  verify: PASS
+  merge_main: PASS
+  render_live_exact_sha: PASS
+  production_smoke: PASS
+  responsive_recovery: PASS
+  prf: CANDIDATE_AWAITING_MERGE
+authorizations:
+  continuous_leandro_phase_15_to_18: true
+human_gate_required: false
+leo_gate: APROVAR
+current_state: GATE_APPROVED_AWAITING_CLOSEOUT_MERGE
+unresolved_findings: []
+blockers: []
+closeout_action: Merge closeout PR and close Issue #49
+next_phase:
+  phase_id: PHASE-17
+  issue: null
+  pr: null
+  state: NOT_INSTANTIATED
+  next_action: Recover objective from live roadmap/repository evidence and instantiate PHASE-17 through the current MCF loop; do not invent scope.
+checkpoint_recipient: MESTRE

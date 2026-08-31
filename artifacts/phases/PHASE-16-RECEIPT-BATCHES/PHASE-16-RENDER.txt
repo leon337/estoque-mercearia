@@ -1,0 +1,14 @@
+PHASE-16 — RENDER
+
+workspace: tea-d2u2msje5dus73eb6ehg
+service: srv-da1et8pt0dsc73bn9pgg
+service_name: estoque-mercearia
+url: https://estoque-mercearia.onrender.com
+
+final_deploy: dep-daackkc9v7es73e9ifdg
+commit: 8e508e3421528a6da60c8a9b571097a11f651c69
+status: live
+previous_deploy_commit: 73942ff9bc06e9f6f2ab4d804590d30a8dc8bf71
+previous_deploy_status: deactivated
+
+Result: PASS — production serves the exact final baseline used by the final smoke.

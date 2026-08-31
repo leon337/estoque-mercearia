@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createReceiptBatch } from "../actions";
 
 export const dynamic = "force-dynamic";
+const controlClass = "min-h-12 min-w-0 w-full rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-3";
 
 export default async function NewBatchPage() {
   const supabase = await createClient();
@@ -41,8 +42,8 @@ export default async function NewBatchPage() {
         <PageHeader title="Registrar lote" subtitle="Associe lote e validade a um item efetivamente recebido." />
         <DataCard className="mt-6">
           <form action={createReceiptBatch} className="grid gap-5">
-            <label className="grid gap-1 text-sm font-semibold">Item recebido
-              <select className="min-h-12 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-lowest)] px-3" name="purchase_receipt_item_id" required>
+            <label className="grid min-w-0 gap-1 text-sm font-semibold">Item recebido
+              <select className={controlClass} name="purchase_receipt_item_id" required>
                 <option value="">Selecione</option>
                 {(receiptItems ?? []).map((item) => {
                   const productId = orderToProduct.get(item.purchase_order_item_id);
@@ -51,9 +52,9 @@ export default async function NewBatchPage() {
                 })}
               </select>
             </label>
-            <label className="grid gap-1 text-sm font-semibold">Código do lote<input className="min-h-12 rounded-lg border border-[var(--color-border-subtle)] px-3" maxLength={100} name="lot_code" required /></label>
-            <label className="grid gap-1 text-sm font-semibold">Validade<input className="min-h-12 rounded-lg border border-[var(--color-border-subtle)] px-3" name="expires_on" type="date" /></label>
-            <label className="grid gap-1 text-sm font-semibold">Quantidade<input className="min-h-12 rounded-lg border border-[var(--color-border-subtle)] px-3" inputMode="decimal" min="0" name="quantity" required /></label>
+            <label className="grid min-w-0 gap-1 text-sm font-semibold">Código do lote<input className={controlClass} maxLength={100} name="lot_code" required /></label>
+            <label className="grid min-w-0 gap-1 text-sm font-semibold">Validade<input className={controlClass} name="expires_on" type="date" /></label>
+            <label className="grid min-w-0 gap-1 text-sm font-semibold">Quantidade<input className={controlClass} inputMode="decimal" min="0" name="quantity" required /></label>
             <div className="flex flex-wrap gap-3"><button className="min-h-12 rounded-lg bg-[var(--color-primary)] px-4 font-semibold text-[var(--color-on-primary)]" type="submit">Salvar lote</button><Link className="inline-flex min-h-12 items-center px-4 font-semibold text-[var(--color-primary)]" href="/batches">Cancelar</Link></div>
           </form>
         </DataCard>

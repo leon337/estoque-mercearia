@@ -1,12 +1,11 @@
 # Estoque Mercearia — Estado Atual e Mapa de Verdade
 
 **Classificação:** `CURRENT_IMPLEMENTED` + `STABLE_BASELINE`  
-**Baseline funcional qualificada:** `main@8d43e46aac11120ac786e6e1e343b9175050a11a`  
-**Fase mais recente:** PHASE-15 — Alertas operacionais de estoque  
-**Data da reconciliação:** 2026-08-30
+**Baseline funcional qualificada:** `main@8e508e3421528a6da60c8a9b571097a11f651c69`  
+**Fase mais recente:** PHASE-16 — Lotes e validade de recebimentos  
+**Data da reconciliação:** 2026-08-30/31
 
 ## 1. Precedência de verdade
-
 1. instrução explícita atual de LEANDRO;
 2. GitHub / Render / Supabase live;
 3. código, testes e workflows do SHA aplicável;
@@ -16,7 +15,6 @@
 Estados de deploy, branch, PR, Issue e workflow são voláteis e devem ser confirmados live quando relevantes.
 
 ## 2. Estado executivo
-
 ```text
 PHASE-06  MVP funcional                 ✅
 PHASE-07  Public Release                ✅
@@ -27,108 +25,96 @@ PHASE-11  Fornecedores                  ✅
 PHASE-12  Compras e Reposição           ✅
 PHASE-13  Custos e Preços               ✅
 PHASE-14  Vendas / PDV mínimo           ✅
-PHASE-15  Alertas operacionais          ✅ qualificada
-PHASE-16  Lotes e validade              🟡 missão aberta / PR candidata
+PHASE-15  Alertas operacionais          ✅
+PHASE-16  Lotes e validade              ✅ qualificada
+PHASE-17  Próximo loop                  ⚪ não instanciada
 ```
 
 ## 3. Capacidades atuais
-
-### Fundação operacional
+### Fundação
 - autenticação e perfis `ADMIN` / `OPERATOR`;
 - categorias/produtos;
 - estoque materializado;
 - movimentos `INITIAL`, `ENTRY`, `EXIT`, `ADJUSTMENT`;
-- histórico auditável;
-- idempotência;
-- bloqueio de estoque negativo;
-- precisão por unidade;
-- estoque mínimo coerente;
-- dashboard e administração.
+- histórico auditável, idempotência, bloqueio de estoque negativo e precisão por unidade.
 
-### PHASE-11 — Fornecedores
-- `suppliers`;
-- `product_suppliers`;
-- cadastro, edição, ativação/inativação;
-- vínculo produto-fornecedor;
-- fornecedor preferencial;
-- RLS e operações administrativas.
+### Fornecedores, compras, preços e vendas
+- fornecedores e vínculos produto-fornecedor;
+- pedidos, recebimentos e entrada autoritativa de estoque;
+- custo e preço de venda;
+- vendas `DRAFT`, `COMPLETED`, `CANCELLED`;
+- snapshot de preço e conclusão atômica com `EXIT`.
 
-### PHASE-12 — Compras
-- pedidos e itens;
-- lifecycle de compra/recebimento;
-- recebimentos transacionais;
-- entrada autoritativa de estoque;
-- idempotência;
-- RLS;
-- UI `/purchases`.
+### Alertas
+- `/alerts`;
+- estoque crítico/baixo derivado de `products.minimum_stock + inventory.quantity`;
+- validade de lotes integrada como seção derivada;
+- nenhum saldo/severidade duplicado como autoridade.
 
-### PHASE-13 — Custos e preços
-- `cost_price`;
-- `sale_price`;
-- custo unitário de compra;
-- atualização de último custo recebido;
-- total monetário derivado, não agregado persistido;
-- boundaries monetários no banco.
+### PHASE-16 — Lotes e validade
+- `receipt_batches` ligado a `purchase_receipt_items`;
+- `lot_code`, `expires_on`, `quantity`, `active`, ator e timestamps;
+- soma de lotes ativos não excede a quantidade efetivamente recebida;
+- precisão reutiliza a política da unidade do produto;
+- RLS: usuário ativo lê; ADMIN cria/corrige/inativa;
+- sem DELETE pela aplicação;
+- `/batches` e `/batches/new`;
+- estados `EXPIRED`, `EXPIRING`, `OK`, `NO_EXPIRY`;
+- nenhuma baixa por lote/FEFO e nenhum saldo autoritativo por lote.
 
-### PHASE-14 — Vendas / PDV mínimo
-- `sales` e `sale_items`;
-- `DRAFT`, `COMPLETED`, `CANCELLED`;
-- snapshot de `products.sale_price`;
-- quantidade com política de unidade;
-- conclusão atômica;
-- `EXIT` via domínio autoritativo de estoque;
-- idempotência;
-- histórico sem DELETE pela aplicação;
-- UI `/sales`, `/sales/new`, `/sales/[id]`.
+## 4. PHASE-16 — evidência terminal
+### Implementação
+- design: `docs/superpowers/specs/2026-08-25-phase16-receipt-batches-design.md`;
+- plano: `docs/superpowers/plans/2026-08-25-phase16-receipt-batches.md`;
+- RED inicial `984411bc39160169f11f10993236ca643d8a4379`;
+- GREEN inicial `21752599aaa62d27425dc26a9011a018f0c5f460`;
+- merge funcional inicial PR #54 → `73942ff9bc06e9f6f2ab4d804590d30a8dc8bf71`.
 
-### PHASE-15 — Alertas operacionais
-- rota `/alerts`;
-- alertas derivados de produtos ativos + `inventory`;
-- `CRITICAL` para `quantity <= 0`;
-- `WARNING` para `quantity > 0 && quantity <= minimum_stock`;
-- busca, filtro, contadores e ordenação;
-- handoff do dashboard para o centro de alertas;
-- navegação desktop sem exceder o limite qualificado do bottom-nav mobile;
-- nenhum saldo ou severidade autoritativa duplicada.
+### Finding e recovery
+- smoke `33341812298` bloqueou closeout por overflow em `/batches/new` em 375/320 px;
+- artifact `9740814353`;
+- RED recovery `9a37012197e90e3fcb144b883ec8fb6b421872b7`;
+- GREEN recovery `cb569a42d92f7ae17e8c0f5c5672a2ffcdeb2408`;
+- PR #56 merge final `8e508e3421528a6da60c8a9b571097a11f651c69`.
 
-## 4. PHASE-15 — evidência final
-
-### Implementação e recovery
-- PR #48 merge `2bdb666fc3ecceb5718fc76c2444187064676744`;
-- PR #51 merge `1014dcd87f98a3f892b7b0e99be704b8d64d14fa`;
-- smoke intermediário `32823449233` detectou overflow real em 320 px;
-- PR #52 recovery por TDD;
-- merge funcional final `8d43e46aac11120ac786e6e1e343b9175050a11a`.
-
-### CI fresco
-Requalificação em 2026-08-30:
-- run `32824603560`;
-- attempt `2`;
-- job `99336733237`;
+### CI final
+- run `33344608583`;
+- job `99346251908`;
 - lint PASS;
-- testes PASS;
+- 147 testes PASS;
 - typecheck PASS;
 - build PASS.
+
+### Supabase live
+Projeto `exwtngpwqgkrkoszpgib`:
+- tabela `receipt_batches` presente e RLS habilitado;
+- policies `receipt_batches_active_user_select`, `receipt_batches_admin_insert`, `receipt_batches_admin_update`;
+- triggers `receipt_batches_set_actor`, `receipt_batches_touch_updated_at`, `receipt_batches_validate`;
+- grants `authenticated` restritos às colunas previstas;
+- `anon` sem grants;
+- funções privadas relevantes sem EXECUTE para `authenticated`/`anon`.
 
 ### Render
 - workspace `tea-d2u2msje5dus73eb6ehg`;
 - service `srv-da1et8pt0dsc73bn9pgg`;
-- deploy `dep-da6kob5bedkc73fr83ig`;
-- commit `8d43e46aac11120ac786e6e1e343b9175050a11a`;
+- deploy `dep-daackkc9v7es73e9ifdg`;
+- commit `8e508e3421528a6da60c8a9b571097a11f651c69`;
 - status `live`.
 
-### Production Smoke
-- run `32824720287`;
-- job `97730119241`;
-- head SHA `8d43e46aac11120ac786e6e1e343b9175050a11a`;
+### Production Smoke final
+- run `33344692905`;
+- job `99346483166`;
+- head SHA `8e508e3421528a6da60c8a9b571097a11f651c69`;
 - workflow `success`;
 - normal smoke PASS;
 - independent critical review PASS;
-- artifact `9554526907`;
-- digest `sha256:d4a978161419a8b5bdc0c303022517cac76d8930e56f0d335e418fbbd35fdd70`.
+- enforcement PASS;
+- `/batches` PASS;
+- `/batches/new` PASS em desktop/mobile/narrow/intermediate;
+- artifact `9741654703`;
+- digest `sha256:b1df8994cae45a5bd6c252535627d113d72b8aead8b3d448833fe0cb084abba3`.
 
 ## 5. Arquitetura operacional
-
 ```text
 Browser / Next.js UI
         ↓
@@ -136,31 +122,26 @@ Server Actions / SSR
         ↓
 Supabase Auth + RLS
         ↓
-public SECURITY INVOKER RPCs + leituras sujeitas a RLS
-        ↓
-private controlled implementations
-        ↓
 PostgreSQL domains
   ├─ products / suppliers
   ├─ purchases / receipts
   ├─ inventory / stock_movements
-  └─ sales / sale_items
+  ├─ sales / sale_items
+  └─ receipt_batches (traceability only)
 
 /alerts
-  └─ derivação em leitura de products + inventory
+  └─ derived stock + batch-expiry signals
 ```
 
 Princípios:
 - cliente envia intenção;
 - ator deriva da sessão;
-- saldo e movimentos são autoritativos no banco;
-- alerta é estado derivado, não novo saldo;
-- preço de venda do item é snapshot controlado no boundary;
+- `inventory.quantity` é saldo autoritativo;
+- lotes descrevem recebimentos, não substituem estoque;
 - operações transacionais são idempotentes;
 - histórico não é reescrito para “corrigir” operações concluídas.
 
 ## 6. Governança
-
 ```yaml
 default_branch: main
 ruleset: Protect main
@@ -172,46 +153,39 @@ block_force_push: true
 restrict_deletions: true
 ```
 
-A API de branch protection tradicional pode continuar mostrando proteção legada desativada; o ruleset é a proteção efetiva.
-
 ## 7. Produção
-
 URL: `https://estoque-mercearia.onrender.com`
 
-Baseline funcional PHASE-15:
-`8d43e46aac11120ac786e6e1e343b9175050a11a`
+Baseline:
+`8e508e3421528a6da60c8a9b571097a11f651c69`
 
-Render LIVE:
-`dep-da6kob5bedkc73fr83ig` → `8d43e46aac11120ac786e6e1e343b9175050a11a`.
+Deploy:
+`dep-daackkc9v7es73e9ifdg` → `8e508e3421528a6da60c8a9b571097a11f651c69` (`live`).
 
 ## 8. Continuidade ativa
+A PHASE-16 está tecnicamente qualificada e aguarda apenas merge do PRF/closeout e fechamento da Issue #49.
 
-### PHASE-16 — Lotes e validade
-- Issue #49: aberta;
-- PR #50: draft aberta e mergeable no snapshot de retomada;
-- migration candidata `0017_receipt_batches.sql` já reportada como aplicada/validada no Supabase;
-- próximo gate: sincronizar a PR #50 com o `main` pós-closeout da PHASE-15, requalificar CI, integrar, confirmar Render LIVE no novo SHA, executar Production Smoke pós-deploy e gerar PRF Classe B.
-
-Nenhum HUMAN_GATE novo é necessário enquanto a execução permanecer dentro da autorização contínua registrada para PHASE-15 → PHASE-18 e não ocorrer gatilho reservado do MCF.
+Não existe PHASE-17 materializada em Issue, PR, branch ou documento no snapshot de reconciliação. Após o closeout:
+1. confirmar live `main`, Issue #49 e deploy;
+2. iniciar o próximo loop objetivo do MCF;
+3. recuperar o próximo objetivo do roadmap/código/evidência vigente;
+4. instanciar PHASE-17 somente então;
+5. continuar dentro da autorização PHASE-15→18, escalando a LEANDRO apenas se surgir gate reservado.
 
 ## 9. Fora do escopo atual
-
-- pagamento Pix/cartão integrado;
-- caixa financeiro;
-- clientes/fiado;
-- fiscal/NF-e/NFC-e;
-- devoluções/trocas;
-- promoções/comissões;
-- FEFO automático e saldo autoritativo por lote;
+- saldo autoritativo por lote;
+- FEFO automático;
 - serialização/recall/cadeia fria;
 - multi-loja;
-- automação/IA de demanda.
+- fiscal/NF-e/NFC-e;
+- caixa financeiro;
+- pagamentos integrados;
+- automação/IA avançada.
 
 ## 10. Regra de continuidade
-
 Ao retomar:
 1. verificar GitHub/Render/Supabase live;
-2. usar este arquivo como mapa canônico depois da leitura live;
-3. consultar o PRF da PHASE-15 para evidência de closeout;
-4. retomar PHASE-16 pela Issue #49 / PR #50;
+2. usar este arquivo como mapa canônico após a leitura live;
+3. consultar o PRF da PHASE-16;
+4. recuperar o próximo objetivo antes de criar PHASE-17;
 5. escalar a LEANDRO somente nos gates reservados pelo MCF.

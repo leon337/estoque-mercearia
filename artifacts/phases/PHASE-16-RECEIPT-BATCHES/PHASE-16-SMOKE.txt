@@ -1,0 +1,33 @@
+PHASE-16 — PRODUCTION SMOKE
+
+Final canonical run
+run: 33344692905
+job: 99346483166
+event: issue_comment
+head_branch: main
+head_sha: 8e508e3421528a6da60c8a9b571097a11f651c69
+base_url: https://estoque-mercearia.onrender.com
+conclusion: success
+
+normal_production_smoke: PASS
+independent_critical_review: PASS
+upload_evidence: PASS
+enforce_evidence_backed_result: PASS
+
+receipt batch surfaces
+/batches: PASS
+/batches/new: PASS
+/batches/new desktop: PASS
+/batches/new mobile: PASS
+/batches/new narrow_mobile: PASS
+/batches/new intermediate: PASS
+critical_review_findings: []
+
+artifact: 9741654703
+digest: sha256:b1df8994cae45a5bd6c252535627d113d72b8aead8b3d448833fe0cb084abba3
+
+Previous blocked run
+run: 33341812298
+artifact: 9740814353
+finding: real horizontal overflow in /batches/new at 375px and 320px
+resolution: TDD recovery merged in 8e508e3421528a6da60c8a9b571097a11f651c69

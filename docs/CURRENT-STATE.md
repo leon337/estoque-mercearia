@@ -3,7 +3,8 @@
 **Classificação:** `CURRENT_IMPLEMENTED` + `STABLE_BASELINE`  
 **Baseline funcional qualificada:** `main@8e508e3421528a6da60c8a9b571097a11f651c69`  
 **Fase mais recente:** PHASE-16 — Lotes e validade de recebimentos  
-**Data da reconciliação:** 2026-08-30/31
+**Qualificação funcional:** 2026-08-30/31  
+**Reconciliação operacional (snapshot):** 2026-11-04
 
 ## 1. Precedência de verdade
 1. instrução explícita atual de LEANDRO;
@@ -26,7 +27,7 @@ PHASE-12  Compras e Reposição           ✅
 PHASE-13  Custos e Preços               ✅
 PHASE-14  Vendas / PDV mínimo           ✅
 PHASE-15  Alertas operacionais          ✅
-PHASE-16  Lotes e validade              ✅ qualificada
+PHASE-16  Lotes e validade              ✅ entregue (PR #57 / Issue #49)
 PHASE-17  Próximo loop                  ⚪ não instanciada
 ```
 
@@ -99,7 +100,7 @@ Projeto `exwtngpwqgkrkoszpgib`:
 - service `srv-da1et8pt0dsc73bn9pgg`;
 - deploy `dep-daackkc9v7es73e9ifdg`;
 - commit `8e508e3421528a6da60c8a9b571097a11f651c69`;
-- status `live`.
+- status `live` em 2026-08-31 (evidência histórica; deploy posteriormente substituído).
 
 ### Production Smoke final
 - run `33344692905`;
@@ -113,6 +114,12 @@ Projeto `exwtngpwqgkrkoszpgib`:
 - `/batches/new` PASS em desktop/mobile/narrow/intermediate;
 - artifact `9741654703`;
 - digest `sha256:b1df8994cae45a5bd6c252535627d113d72b8aead8b3d448833fe0cb084abba3`.
+
+### Encerramento formal posterior à qualificação
+- PR [#57](https://github.com/leon337/estoque-mercearia/pull/57) integrado em 2026-08-31: merge `520e2b811baf1d50c42dab1694befbc415f1b2f4`;
+- Issue [#49](https://github.com/leon337/estoque-mercearia/issues/49) encerrada como `completed` em 2026-08-31;
+- CI do merge documental: [run 33345474881](https://github.com/leon337/estoque-mercearia/actions/runs/33345474881), `success`;
+- o PRF da PHASE-16, inclusive `PHASE-16-CHECKPOINT.yaml`, conserva o checkpoint **pré-merge** (`GATE_APPROVED_AWAITING_CLOSEOUT_MERGE`). É evidência histórica, não uma pendência atual. Não reescrever o pacote nem invalidar seu manifesto de hashes.
 
 ## 5. Arquitetura operacional
 ```text
@@ -153,24 +160,37 @@ block_force_push: true
 restrict_deletions: true
 ```
 
-## 7. Produção
-URL: `https://estoque-mercearia.onrender.com`
+## 7. Produção — leitura reconciliada de 2026-11-04
+URL pública: `https://estoque-mercearia.onrender.com`.
 
-Baseline:
-`8e508e3421528a6da60c8a9b571097a11f651c69`
+### Baseline funcional qualificada (histórica)
+- Código: `main@8e508e3421528a6da60c8a9b571097a11f651c69`;
+- Render: `dep-daackkc9v7es73e9ifdg`, `live` na qualificação de 2026-08-31, posteriormente substituído;
+- CI funcional `33344608583` e Production Smoke `33344692905` aprovados na ocasião;
+- esse smoke **não** comprova disponibilidade em novembro.
 
-Deploy:
-`dep-daackkc9v7es73e9ifdg` → `8e508e3421528a6da60c8a9b571097a11f651c69` (`live`).
+### Encerramento e publicação documental
+- GitHub `main` **antes desta reconciliação**: `520e2b811baf1d50c42dab1694befbc415f1b2f4` (merge do PR #57);
+- Render consultado em 2026-11-04: `dep-daacstu7bikc73bkia4g`, estado reportado `live`, mesmo SHA;
+- Render tem auto-deploy de commits em `main`. Coincidência de SHA e estado `live` não validam o funcionamento do banco.
 
-## 8. Continuidade ativa
-A PHASE-16 está tecnicamente qualificada e aguarda apenas merge do PRF/closeout e fechamento da Issue #49.
+### Dependência de infraestrutura bloqueante (2026-11-04)
+- Supabase do Estoque Mercearia: gerenciamento reporta `INACTIVE`;
+- consulta live do histórico de migrations falhou por timeout de conexão;
+- tentativa de restaurar o projeto recusada por limite de **2 projetos gratuitos ativos** na conta;
+- nenhum outro projeto foi pausado, nenhum plano foi contratado e nenhum dado/migration foi modificado;
+- **HUMAN_GATE:** LEANDRO deve decidir explicitamente como disponibilizar uma vaga gratuita ou autorizar alternativa. Após isso, restaurar **este projeto**, confirmar `ACTIVE_HEALTHY`, histórico de migrations, RLS, login e smoke de produção.
 
-Não existe PHASE-17 materializada em Issue, PR, branch ou documento no snapshot de reconciliação. Após o closeout:
-1. confirmar live `main`, Issue #49 e deploy;
-2. iniciar o próximo loop objetivo do MCF;
-3. recuperar o próximo objetivo do roadmap/código/evidência vigente;
-4. instanciar PHASE-17 somente então;
-5. continuar dentro da autorização PHASE-15→18, escalando a LEANDRO apenas se surgir gate reservado.
+Branch, deploy e infraestrutura são estados mutáveis: consultar providers novamente antes de qualquer release.
+
+## 8. Continuidade ativa — pré-PHASE-17
+A PHASE-16 está **entregue e formalmente encerrada**: PR #57 merged e Issue #49 closed/completed. Na leitura de entrada de 2026-11-04, **antes da PR desta reconciliação**, não havia PRs ou Issues abertos; contagens posteriores devem ser verificadas live.
+
+1. A descoberta/documentação do próximo objetivo pode continuar no loop MCF sem inventar escopo.
+2. A requalificação de produção e uma nova fase dependente do banco estão em `AGUARDANDO_DEPENDENCIA_EXTERNA` enquanto o Supabase estiver `INACTIVE`.
+3. A escolha entre afetar outro projeto ativo ou assumir custos é um gate reservado a LEANDRO; autorização genérica PHASE-15→18 não presume nenhuma das duas.
+4. Após resolver o bloqueio, validar migrations (arquivos `0001`–`0017` no GitHub), RLS, dados essenciais, CI e Production Smoke atual no SHA aplicável.
+5. Recuperar objetivo e critérios de aceite da PHASE-17 de fontes verificáveis; somente então instanciar sua Issue/contrato e iniciar execução.
 
 ## 9. Fora do escopo atual
 - saldo autoritativo por lote;
@@ -188,4 +208,5 @@ Ao retomar:
 2. usar este arquivo como mapa canônico após a leitura live;
 3. consultar o PRF da PHASE-16;
 4. recuperar o próximo objetivo antes de criar PHASE-17;
-5. escalar a LEANDRO somente nos gates reservados pelo MCF.
+5. escalar a LEANDRO somente nos gates reservados, incluindo a decisão sobre a capacidade atual do Supabase;
+6. não inferir disponibilidade da aplicação apenas por CI verde ou status `live` no Render.

@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { Button } from "@/components/ui/Button";
-import { login } from "./actions";
+import { login, loginWithGoogle } from "./actions";
 
 const messages: Record<string, string> = {
   required: "Informe e-mail e senha.",
   invalid: "E-mail ou senha inválidos.",
+  unconfirmed: "Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada e spam.",
+  google_unavailable: "O acesso com Google ainda não está habilitado neste ambiente.",
+  google_failed: "Não foi possível iniciar o login com Google. Tente novamente.",
+  oauth_failed: "Não foi possível concluir o login com Google. Tente novamente.",
   inactive: "Seu acesso ainda não foi liberado ou está inativo.",
   config: "A autenticação ainda não foi configurada neste ambiente.",
 };
@@ -24,7 +28,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     >
       {registered === "pending" ? (
         <p className="mb-4 rounded-lg border border-[var(--color-status-success)]/35 bg-[var(--color-status-success)]/10 p-3 text-sm leading-6 text-[var(--color-on-surface)]" role="status" aria-live="polite">
-          Pedido recebido. Confirme seu e-mail se solicitado e aguarde a aprovação de um administrador.
+          Pedido de acesso recebido. Verifique seu e-mail (inclusive spam) para confirmar a conta e aguarde a aprovação administrativa. Não é necessário enviar outra solicitação.
         </p>
       ) : null}
 
@@ -47,6 +51,21 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
         <Button className="mt-1 w-full" type="submit">Entrar</Button>
       </form>
+      {process.env.GOOGLE_OAUTH_ENABLED === "true" ? (
+        <>
+          <div className="my-5 flex items-center gap-3 text-xs text-[var(--color-on-surface-variant)]" aria-hidden="true">
+            <span className="h-px flex-1 bg-[var(--color-outline-variant)]" />
+            <span>ou</span>
+            <span className="h-px flex-1 bg-[var(--color-outline-variant)]" />
+          </div>
+          <form action={loginWithGoogle}>
+            <Button type="submit" variant="secondary" className="flex w-full items-center justify-center gap-3" aria-label="Continuar com Google">
+              <span aria-hidden="true" className="font-bold text-lg">G</span>
+              Continuar com Google
+            </Button>
+          </form>
+        </>
+      ) : null}
     </AuthCard>
   );
 }

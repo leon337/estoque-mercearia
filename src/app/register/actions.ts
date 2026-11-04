@@ -21,10 +21,29 @@ export async function register(formData: FormData) {
   });
 
   if (error) {
-    const code = error.message.toLowerCase().includes("rate") ? "rate_limit" : "signup";
-    redirect(`/register?error=${code}`);
+    // Never log e-mails, passwords or provider response bodies.
+    console.warn("auth.signup.failed", { code: error.code, status: error.status });
+    const errorCode = (error.code ?? "").toLowerCase();
+    const errorMessage = error.message.toLowerCase();
+
+    if (error.status === 429 || errorCode.includes("rate_limit") || errorMessage.includes("rate limit")) {
+      redirect("/register?error=rate_limit");
+    }
+
+    if (errorCode.includes("email_address_not_authorized") ||
+        errorCode.includes("email_provider_disabled") ||
+        errorMessage.includes("email address not authorized")) {
+      redirect("/register?error=email_unavailable");
+    }
+
+    if (errorCode.includes("signup_disabled") || errorMessage.includes("signups not allowed")) {
+      redirect("/register?error=signup_disabled");
+    }
+
+    redirect("/register?error=signup");
   }
 
+  // The database trigger creates an inactive OPERATOR. Signup is not authorization.
   await supabase.auth.signOut();
   redirect("/login?registered=pending");
 }

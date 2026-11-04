@@ -6,7 +6,9 @@ export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const pathname = request.nextUrl.pathname;
-  const isPublicAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
+  const isOAuthCallback = pathname === "/auth/callback";
+  const isLoginOrRegister = pathname === "/login" || pathname === "/register";
+  const isPublicAuthRoute = isLoginOrRegister || isOAuthCallback;
 
   if (!supabaseUrl || !publishableKey) {
     if (isPublicAuthRoute) return supabaseResponse;
@@ -44,7 +46,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (isAuthenticated && isPublicAuthRoute) {
+  if (isAuthenticated && isLoginOrRegister) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

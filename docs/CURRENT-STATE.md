@@ -4,7 +4,7 @@
 **Baseline funcional qualificada:** `main@8e508e3421528a6da60c8a9b571097a11f651c69`  
 **Fase mais recente:** PHASE-16 — Lotes e validade de recebimentos  
 **Qualificação funcional:** 2026-08-30/31  
-**Reconciliação operacional (snapshot):** 2026-11-04
+**Última reconciliação operacional:** 2026-11-04 (restauração de infraestrutura)
 
 ## 1. Precedência de verdade
 1. instrução explícita atual de LEANDRO;
@@ -174,22 +174,32 @@ URL pública: `https://estoque-mercearia.onrender.com`.
 - Render consultado em 2026-11-04: `dep-daacstu7bikc73bkia4g`, estado reportado `live`, mesmo SHA;
 - Render tem auto-deploy de commits em `main`. Coincidência de SHA e estado `live` não validam o funcionamento do banco.
 
-### Dependência de infraestrutura bloqueante (2026-11-04)
+### Incidente de infraestrutura (início de 2026-11-04; posteriormente resolvido)
 - Supabase do Estoque Mercearia: gerenciamento reporta `INACTIVE`;
 - consulta live do histórico de migrations falhou por timeout de conexão;
 - tentativa de restaurar o projeto recusada por limite de **2 projetos gratuitos ativos** na conta;
 - nenhum outro projeto foi pausado, nenhum plano foi contratado e nenhum dado/migration foi modificado;
 - **HUMAN_GATE:** LEANDRO deve decidir explicitamente como disponibilizar uma vaga gratuita ou autorizar alternativa. Após isso, restaurar **este projeto**, confirmar `ACTIVE_HEALTHY`, histórico de migrations, RLS, login e smoke de produção.
 
-Branch, deploy e infraestrutura são estados mutáveis: consultar providers novamente antes de qualquer release.
+### Restauração do Supabase (2026-11-04; atualização posterior)
+- LEANDRO autorizou a pausa do projeto `cognitive-ledger` e concluiu-a manualmente no painel autenticado. O provedor confirmou `INACTIVE` para `glyfavvwarffkkthpwlj`.
+- Restauração do projeto correto `exwtngpwqgkrkoszpgib` solicitada pelo conector Supabase; resposta `{"success":true}`.
+- Transição observada: `INACTIVE → COMING_UP → RESTORING → ACTIVE_HEALTHY`.
+- Histórico remoto de migrations: **16 registros**; repositório possui **17 arquivos SQL** (`0001`–`0017`). O arquivo `0009_product_minimum_stock_precision.sql` não tem registro separado com esse nome na lista remota, mas as verificações SQL live confirmaram função `private.enforce_product_minimum_stock_precision()` e trigger `products_minimum_stock_precision` habilitados. Trata-se de divergência de rastreabilidade, **não** evidência de ausência da regra em produção. Não reaplicar cegamente a migration.
+- **14/14 tabelas públicas com RLS habilitado**; lote `receipt_batches` com policies `receipt_batches_active_user_select`, `receipt_batches_admin_insert`, `receipt_batches_admin_update` e triggers `receipt_batches_set_actor`, `receipt_batches_touch_updated_at`, `receipt_batches_validate`.
+- Supabase Security Advisor identificou `auth_leaked_password_protection` como `WARN` (proteção de senhas vazadas desativada): [orientação oficial](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). Revisão/configuração depende do painel e suporte do plano.
+- `main` e Render permanecem alinhados em `97274aa31446d0bcf67bc59d80201320638091f9`, deploy `dep-dblksluc6qcc738fi4t0` `live`; CI pós-merge `41857539646` `success`.
+- Production Smoke E2E atualizado disparado via comentário `/smoke-production` na PR #58: [run 41863574758](https://github.com/leon337/estoque-mercearia/actions/runs/41863574758). Resultado deve ser confirmado live antes da qualificação fim a fim.
+
+Branch, deploy, banco e workflows são estados mutáveis: consultar providers novamente antes de qualquer release.
 
 ## 8. Continuidade ativa — pré-PHASE-17
 A PHASE-16 está **entregue e formalmente encerrada**: PR #57 merged e Issue #49 closed/completed. Na leitura de entrada de 2026-11-04, **antes da PR desta reconciliação**, não havia PRs ou Issues abertos; contagens posteriores devem ser verificadas live.
 
 1. A descoberta/documentação do próximo objetivo pode continuar no loop MCF sem inventar escopo.
-2. A requalificação de produção e uma nova fase dependente do banco estão em `AGUARDANDO_DEPENDENCIA_EXTERNA` enquanto o Supabase estiver `INACTIVE`.
-3. A escolha entre afetar outro projeto ativo ou assumir custos é um gate reservado a LEANDRO; autorização genérica PHASE-15→18 não presume nenhuma das duas.
-4. Após resolver o bloqueio, validar migrations (arquivos `0001`–`0017` no GitHub), RLS, dados essenciais, CI e Production Smoke atual no SHA aplicável.
+2. O bloqueio externo de infraestrutura foi **resolvido**: projeto Supabase restaurado para `ACTIVE_HEALTHY` após pausa autorizada do Cognitive Ledger; não houve contratação de plano.
+3. Integridade básica do schema e RLS verificados em consulta live, com divergência de rastreabilidade na migration `0009` documentada e aviso de segurança do Auth encaminhado para avaliação.
+4. Qualificação fim a fim depende de confirmar resultado do Production Smoke atualizado no SHA `97274aa`; revalidar também se novas mudanças forem publicadas.
 5. Recuperar objetivo e critérios de aceite da PHASE-17 de fontes verificáveis; somente então instanciar sua Issue/contrato e iniciar execução.
 
 ## 9. Fora do escopo atual

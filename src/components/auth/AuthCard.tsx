@@ -42,10 +42,10 @@ export function AuthCard({ title, description, children, footer }: AuthCardProps
 
           <div className="mt-6 border-t border-[var(--color-border-subtle)] pt-5 text-sm text-[var(--color-on-surface-variant)]">
             {footer}
-            <nav className="mt-4 flex flex-wrap gap-4 text-xs" aria-label="Informações públicas">
-              <Link href="/sobre" className="underline underline-offset-4">Sobre a aplicação</Link>
-              <Link href="/privacidade" className="underline underline-offset-4">Privacidade</Link>
-              <Link href="/termos" className="underline underline-offset-4">Termos de uso</Link>
+            <nav className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs" aria-label="Informações públicas">
+              <Link href="/sobre" className="inline-flex min-h-12 items-center underline underline-offset-4">Sobre a aplicação</Link>
+              <Link href="/privacidade" className="inline-flex min-h-12 items-center underline underline-offset-4">Privacidade</Link>
+              <Link href="/termos" className="inline-flex min-h-12 items-center underline underline-offset-4">Termos de uso</Link>
             </nav>
           </div>
         </div>

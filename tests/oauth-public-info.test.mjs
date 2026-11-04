@@ -31,3 +31,11 @@ test("public pages describe the product, data processing and approved access", a
     assert.match(source, /href="\/termos"/);
   }
 });
+
+
+test("auth footer links meet mobile touch-target height guidelines", async () => {
+  const auth = await src("src/components/auth/AuthCard.tsx");
+  for (const url of ["/sobre", "/privacidade", "/termos"]) {
+    assert.match(auth, new RegExp(`href="${url}" className="inline-flex min-h-12 items-center`));
+  }
+});

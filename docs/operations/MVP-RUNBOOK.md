@@ -1,12 +1,12 @@
-# MVP Runbook — Estoque Mercearia
+# Runbook operacional — Estoque Mercearia (baseline PHASE-16)
 
-Este runbook descreve como preparar, operar e recuperar o MVP. Não contém senhas, chaves administrativas ou strings de conexão reais.
+Este runbook descreve como preparar, operar e recuperar o sistema qualificado até a PHASE-16. Não contém senhas, chaves administrativas ou strings de conexão reais. Para estados voláteis, consulte `docs/CURRENT-STATE.md` e os providers live.
 
 ## 1. Pré-requisitos
 
 - Node.js >= 20.9 e npm.
 - Projeto Supabase dedicado.
-- Migrations `0001` até `0007` aplicadas em ordem.
+- Migrations versionadas `0001` até `0017`: aplicar em ordem em ambiente novo. Em ambiente existente, verificar o histórico remoto antes de aplicar qualquer script; presença de arquivo no Git não comprova que a migration foi executada.
 - Variáveis do aplicativo:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
@@ -63,6 +63,15 @@ Somente ADMIN usa `/admin/adjustment`. Informe a contagem física real e um moti
 - `/history`: filtre por produto, tipo, ator e período.
 - dashboard: acompanhe **Estoque zerado** e **Estoque baixo**.
 - `/inventory`: consulte o saldo atual antes de decisões de reposição.
+
+### Fluxos adicionados entre PHASE-11 e PHASE-16
+- **Fornecedores:** ADMIN cadastra e vincula fornecedores em `/suppliers`.
+- **Compras e recebimentos:** ADMIN cria pedidos em `/purchases` e registra recebimentos parciais/totais. Recebimentos confirmados geram entrada autoritativa de estoque; **não** lançar a mesma entrada manualmente em `/movements/new`.
+- **Custos e preços:** ADMIN mantém valores por produto/compra. Recebimento pode atualizar o custo atual; totais monetários operacionais não equivalem a contabilidade/fiscal.
+- **Vendas/PDV:** usuários ativos autorizados usam `/sales`; concluir uma venda registra baixa transacional. **Não** repetir uma `EXIT` manual para a mesma venda.
+- **Alertas:** consultar `/alerts` para estoque zerado/baixo e prazos de validade.
+- **Lotes:** ADMIN cadastra rastreabilidade de recebimentos em `/batches/new`; consultar `/batches` para `EXPIRED`, `EXPIRING`, `OK` ou `NO_EXPIRY`. A fase não implementa saldo nem baixa autoritativa por lote ou FEFO.
+- **Autoridade de estoque:** `inventory.quantity` continua sendo o saldo quantitativo, preservando auditoria por movimentos.
 
 ## 6. Usuários e permissões
 
@@ -138,6 +147,25 @@ A restauração de banco pode exigir reconfigurar itens externos ao dump, como c
 - **Perda de dados:** interrompa novas movimentações, preserve evidências, escolha o backup anterior ao incidente, restaure primeiro em ambiente controlado e confira os critérios de aceite.
 - **Falha de internet:** não faça anotações retroativas sem identificação; registre as operações no sistema assim que a conexão voltar, respeitando a ordem real e os responsáveis.
 
-## 10. Release
+## 10. Integração e release atual
 
-Este runbook qualifica o MVP técnico. Publicação/deploy para acesso público é uma decisão separada e exige gate humano específico; M7 não autoriza release público.
+A qualificação M7 é histórica; desde então o produto foi publicado e evoluiu até PHASE-16. O processo atual exige:
+1. mudança em branch e PR, sem push direto na `main`;
+2. check obrigatório `verify` (lint, testes, typecheck, build) aprovado antes do merge;
+3. validação de SHA e estado de deploy no Render;
+4. confirmação da saúde do Supabase e do histórico de migrations;
+5. Production Smoke E2E pós-deploy, com revisão crítica e evidências;
+6. respeito aos gates do MCF para mudanças de produção e decisões que afetem custos ou outros projetos.
+
+CI verde ou Render `live`, isoladamente, não comprovam saúde do banco nem a operação fim a fim.
+
+## 11. Banco Supabase inativo/pausado
+
+Projetos do plano gratuito podem ser pausados após baixa atividade. Quando o Supabase informa `INACTIVE`, primeiro verificar se há pausa e se o banco pode ser restaurado.
+
+- Confirmar a identidade do projeto antes de restaurar;
+- se houver limite de projetos gratuitos ativos, **não** pausar outro projeto e **não** contratar plano sem decisão explícita de LEANDRO;
+- após a restauração, conferir `ACTIVE_HEALTHY`, migrations aplicadas, RLS, login e smoke funcional;
+- se a restauração falhar, registrar o erro do provedor e manter `AGUARDANDO_DEPENDENCIA_EXTERNA` para tarefas dependentes do banco.
+
+Referência: https://supabase.com/docs/guides/platform/free-project-pausing. O achado de 2026-11-04 está registrado em `docs/CURRENT-STATE.md`.

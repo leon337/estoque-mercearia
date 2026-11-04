@@ -8,7 +8,9 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isOAuthCallback = pathname === "/auth/callback";
   const isLoginOrRegister = pathname === "/login" || pathname === "/register";
-  const isPublicAuthRoute = isLoginOrRegister || isOAuthCallback;
+  // Informações públicas obrigatórias ao consentimento OAuth: nunca expõem dados do estoque.
+  const isPublicInfoRoute = ["/sobre", "/privacidade", "/termos"].includes(pathname);
+  const isPublicAuthRoute = isLoginOrRegister || isOAuthCallback || isPublicInfoRoute;
 
   if (!supabaseUrl || !publishableKey) {
     if (isPublicAuthRoute) return supabaseResponse;

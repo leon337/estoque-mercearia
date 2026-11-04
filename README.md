@@ -47,9 +47,9 @@ Produção pública: `https://estoque-mercearia.onrender.com`
 Baseline funcional PHASE-16:
 `main@8e508e3421528a6da60c8a9b571097a11f651c69`
 
-Render:
+Render (evidência histórica de 2026-08-31):
 - deploy `dep-daackkc9v7es73e9ifdg`;
-- status `live`;
+- status então `live`, posteriormente substituído;
 - commit `8e508e3421528a6da60c8a9b571097a11f651c69`.
 
 CI final:
@@ -67,6 +67,11 @@ Production Smoke final PHASE-16:
 - artifact `9741654703`;
 - digest `sha256:b1df8994cae45a5bd6c252535627d113d72b8aead8b3d448833fe0cb084abba3`.
 
+Encerramento formal da PHASE-16:
+- PR [#57](https://github.com/leon337/estoque-mercearia/pull/57) mergeado e Issue [#49](https://github.com/leon337/estoque-mercearia/issues/49) concluída em 2026-08-31;
+- `main@520e2b811baf1d50c42dab1694befbc415f1b2f4` após o closeout (snapshot), CI [33345474881](https://github.com/leon337/estoque-mercearia/actions/runs/33345474881) `success`;
+- em 2026-11-04, o Render reportou deploy `dep-daacstu7bikc73bkia4g` como `live`, mas o Supabase estava `INACTIVE` e a restauração foi bloqueada por limite de projetos gratuitos ativos. A qualificação histórica não garante disponibilidade atual.
+
 ## Operação e evidências
 - mapa de verdade: `docs/CURRENT-STATE.md`;
 - runbook: `docs/operations/MVP-RUNBOOK.md`;
@@ -77,4 +82,4 @@ Production Smoke final PHASE-16:
 - ruleset `Protect main`.
 
 ## Próxima expansão
-Não há PHASE-17 materializada no snapshot deste closeout. MESTRE deve recuperar o próximo objetivo das fontes de verdade e instanciar a próxima missão pelo MCF vigente, sem inventar escopo. Capacidades ainda fora do baseline incluem FEFO automático, saldo autoritativo por lote, multi-loja, integrações fiscais/financeiras e automação avançada.
+Não há PHASE-17 materializada na reconciliação de 2026-11-04. MESTRE deve recuperar o próximo objetivo verificável antes de instanciar a missão e resolver o gate de infraestrutura registrado no mapa canônico antes de qualificar nova fase dependente do banco. Capacidades ainda fora do baseline incluem FEFO automático, saldo autoritativo por lote, multi-loja, integrações fiscais/financeiras e automação avançada.

@@ -24,7 +24,8 @@ jobs:
         contains(github.event.comment.body, '/smoke-production') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
       )
-    runs-on: ubuntu-latest
+    # Playwright 1.55.0 não suporta Ubuntu 26.04; evitar imagem flutuante.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:

@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
-import { Button } from "@/components/ui/Button";
+import { SubmitButton } from "@/components/auth/SubmitButton";
 import { register } from "./actions";
 
 const messages: Record<string, string> = {
   required: "Preencha nome, e-mail e senha.",
   password_length: "A senha deve ter pelo menos 8 caracteres.",
   password_match: "As senhas não conferem.",
-  rate_limit: "Muitas tentativas de cadastro. Tente novamente mais tarde.",
-  signup: "Não foi possível enviar o pedido de acesso.",
+  rate_limit: "Limite temporário de solicitações. Se você já enviou o pedido, confira seu e-mail e não repita o cadastro.",
+  email_unavailable: "Não foi possível enviar a confirmação por e-mail. Contate o administrador do sistema.",
+  signup_disabled: "Novos pedidos estão temporariamente indisponíveis. Contate o administrador.",
+  signup: "Não foi possível concluir a solicitação. Tente novamente mais tarde ou contate o administrador.",
 };
 
 const inputClass = "min-h-12 w-full rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface-lowest)] px-3 py-2 text-[var(--color-on-surface)] outline-none transition placeholder:text-[var(--color-outline)] focus:border-[var(--color-primary)]";
@@ -24,7 +26,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
       footer={<Link className="font-semibold text-[var(--color-primary)] underline underline-offset-4" href="/login">Já tenho acesso</Link>}
     >
       <div className="mb-5 rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-low)] p-3 text-sm leading-6 text-[var(--color-on-surface-variant)]">
-        Após o envio, você poderá precisar confirmar seu e-mail. O acesso ao estoque só será liberado depois da aprovação administrativa.
+        Após o envio, confirme seu e-mail e aguarde a aprovação administrativa. Não envie outro pedido se já recebeu a confirmação.
       </div>
 
       {message ? (
@@ -55,7 +57,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
           <input className={inputClass} type="password" name="password_confirm" autoComplete="new-password" minLength={8} required />
         </label>
 
-        <Button className="mt-1 w-full" type="submit">Enviar pedido de acesso</Button>
+        <SubmitButton className="mt-1 w-full" pendingText="Enviando solicitação...">Enviar pedido de acesso</SubmitButton>
       </form>
     </AuthCard>
   );

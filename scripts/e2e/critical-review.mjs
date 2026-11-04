@@ -54,7 +54,8 @@ async function revisitRoute(report, browser, viewportName, viewport, route, hasS
     return;
   }
 
-  if (!route.concretePath) {
+  // Never navigate a dynamic template literally (e.g. /sales/[id]); it is not a real URL.
+  if (!route.concretePath || /\[[^\]/]+\]/.test(route.concretePath)) {
     recordCriticalRoute(report, route.route, {
       viewport: viewportName,
       path: null,

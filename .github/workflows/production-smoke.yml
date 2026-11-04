@@ -13,6 +13,12 @@ on:
   issue_comment:
     types: [created]
 
+concurrency:
+  # The smoke creates/updates isolated QA stock and sales records in production.
+  # Avoid two CI runs mutating the same environment at the same time.
+  group: production-smoke-${{ github.repository }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 

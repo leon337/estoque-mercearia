@@ -72,6 +72,8 @@ Encerramento formal da PHASE-16:
 - `main@520e2b811baf1d50c42dab1694befbc415f1b2f4` após o closeout (snapshot), CI [33345474881](https://github.com/leon337/estoque-mercearia/actions/runs/33345474881) `success`;
 - em 2026-11-04, o Render reportou deploy `dep-daacstu7bikc73bkia4g` como `live`, mas o Supabase estava `INACTIVE` e a restauração foi bloqueada por limite de projetos gratuitos ativos. A qualificação histórica não garante disponibilidade atual.
 
+**Atualização de infraestrutura — 2026-11-04 (posterior ao incidente):** o projeto Supabase do Estoque Mercearia foi restaurado para `ACTIVE_HEALTHY` após pausa autorizada do Cognitive Ledger. Validação live: 14/14 tabelas `public` com RLS; função e trigger de precisão do estoque mínimo ativos. Existem 16 registros no histórico remoto e 17 migrations versionadas — diferença da `0009` rastreada em `docs/CURRENT-STATE.md`. Requalificação fim a fim: [Production Smoke 41863574758](https://github.com/leon337/estoque-mercearia/actions/runs/41863574758); confirmar seu resultado live antes de afirmar operação E2E saudável.
+
 ## Operação e evidências
 - mapa de verdade: `docs/CURRENT-STATE.md`;
 - runbook: `docs/operations/MVP-RUNBOOK.md`;

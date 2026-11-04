@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type AuthCardProps = {
   title: string;
@@ -41,6 +42,11 @@ export function AuthCard({ title, description, children, footer }: AuthCardProps
 
           <div className="mt-6 border-t border-[var(--color-border-subtle)] pt-5 text-sm text-[var(--color-on-surface-variant)]">
             {footer}
+            <nav className="mt-4 flex flex-wrap gap-4 text-xs" aria-label="Informações públicas">
+              <Link href="/sobre" className="underline underline-offset-4">Sobre a aplicação</Link>
+              <Link href="/privacidade" className="underline underline-offset-4">Privacidade</Link>
+              <Link href="/termos" className="underline underline-offset-4">Termos de uso</Link>
+            </nav>
           </div>
         </div>
       </section>

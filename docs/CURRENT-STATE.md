@@ -184,7 +184,7 @@ URL pública: `https://estoque-mercearia.onrender.com`.
 Branch, deploy e infraestrutura são estados mutáveis: consultar providers novamente antes de qualquer release.
 
 ## 8. Continuidade ativa — pré-PHASE-17
-A PHASE-16 está **entregue e formalmente encerrada**: PR #57 merged, Issue #49 closed/completed e nenhum PR ou Issue em aberto na consulta de 2026-11-04.
+A PHASE-16 está **entregue e formalmente encerrada**: PR #57 merged e Issue #49 closed/completed. Na leitura de entrada de 2026-11-04, **antes da PR desta reconciliação**, não havia PRs ou Issues abertos; contagens posteriores devem ser verificadas live.
 
 1. A descoberta/documentação do próximo objetivo pode continuar no loop MCF sem inventar escopo.
 2. A requalificação de produção e uma nova fase dependente do banco estão em `AGUARDANDO_DEPENDENCIA_EXTERNA` enquanto o Supabase estiver `INACTIVE`.
